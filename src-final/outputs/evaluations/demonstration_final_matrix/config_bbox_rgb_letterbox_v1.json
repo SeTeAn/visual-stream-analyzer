@@ -1,0 +1,74 @@
+{
+  "candidate_extraction": {},
+  "config_version": "1.0.0",
+  "diagnostic_level": "standard",
+  "environment_provenance": {
+    "dependency_versions": {},
+    "determinism_enabled": true,
+    "dtype": "float32",
+    "environment_metadata": {},
+    "requested_device": "cpu",
+    "resolved_device": "cpu"
+  },
+  "events": {
+    "position_threshold_norm": 0.1,
+    "severe_quality_flags": [
+      "POSSIBLE_SPLITTING",
+      "POSSIBLE_MERGING"
+    ]
+  },
+  "grouping": {
+    "coframe_margin_bypass": true,
+    "coframe_visual_gate": 0.963,
+    "medoid_gate": 0.8,
+    "medoid_weight": 0.4,
+    "quantile_gate": 0.8,
+    "quantile_weight": 0.4,
+    "representation_variant_id": "bbox_rgb_letterbox_v1",
+    "scorer_id": "dinov2_cosine_canonical_v1",
+    "scorer_version": "1.0.0",
+    "second_best_margin": 0.01,
+    "severe_quality_flags": [
+      "POSSIBLE_SPLITTING",
+      "POSSIBLE_MERGING"
+    ],
+    "support_pair_gate": 0.8,
+    "support_quantile": 0.25,
+    "support_ratio_gate": 0.75,
+    "support_ratio_weight": 0.2,
+    "visual_gate": 0.8
+  },
+  "matching": {
+    "global_margin_gate": 0.01,
+    "local_margin_gate": 0.01,
+    "severe_quality_flags": [
+      "POSSIBLE_SPLITTING",
+      "POSSIBLE_MERGING"
+    ],
+    "unmatched_pair_cost": 0.7
+  },
+  "representation": {
+    "family": "dinov2",
+    "parameters": {
+      "batch_size": 16,
+      "device_policy": "cpu",
+      "expected_checkpoint_sha256": "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9",
+      "expected_checkpoint_size_bytes": 88283115,
+      "expected_source_tree_fingerprint": "cdab7b4237c2d341e4d223fb54f95700dabcba2d320b01f6e535a7f07a2aaf82"
+    },
+    "variant": "bbox_rgb_letterbox_v1"
+  },
+  "scoring": {
+    "scorer_id": "dinov2_cosine_canonical_v1",
+    "scorer_version": "1.0.0",
+    "spatial_gate": null,
+    "visual_gate": 0.8
+  },
+  "source_provenance": {
+    "revision": "demonstration-final-after-v3.2-handcrafted1.1-dino-grouping1.3.0",
+    "tree_fingerprint": {
+      "algorithm": "sha256",
+      "value": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

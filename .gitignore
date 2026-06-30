@@ -1,0 +1,28 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local experiment outputs created while running the CLI.
+.local_outputs/
+tmp_outputs/
+
+# Keep only the curated example artifacts committed in this repository.
+src-final/outputs/runs/*
+!src-final/outputs/runs/demonstration_final_h04_dino_bbox/
+!src-final/outputs/runs/demonstration_final_h04_dino_bbox/**
+src-final/outputs/evaluations/*
+!src-final/outputs/evaluations/demonstration_final_matrix/
+!src-final/outputs/evaluations/demonstration_final_matrix/**
+
+# Model weights are intentionally not stored in git.
+*.pt
+*.pth
+*.onnx
+models/
+
+# Editor and OS files.
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store

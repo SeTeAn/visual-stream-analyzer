@@ -1,0 +1,257 @@
+{
+  "diagnostics": {
+    "errors": [],
+    "warnings": []
+  },
+  "provenance": {
+    "data": {
+      "candidate_snapshot_digest": {
+        "algorithm": "sha256",
+        "value": "636c0cf0e1f604640f5d6eee2b31b96abf02fc824cf6b66eef6437c19066c3a6"
+      },
+      "frame_content_digests": {
+        "frame_001": {
+          "algorithm": "sha256",
+          "value": "d8d0023d93b8deffb01861d34671c2f1809c17e786026ad1bdf6a72c0b825947"
+        },
+        "frame_002": {
+          "algorithm": "sha256",
+          "value": "fa5c01da6f734bd5c04a92dc4247d068c841e4de686258e189cf9dbbcdb1469d"
+        },
+        "frame_003": {
+          "algorithm": "sha256",
+          "value": "a68ca16276e11f8b997a9110d4a02a6acbaeb3a1c0590a76fa5c0c8744495c5c"
+        },
+        "frame_004": {
+          "algorithm": "sha256",
+          "value": "5e0132945b02a68cf6dfe7a94d78736d342a5ad2c11704c14af15cfae3b120b5"
+        },
+        "frame_005": {
+          "algorithm": "sha256",
+          "value": "1eb72662d2f41250ff106db46bba90db4cdecf9ae83a24f85d10cb34ac0a8194"
+        },
+        "frame_006": {
+          "algorithm": "sha256",
+          "value": "eb3c03c5fab5e8fc9941f50590b06676178c51a5eecc8ee6176b31292ea9ae0a"
+        },
+        "frame_007": {
+          "algorithm": "sha256",
+          "value": "79b415741b8bdb87f8093cc8967e9039c811357a974b2146bae047b08327938b"
+        },
+        "frame_008": {
+          "algorithm": "sha256",
+          "value": "3faac69f0b74bc5eef251fe47b8cc00ffcb4fa42efdc477b64a47fa7e03b9b51"
+        },
+        "frame_009": {
+          "algorithm": "sha256",
+          "value": "35cd98a9a672ba4e767a13dc36cc7d5a94fc824199cf64067487b5a04e3ab14c"
+        },
+        "frame_010": {
+          "algorithm": "sha256",
+          "value": "4a5e9b3f8b48df34a86643413e2602b3549e2a8f484c7f2796bce49228ae7fef"
+        },
+        "frame_011": {
+          "algorithm": "sha256",
+          "value": "8814d85229c2ca2443a971dd077fc6ca9c9743d02051b9421411a0d945d3b8c0"
+        },
+        "frame_012": {
+          "algorithm": "sha256",
+          "value": "a277ef269961da8e16113512da09edcf7b5ddaa400ccb89c19f11f3db1436606"
+        },
+        "frame_013": {
+          "algorithm": "sha256",
+          "value": "9b35c1dd266a6c5be7d072ba420da362af312e2077c2b75a703133ef041d87a6"
+        },
+        "frame_014": {
+          "algorithm": "sha256",
+          "value": "8dd7a5625ba186b33788d845fdab1f526e7086f3b96c51726a1ed99929127ede"
+        },
+        "frame_015": {
+          "algorithm": "sha256",
+          "value": "98646d7c1d2558fbdf36fb97efa3443fd7d4d975cb44be02e9bb0fc6c31edac2"
+        },
+        "frame_016": {
+          "algorithm": "sha256",
+          "value": "3a4e82be5f46e0179227e079db0fa4388072a082146bc1d5bd389e15ab19588e"
+        },
+        "frame_017": {
+          "algorithm": "sha256",
+          "value": "0bd91052d25f89d037d21645211ee811ca2a44bd81e8a2c13f8697ee0448271e"
+        },
+        "frame_018": {
+          "algorithm": "sha256",
+          "value": "b0debea0b35b6fe704efb53f46de64dec7c743f2939b7429fc5264c7a2daebbb"
+        },
+        "frame_019": {
+          "algorithm": "sha256",
+          "value": "e1176fcc51f35a6c6e784c47826dff0b955df0993922ab68c5425a47454d6076"
+        },
+        "frame_020": {
+          "algorithm": "sha256",
+          "value": "a7a64219c68dd5e38793feb6f7253d0a2e57d3da6ba2a4e92dd1b4d064246a13"
+        }
+      },
+      "manifest_digest": {
+        "algorithm": "sha256",
+        "value": "695f8f8791b19cc8a66a9aaf69ef01e0a104e4b343138b84537eca62d3653681"
+      }
+    },
+    "environment": {
+      "dependency_versions": {},
+      "determinism_enabled": true,
+      "determinism_metadata": {},
+      "dtype": "float32",
+      "environment_metadata": {},
+      "requested_device": "cpu",
+      "resolved_device": "cpu"
+    },
+    "models": [
+      {
+        "checkpoint_fingerprint": {
+          "algorithm": "sha256",
+          "value": "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9"
+        },
+        "metadata": {
+          "checkpoint_size_bytes": 88283115
+        },
+        "model_id": "dinov2_vits14",
+        "model_version": "dinov2-vits14-pretrained-1.0",
+        "source_fingerprint": {
+          "algorithm": "sha256",
+          "value": "cdab7b4237c2d341e4d223fb54f95700dabcba2d320b01f6e535a7f07a2aaf82"
+        }
+      }
+    ],
+    "output_schema_versions": {
+      "candidate_manifest": "stream_analysis.candidate_manifest.v1",
+      "diagnostic_pair_scores": "stream_analysis.diagnostic_pair_scores.v1",
+      "run_manifest": "stream_analysis.run_manifest.v1",
+      "runtime_status": "stream_analysis.runtime_status.v1",
+      "stream_analysis": "stream_analysis.primary_stream_result.v1"
+    },
+    "parent_run_ids": [],
+    "role": "primary_analyze",
+    "run_id": "demonstration_final_20260623_h04_dino_bbox",
+    "schema_id": "stream_analysis.run_provenance.v1",
+    "source": {
+      "revision": "demonstration-final-after-v3.2-handcrafted1.1-dino-grouping1.3.0",
+      "tree_fingerprint": {
+        "algorithm": "sha256",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "stage_configs": [
+      {
+        "config_version": "3.2",
+        "diagnostic_parameters": {},
+        "runtime_parameters": {},
+        "schema_id": "stream_analysis.candidate_extraction_config.v3",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "6104ea5d30658c074701502477065398c1a7b5508a60379b38da714120371bb4"
+        },
+        "stage_id": "candidate_extraction"
+      },
+      {
+        "config_version": "1.0.0",
+        "diagnostic_parameters": {},
+        "runtime_parameters": {},
+        "schema_id": "stream_analysis.event_config.v1",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "e9a94445f3daac07b1862d6b562e7629cfaaac12fd019408feb33155fe76376f"
+        },
+        "stage_id": "events"
+      },
+      {
+        "config_version": "1.0.0",
+        "diagnostic_parameters": {},
+        "runtime_parameters": {},
+        "schema_id": "stream_analysis.grouping_config.v1",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "b2b15bcaa2bfaa2f733b2045772b5768fdf52f56831000195a601ea213b5d989"
+        },
+        "stage_id": "grouping"
+      },
+      {
+        "config_version": "1.0.0",
+        "diagnostic_parameters": {},
+        "runtime_parameters": {},
+        "schema_id": "stream_analysis.matching_config.v1",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "ed179c05ceb696f901cd5ade98ad29232f87906fa514c74d0e027ad7a998f24f"
+        },
+        "stage_id": "matching"
+      },
+      {
+        "config_version": "1.0.0",
+        "diagnostic_parameters": {
+          "diagnostic_level": "standard"
+        },
+        "runtime_parameters": {},
+        "schema_id": "stream_analysis.reporting_config.v1",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "2fde737967bab9f73b9c8d4becee247ed2f14b5bd341065ca80f8fe2e7607067"
+        },
+        "stage_id": "reporting"
+      },
+      {
+        "config_version": "1.0",
+        "diagnostic_parameters": {},
+        "runtime_parameters": {
+          "batch_size": 16,
+          "device_policy": "cpu"
+        },
+        "schema_id": "stream_analysis.dinov2_representation_config.v1",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "9f752572eda7ff755ddff33831fd443023afa66fbda01743d0db874b6d0e4f0a"
+        },
+        "stage_id": "representation"
+      },
+      {
+        "config_version": "1.0.0",
+        "diagnostic_parameters": {},
+        "runtime_parameters": {
+          "diagnostic_level": "standard"
+        },
+        "schema_id": "stream_analysis.runtime_policy.v1",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "c55bceb466152d7475e25e2d1f25b75a12f7d7552c7cf2dcf88c6e656f2346a9"
+        },
+        "stage_id": "runtime_policy"
+      },
+      {
+        "config_version": "1.0.0",
+        "diagnostic_parameters": {},
+        "runtime_parameters": {},
+        "schema_id": "stream_analysis.pair_scoring_config.v1",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "2538357cc6af4e4ad362d4faaf5beecbfd9046d46f4978ddf566eae6c71a9b82"
+        },
+        "stage_id": "scorer"
+      },
+      {
+        "config_version": "1.0.0",
+        "diagnostic_parameters": {},
+        "runtime_parameters": {},
+        "schema_id": "stream_analysis.stream_input_config.v1",
+        "semantic_digest": {
+          "algorithm": "sha256",
+          "value": "ac3f9788abdfcc3cafef8802129fd3ccdcc50f35153ee5ac8087c3d82deda22f"
+        },
+        "stage_id": "stream_input"
+      }
+    ],
+    "timestamps": {
+      "finished_at": "2026-06-23T14:54:44.264194+00:00",
+      "started_at": "2026-06-23T14:54:27.213499+00:00"
+    }
+  },
+  "schema_id": "stream_analysis.run_manifest.v1"
+}

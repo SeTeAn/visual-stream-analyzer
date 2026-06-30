@@ -1,0 +1,1483 @@
+﻿{
+  "schema_version": "stream-pilot-annotation-0.1",
+  "stream_id": "probe_03_tableware",
+  "manifest_ref": "manifest.json",
+  "annotation_scope": "pilot_development",
+  "visual_types": [
+    {
+      "visual_type_id": "circle_subclass_01",
+      "description": "Круглая тарелка в виде сверху с тонким ободом и центральной зоной.",
+      "notes": "Локальный ID потока probe_03_tableware; geometric_class=circle; предмет=круглая тарелка."
+    },
+    {
+      "visual_type_id": "circle_subclass_02",
+      "description": "Миска в виде сверху с толстым ободом и глубокой внутренней областью.",
+      "notes": "Локальный ID потока probe_03_tableware; geometric_class=circle; предмет=миска."
+    },
+    {
+      "visual_type_id": "oval_subclass_01",
+      "description": "Овальное блюдо в виде сверху с внутренним кантом.",
+      "notes": "Локальный ID потока probe_03_tableware; geometric_class=oval; предмет=овальное блюдо."
+    },
+    {
+      "visual_type_id": "square_subclass_01",
+      "description": "Квадратная тарелка в виде сверху с декоративной рамкой.",
+      "notes": "Локальный ID потока probe_03_tableware; geometric_class=square; предмет=квадратная тарелка."
+    },
+    {
+      "visual_type_id": "rectangle_subclass_01",
+      "description": "Прямоугольный поднос в виде сверху с двумя ручками.",
+      "notes": "Локальный ID потока probe_03_tableware; geometric_class=rectangle; предмет=прямоугольный поднос."
+    },
+    {
+      "visual_type_id": "triangle_subclass_01",
+      "description": "Треугольная тарелка в виде сверху с внутренним кантом.",
+      "notes": "Локальный ID потока probe_03_tableware; geometric_class=triangle; предмет=треугольная сервировочная тарелка."
+    },
+    {
+      "visual_type_id": "undefined_subclass_01",
+      "description": "Чашка в виде сбоку с корпусом, верхним краем и боковой ручкой.",
+      "notes": "Локальный ID потока probe_03_tableware; geometric_class=undefined; предмет=чашка."
+    }
+  ],
+  "expected_element_instances": [
+    {
+      "instance_id": "inst_round_plate_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 53,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 232,
+        "y": 58,
+        "width": 136,
+        "height": 84
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_cup_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 462,
+        "y": 60,
+        "width": 117,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чашка; geometric_class=undefined; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 232,
+        "y": 58,
+        "width": 136,
+        "height": 84
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_cup_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 462,
+        "y": 60,
+        "width": 117,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чашка; geometric_class=undefined; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_round_plate_02_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 44,
+        "y": 53,
+        "width": 93,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=2; rotation_deg=0; scale=1; tone=teal."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 232,
+        "y": 58,
+        "width": 136,
+        "height": 84
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_cup_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 462,
+        "y": 60,
+        "width": 117,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чашка; geometric_class=undefined; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_round_plate_02_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 44,
+        "y": 53,
+        "width": 93,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=2; rotation_deg=0; scale=1; tone=teal."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 232,
+        "y": 58,
+        "width": 136,
+        "height": 84
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 253,
+        "y": 202,
+        "width": 95,
+        "height": 96
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная тарелка; geometric_class=square; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_cup_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 462,
+        "y": 60,
+        "width": 117,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чашка; geometric_class=undefined; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_round_plate_02_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 44,
+        "y": 53,
+        "width": 93,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=2; rotation_deg=0; scale=1; tone=teal."
+    },
+    {
+      "instance_id": "inst_bowl_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 465,
+        "y": 205,
+        "width": 91,
+        "height": 91
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: миска; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 232,
+        "y": 58,
+        "width": 136,
+        "height": 84
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 253,
+        "y": 202,
+        "width": 95,
+        "height": 96
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная тарелка; geometric_class=square; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_cup_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 462,
+        "y": 60,
+        "width": 117,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чашка; geometric_class=undefined; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_round_plate_02_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 44,
+        "y": 53,
+        "width": 93,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=2; rotation_deg=0; scale=1; tone=teal."
+    },
+    {
+      "instance_id": "inst_round_plate_03_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 44,
+        "y": 319,
+        "width": 93,
+        "height": 93
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=3; rotation_deg=0; scale=1; tone=coral."
+    },
+    {
+      "instance_id": "inst_bowl_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 465,
+        "y": 205,
+        "width": 91,
+        "height": 91
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: миска; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 35,
+        "width": 214,
+        "height": 130
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1.6; tone=default."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 253,
+        "y": 202,
+        "width": 95,
+        "height": 96
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная тарелка; geometric_class=square; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_cup_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 462,
+        "y": 60,
+        "width": 117,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чашка; geometric_class=undefined; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_round_plate_02_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 44,
+        "y": 53,
+        "width": 93,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=2; rotation_deg=0; scale=1; tone=teal."
+    },
+    {
+      "instance_id": "inst_bowl_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 465,
+        "y": 205,
+        "width": 91,
+        "height": 91
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: миска; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 35,
+        "width": 214,
+        "height": 130
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1.6; tone=default."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 253,
+        "y": 202,
+        "width": 95,
+        "height": 96
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная тарелка; geometric_class=square; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_tray_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 351,
+        "width": 158,
+        "height": 78
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольный поднос; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_cup_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 462,
+        "y": 60,
+        "width": 117,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чашка; geometric_class=undefined; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_round_plate_02_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 44,
+        "y": 53,
+        "width": 93,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=2; rotation_deg=0; scale=1; tone=teal."
+    },
+    {
+      "instance_id": "inst_bowl_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 465,
+        "y": 205,
+        "width": 91,
+        "height": 91
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: миска; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 35,
+        "width": 214,
+        "height": 130
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1.6; tone=default."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 253,
+        "y": 202,
+        "width": 95,
+        "height": 96
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная тарелка; geometric_class=square; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_tray_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 351,
+        "width": 158,
+        "height": 78
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольный поднос; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 451,
+        "y": 338,
+        "width": 118,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольная сервировочная тарелка; geometric_class=triangle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_bowl_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 465,
+        "y": 205,
+        "width": 91,
+        "height": 91
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: миска; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 35,
+        "width": 214,
+        "height": 130
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1.6; tone=default."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 246,
+        "y": 196,
+        "width": 108,
+        "height": 108
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная тарелка; geometric_class=square; slot=1; rotation_deg=0; scale=1.15; tone=default."
+    },
+    {
+      "instance_id": "inst_tray_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 431,
+        "y": 66,
+        "width": 159,
+        "height": 79
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольный поднос; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 451,
+        "y": 338,
+        "width": 118,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольная сервировочная тарелка; geometric_class=triangle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_round_plate_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 43,
+        "y": 183,
+        "width": 94,
+        "height": 94
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: круглая тарелка; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=ivory."
+    },
+    {
+      "instance_id": "inst_bowl_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 255,
+        "y": 345,
+        "width": 91,
+        "height": 91
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: миска; geometric_class=circle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 35,
+        "width": 214,
+        "height": 130
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: овальное блюдо; geometric_class=oval; slot=1; rotation_deg=0; scale=1.6; tone=default."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 246,
+        "y": 196,
+        "width": 108,
+        "height": 108
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная тарелка; geometric_class=square; slot=1; rotation_deg=0; scale=1.15; tone=default."
+    },
+    {
+      "instance_id": "inst_tray_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 431,
+        "y": 66,
+        "width": 159,
+        "height": 79
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольный поднос; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 451,
+        "y": 338,
+        "width": 118,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольная сервировочная тарелка; geometric_class=triangle; slot=1; rotation_deg=0; scale=1; tone=default."
+    },
+    {
+      "instance_id": "inst_cup_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 32,
+        "y": 350,
+        "width": 117,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чашка; geometric_class=undefined; slot=1; rotation_deg=0; scale=1; tone=default."
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "expected_change_event_ids": [
+        "event_001",
+        "event_002",
+        "event_003",
+        "event_004"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "expected_change_event_ids": [
+        "event_005",
+        "event_006",
+        "event_007",
+        "event_008"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "expected_change_event_ids": [
+        "event_009",
+        "event_010",
+        "event_011",
+        "event_012"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "expected_change_event_ids": [
+        "event_013",
+        "event_014",
+        "event_015",
+        "event_016",
+        "event_017"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "expected_change_event_ids": [
+        "event_018",
+        "event_019",
+        "event_020",
+        "event_021",
+        "event_022",
+        "event_023"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "expected_change_event_ids": [
+        "event_024",
+        "event_025",
+        "event_026",
+        "event_027",
+        "event_028",
+        "event_029",
+        "event_030"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "expected_change_event_ids": [
+        "event_031",
+        "event_032",
+        "event_033",
+        "event_034",
+        "event_035",
+        "event_036",
+        "event_037"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "expected_change_event_ids": [
+        "event_038",
+        "event_039",
+        "event_040",
+        "event_041",
+        "event_042",
+        "event_043",
+        "event_044",
+        "event_045"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "expected_change_event_ids": [
+        "event_046",
+        "event_047",
+        "event_048",
+        "event_049",
+        "event_050",
+        "event_051",
+        "event_052",
+        "event_053"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    }
+  ],
+  "change_events": [
+    {
+      "event_id": "event_001",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_002",
+      "event_type": "position_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Средний центр подкласса смещен примерно на 130.0 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_003",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_004",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_005",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_006",
+      "event_type": "count_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Количество экземпляров изменилось с 1 до 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_007",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_008",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_009",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_010",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_011",
+      "event_type": "appeared",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_012",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_013",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_014",
+      "event_type": "appeared",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_015",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_016",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_017",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_018",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_019",
+      "event_type": "count_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Количество экземпляров изменилось с 2 до 3.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_020",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_021",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_022",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_023",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_024",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_025",
+      "event_type": "count_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Количество экземпляров изменилось с 3 до 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_026",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_027",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_028",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_029",
+      "event_type": "appeared",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_030",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_031",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_032",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_033",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_034",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_035",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_036",
+      "event_type": "appeared",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_037",
+      "event_type": "disappeared",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие disappeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_038",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_039",
+      "event_type": "count_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Количество экземпляров изменилось с 2 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_040",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_041",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_042",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_043",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_044",
+      "event_type": "position_changed",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Средний центр подкласса смещен примерно на 354.0 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_045",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_046",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_047",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_048",
+      "event_type": "position_changed",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Средний центр подкласса смещен примерно на 252.4 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_049",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_050",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_051",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_052",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_053",
+      "event_type": "appeared",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    }
+  ],
+  "allowed_event_types": [
+    "persisted",
+    "appeared",
+    "disappeared",
+    "count_changed",
+    "position_changed"
+  ],
+  "uncertainty": [],
+  "notes": "Выбранный вид каждого подкласса постоянен; цвет и масштаб сами по себе не создают отдельное событие."
+}

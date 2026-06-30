@@ -1,0 +1,145 @@
+﻿{
+  "schema_version": "stream-input-0.1",
+  "stream_id": "heldout_05_game_pieces",
+  "scene_description": "Independent controlled held-out game-pieces stream with ten local visual types, irregular placement, structurally distinct similar tokens, reappearance, count changes, motion, rotation, scale, and color variations.",
+  "ordering": "manifest",
+  "frames": [
+    {
+      "frame_id": "frame_001",
+      "index": 1,
+      "image_path": "frames/frame_001.png",
+      "notes": "Начальная сцена: шашка, квадратная плитка, домино и пешка."
+    },
+    {
+      "frame_id": "frame_002",
+      "index": 2,
+      "image_path": "frames/frame_002.png",
+      "notes": "Появляется круглый жетон."
+    },
+    {
+      "frame_id": "frame_003",
+      "index": 3,
+      "image_path": "frames/frame_003.png",
+      "notes": "Шашка перемещается на 75 px."
+    },
+    {
+      "frame_id": "frame_004",
+      "index": 4,
+      "image_path": "frames/frame_004.png",
+      "notes": "Добавляется вторая квадратная плитка."
+    },
+    {
+      "frame_id": "frame_005",
+      "index": 5,
+      "image_path": "frames/frame_005.png",
+      "notes": "Исчезает домино."
+    },
+    {
+      "frame_id": "frame_006",
+      "index": 6,
+      "image_path": "frames/frame_006.png",
+      "notes": "Появляется плитка с эмблемой."
+    },
+    {
+      "frame_id": "frame_007",
+      "index": 7,
+      "image_path": "frames/frame_007.png",
+      "notes": "Круглый жетон меняет цвет."
+    },
+    {
+      "frame_id": "frame_008",
+      "index": 8,
+      "image_path": "frames/frame_008.png",
+      "notes": "Появляется игровая карта."
+    },
+    {
+      "frame_id": "frame_009",
+      "index": 9,
+      "image_path": "frames/frame_009.png",
+      "notes": "Карта поворачивается вокруг центра."
+    },
+    {
+      "frame_id": "frame_010",
+      "index": 10,
+      "image_path": "frames/frame_010.png",
+      "notes": "Появляется треугольный жетон."
+    },
+    {
+      "frame_id": "frame_011",
+      "index": 11,
+      "image_path": "frames/frame_011.png",
+      "notes": "Пешка увеличивается вокруг центра."
+    },
+    {
+      "frame_id": "frame_012",
+      "index": 12,
+      "image_path": "frames/frame_012.png",
+      "notes": "Появляется фишка-человечек."
+    },
+    {
+      "frame_id": "frame_013",
+      "index": 13,
+      "image_path": "frames/frame_013.png",
+      "notes": "Фишка-человечек перемещается на 75 px."
+    },
+    {
+      "frame_id": "frame_014",
+      "index": 14,
+      "image_path": "frames/frame_014.png",
+      "notes": "Появляется шестиугольный жетон."
+    },
+    {
+      "frame_id": "frame_015",
+      "index": 15,
+      "image_path": "frames/frame_015.png",
+      "notes": "Число шашек увеличивается до трех."
+    },
+    {
+      "frame_id": "frame_016",
+      "index": 16,
+      "image_path": "frames/frame_016.png",
+      "notes": "Исчезает круглый жетон."
+    },
+    {
+      "frame_id": "frame_017",
+      "index": 17,
+      "image_path": "frames/frame_017.png",
+      "notes": "Возвращается домино."
+    },
+    {
+      "frame_id": "frame_018",
+      "index": 18,
+      "image_path": "frames/frame_018.png",
+      "notes": "Возвращается круглый жетон."
+    },
+    {
+      "frame_id": "frame_019",
+      "index": 19,
+      "image_path": "frames/frame_019.png",
+      "notes": "Плитка с эмблемой меняет цвет и поворачивается вокруг центра."
+    },
+    {
+      "frame_id": "frame_020",
+      "index": 20,
+      "image_path": "frames/frame_020.png",
+      "notes": "Число обычных плиток уменьшается до одной; шестиугольный жетон перемещается на 75 px."
+    }
+  ],
+  "notes": "Независимый held-out поток для финальной оценки frozen pipeline; не используется для настройки алгоритма.",
+  "metadata": {
+    "source": "deterministic_pillow_generator",
+    "generator": "generate_stream.py",
+    "purpose": "final_evaluation_heldout",
+    "frame_size": {
+      "width": 640,
+      "height": 480
+    },
+    "frame_format": "png_rgb",
+    "background": {
+      "kind": "fixed_vertical_gradient",
+      "top": "#292F4A",
+      "bottom": "#373D59"
+    },
+    "is_final_dataset": true
+  }
+}

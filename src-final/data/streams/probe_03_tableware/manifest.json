@@ -1,0 +1,85 @@
+﻿{
+  "schema_version": "stream-input-0.1",
+  "stream_id": "probe_03_tableware",
+  "scene_description": "Controlled flat tableware stream with fixed views and changing counts of a recurring plate subclass.",
+  "ordering": "manifest",
+  "frames": [
+    {
+      "frame_id": "frame_001",
+      "index": 1,
+      "image_path": "frames/frame_001.png",
+      "notes": "Начальная сцена: круглая тарелка, овальное блюдо и чашка."
+    },
+    {
+      "frame_id": "frame_002",
+      "index": 2,
+      "image_path": "frames/frame_002.png",
+      "notes": "Круглая тарелка перемещена."
+    },
+    {
+      "frame_id": "frame_003",
+      "index": 3,
+      "image_path": "frames/frame_003.png",
+      "notes": "Добавлена вторая круглая тарелка другого цвета, но того же подкласса."
+    },
+    {
+      "frame_id": "frame_004",
+      "index": 4,
+      "image_path": "frames/frame_004.png",
+      "notes": "Появилась квадратная тарелка."
+    },
+    {
+      "frame_id": "frame_005",
+      "index": 5,
+      "image_path": "frames/frame_005.png",
+      "notes": "Появилась миска."
+    },
+    {
+      "frame_id": "frame_006",
+      "index": 6,
+      "image_path": "frames/frame_006.png",
+      "notes": "Добавлена третья круглая тарелка; овальное блюдо значительно увеличено."
+    },
+    {
+      "frame_id": "frame_007",
+      "index": 7,
+      "image_path": "frames/frame_007.png",
+      "notes": "Одна круглая тарелка удалена; появился прямоугольный поднос."
+    },
+    {
+      "frame_id": "frame_008",
+      "index": 8,
+      "image_path": "frames/frame_008.png",
+      "notes": "Чашка исчезла; появилась треугольная сервировочная тарелка."
+    },
+    {
+      "frame_id": "frame_009",
+      "index": 9,
+      "image_path": "frames/frame_009.png",
+      "notes": "Оставлена одна круглая тарелка; поднос перемещен; квадратная тарелка немного увеличена."
+    },
+    {
+      "frame_id": "frame_010",
+      "index": 10,
+      "image_path": "frames/frame_010.png",
+      "notes": "Чашка вернулась после двух кадров отсутствия; миска перемещена."
+    }
+  ],
+  "notes": "Пробный development-поток проекта; не финальный evaluation-набор.",
+  "metadata": {
+    "source": "deterministic_pillow_generator",
+    "generator": "generate_stream.py",
+    "purpose": "stream_analysis_probe_development",
+    "frame_size": {
+      "width": 640,
+      "height": 480
+    },
+    "frame_format": "png_rgb",
+    "background": {
+      "kind": "fixed_vertical_gradient",
+      "top": "#704A63",
+      "bottom": "#5B3D54"
+    },
+    "is_final_dataset": false
+  }
+}

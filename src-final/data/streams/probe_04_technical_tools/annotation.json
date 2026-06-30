@@ -1,0 +1,1605 @@
+﻿{
+  "schema_version": "stream-pilot-annotation-0.1",
+  "stream_id": "probe_04_technical_tools",
+  "manifest_ref": "manifest.json",
+  "annotation_scope": "pilot_development",
+  "visual_types": [
+    {
+      "visual_type_id": "circle_subclass_01",
+      "description": "Круглая шайба с центральным отверстием.",
+      "notes": "Локальный ID потока probe_04_technical_tools; geometric_class=circle; предмет=шайба."
+    },
+    {
+      "visual_type_id": "circle_subclass_02",
+      "description": "Круглая шестеренка с зубцами и центральным отверстием.",
+      "notes": "Локальный ID потока probe_04_technical_tools; geometric_class=circle; предмет=шестеренка."
+    },
+    {
+      "visual_type_id": "square_subclass_01",
+      "description": "Квадратная пластина с четырьмя крепежными отверстиями.",
+      "notes": "Локальный ID потока probe_04_technical_tools; geometric_class=square; предмет=квадратная монтажная пластина."
+    },
+    {
+      "visual_type_id": "rectangle_subclass_01",
+      "description": "Вытянутая пластина с двумя крепежными отверстиями.",
+      "notes": "Локальный ID потока probe_04_technical_tools; geometric_class=rectangle; предмет=прямоугольная монтажная пластина."
+    },
+    {
+      "visual_type_id": "triangle_subclass_01",
+      "description": "Треугольный кронштейн с внутренним вырезом и отверстиями.",
+      "notes": "Локальный ID потока probe_04_technical_tools; geometric_class=triangle; предмет=треугольный кронштейн."
+    },
+    {
+      "visual_type_id": "undefined_subclass_01",
+      "description": "Тонкий Г-образный шестигранный ключ.",
+      "notes": "Локальный ID потока probe_04_technical_tools; geometric_class=undefined; предмет=Г-образный шестигранный ключ."
+    },
+    {
+      "visual_type_id": "undefined_subclass_02",
+      "description": "Гаечный ключ с вытянутой рукояткой и открытыми рабочими концами.",
+      "notes": "Локальный ID потока probe_04_technical_tools; geometric_class=undefined; предмет=двусторонний гаечный ключ."
+    }
+  ],
+  "expected_element_instances": [
+    {
+      "instance_id": "inst_washer_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 58,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 248,
+        "y": 48,
+        "width": 105,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная монтажная пластина; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 209,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_wrench_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 414,
+        "y": 383,
+        "width": 172,
+        "height": 55
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: двусторонний гаечный ключ; geometric_class=undefined; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 248,
+        "y": 48,
+        "width": 105,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная монтажная пластина; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 209,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_wrench_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 414,
+        "y": 356,
+        "width": 172,
+        "height": 107
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: двусторонний гаечный ключ; geometric_class=undefined; slot=1; rotation_deg=25; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_gear_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 458,
+        "y": 48,
+        "width": 106,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шестеренка; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 248,
+        "y": 48,
+        "width": 105,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная монтажная пластина; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 209,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_wrench_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 414,
+        "y": 356,
+        "width": 172,
+        "height": 107
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: двусторонний гаечный ключ; geometric_class=undefined; slot=1; rotation_deg=25; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_02_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 58,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=2; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_gear_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 458,
+        "y": 48,
+        "width": 106,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шестеренка; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 248,
+        "y": 48,
+        "width": 105,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная монтажная пластина; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 209,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_wrench_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 414,
+        "y": 356,
+        "width": 172,
+        "height": 107
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: двусторонний гаечный ключ; geometric_class=undefined; slot=1; rotation_deg=25; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_02_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 58,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=2; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_gear_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 458,
+        "y": 48,
+        "width": 106,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шестеренка; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 40,
+        "width": 120,
+        "height": 120
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная монтажная пластина; geometric_class=square; slot=1; rotation_deg=0; scale=1.15."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 209,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_triangle_bracket_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 450,
+        "y": 216,
+        "width": 119,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольный кронштейн; geometric_class=triangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_wrench_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 414,
+        "y": 356,
+        "width": 172,
+        "height": 107
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: двусторонний гаечный ключ; geometric_class=undefined; slot=1; rotation_deg=25; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_02_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 58,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=2; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_gear_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 458,
+        "y": 48,
+        "width": 106,
+        "height": 105
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шестеренка; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 40,
+        "width": 120,
+        "height": 120
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная монтажная пластина; geometric_class=square; slot=1; rotation_deg=0; scale=1.15."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 349,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_triangle_bracket_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 450,
+        "y": 216,
+        "width": 119,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольный кронштейн; geometric_class=triangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_allen_key_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 33,
+        "y": 347,
+        "width": 115,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: Г-образный шестигранный ключ; geometric_class=undefined; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_wrench_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 414,
+        "y": 356,
+        "width": 172,
+        "height": 107
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: двусторонний гаечный ключ; geometric_class=undefined; slot=1; rotation_deg=25; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_02_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 58,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=2; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_gear_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 428,
+        "y": 17,
+        "width": 165,
+        "height": 165
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шестеренка; geometric_class=circle; slot=1; rotation_deg=18; scale=1.6."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 40,
+        "width": 120,
+        "height": 120
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная монтажная пластина; geometric_class=square; slot=1; rotation_deg=0; scale=1.15."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 349,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_triangle_bracket_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 450,
+        "y": 216,
+        "width": 119,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольный кронштейн; geometric_class=triangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_allen_key_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 33,
+        "y": 347,
+        "width": 115,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: Г-образный шестигранный ключ; geometric_class=undefined; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_gear_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 428,
+        "y": 17,
+        "width": 165,
+        "height": 165
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шестеренка; geometric_class=circle; slot=1; rotation_deg=18; scale=1.6."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 40,
+        "width": 120,
+        "height": 120
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: квадратная монтажная пластина; geometric_class=square; slot=1; rotation_deg=0; scale=1.15."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 349,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_triangle_bracket_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 450,
+        "y": 216,
+        "width": 119,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольный кронштейн; geometric_class=triangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_allen_key_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 233,
+        "y": 211,
+        "width": 134,
+        "height": 78
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: Г-образный шестигранный ключ; geometric_class=undefined; slot=1; rotation_deg=30; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_gear_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 428,
+        "y": 17,
+        "width": 165,
+        "height": 165
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шестеренка; geometric_class=circle; slot=1; rotation_deg=18; scale=1.6."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 221,
+        "y": 349,
+        "width": 158,
+        "height": 82
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_triangle_bracket_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 450,
+        "y": 216,
+        "width": 119,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольный кронштейн; geometric_class=triangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_allen_key_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 233,
+        "y": 211,
+        "width": 134,
+        "height": 78
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: Г-образный шестигранный ключ; geometric_class=undefined; slot=1; rotation_deg=30; scale=1."
+    },
+    {
+      "instance_id": "inst_wrench_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 414,
+        "y": 356,
+        "width": 172,
+        "height": 107
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: двусторонний гаечный ключ; geometric_class=undefined; slot=1; rotation_deg=25; scale=1."
+    },
+    {
+      "instance_id": "inst_washer_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 48,
+        "y": 198,
+        "width": 85,
+        "height": 85
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шайба; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_gear_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 428,
+        "y": 17,
+        "width": 165,
+        "height": 165
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: шестеренка; geometric_class=circle; slot=1; rotation_deg=18; scale=1.6."
+    },
+    {
+      "instance_id": "inst_rect_plate_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 247,
+        "y": 362,
+        "width": 106,
+        "height": 56
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: прямоугольная монтажная пластина; geometric_class=rectangle; slot=1; rotation_deg=0; scale=0.65."
+    },
+    {
+      "instance_id": "inst_triangle_bracket_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 30,
+        "y": 46,
+        "width": 119,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: треугольный кронштейн; geometric_class=triangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_allen_key_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 233,
+        "y": 211,
+        "width": 134,
+        "height": 78
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: Г-образный шестигранный ключ; geometric_class=undefined; slot=1; rotation_deg=30; scale=1."
+    },
+    {
+      "instance_id": "inst_wrench_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 414,
+        "y": 356,
+        "width": 172,
+        "height": 107
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: двусторонний гаечный ключ; geometric_class=undefined; slot=1; rotation_deg=25; scale=1."
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "expected_change_event_ids": [
+        "event_001",
+        "event_002",
+        "event_003",
+        "event_004",
+        "event_005"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "expected_change_event_ids": [
+        "event_006",
+        "event_007",
+        "event_008",
+        "event_009",
+        "event_010"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "expected_change_event_ids": [
+        "event_011",
+        "event_012",
+        "event_013",
+        "event_014",
+        "event_015",
+        "event_016"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "expected_change_event_ids": [
+        "event_017",
+        "event_018",
+        "event_019",
+        "event_020",
+        "event_021",
+        "event_022"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "expected_change_event_ids": [
+        "event_023",
+        "event_024",
+        "event_025",
+        "event_026",
+        "event_027",
+        "event_028",
+        "event_029",
+        "event_030"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "expected_change_event_ids": [
+        "event_031",
+        "event_032",
+        "event_033",
+        "event_034",
+        "event_035",
+        "event_036",
+        "event_037"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "expected_change_event_ids": [
+        "event_038",
+        "event_039",
+        "event_040",
+        "event_041",
+        "event_042",
+        "event_043",
+        "event_044",
+        "event_045"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "expected_change_event_ids": [
+        "event_046",
+        "event_047",
+        "event_048",
+        "event_049",
+        "event_050",
+        "event_051",
+        "event_052"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "expected_change_event_ids": [
+        "event_053",
+        "event_054",
+        "event_055",
+        "event_056",
+        "event_057",
+        "event_058",
+        "event_059"
+      ],
+      "uncertainty": "",
+      "notes": "Согласованный переход probe-сценария."
+    }
+  ],
+  "change_events": [
+    {
+      "event_id": "event_001",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_002",
+      "event_type": "position_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Средний центр подкласса смещен примерно на 140.0 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_003",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_004",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_005",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_006",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_007",
+      "event_type": "appeared",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_008",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_009",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_010",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_011",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_012",
+      "event_type": "count_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Количество экземпляров изменилось с 1 до 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_013",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_014",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_015",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_016",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_017",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_018",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_019",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_020",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_021",
+      "event_type": "appeared",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_022",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_023",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_024",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_025",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_026",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_027",
+      "event_type": "position_changed",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Средний центр подкласса смещен примерно на 140.0 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_028",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_029",
+      "event_type": "appeared",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_030",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_031",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_032",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_033",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_034",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_035",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_036",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_037",
+      "event_type": "disappeared",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Событие disappeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_038",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_039",
+      "event_type": "count_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Количество экземпляров изменилось с 2 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_040",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_041",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_042",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_043",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_044",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_045",
+      "event_type": "position_changed",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Средний центр подкласса смещен примерно на 252.4 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_046",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_047",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_048",
+      "event_type": "disappeared",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие disappeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_049",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_050",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_051",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_052",
+      "event_type": "appeared",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Событие appeared установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_053",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_054",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_055",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_056",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_057",
+      "event_type": "position_changed",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Средний центр подкласса смещен примерно на 453.1 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_058",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_059",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Событие persisted установлено по присутствию подкласса в соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    }
+  ],
+  "allowed_event_types": [
+    "persisted",
+    "appeared",
+    "disappeared",
+    "count_changed",
+    "position_changed"
+  ],
+  "uncertainty": [],
+  "notes": "Отверстия, зубцы и вырезы являются частями объектов; поворот и масштаб сами по себе не создают отдельное событие."
+}

@@ -1,0 +1,4013 @@
+﻿{
+  "schema_version": "stream-pilot-annotation-0.1",
+  "stream_id": "heldout_03_tableware",
+  "manifest_ref": "manifest.json",
+  "annotation_scope": "final_heldout",
+  "visual_types": [
+    {
+      "visual_type_id": "circle_subclass_01",
+      "description": "Круглая тарелка с широким ободом и плоским центральным полем.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=circle; object=plate; similarity_group=round_tableware."
+    },
+    {
+      "visual_type_id": "circle_subclass_02",
+      "description": "Миска с толстым ободом, внутренней чашей и дугой глубины.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=circle; object=bowl; similarity_group=round_tableware."
+    },
+    {
+      "visual_type_id": "circle_subclass_03",
+      "description": "Блюдце с тонким ободом и центральным кольцом под чашку.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=circle; object=saucer; similarity_group=round_tableware."
+    },
+    {
+      "visual_type_id": "oval_subclass_01",
+      "description": "Овальное сервировочное блюдо с вытянутым двойным ободом.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=oval; object=oval_platter; similarity_group=none."
+    },
+    {
+      "visual_type_id": "square_subclass_01",
+      "description": "Квадратная тарелка со скругленным контуром и внутренней рамкой.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=square; object=square_plate; similarity_group=none."
+    },
+    {
+      "visual_type_id": "rectangle_subclass_01",
+      "description": "Поднос с прямоугольным бортом и двумя короткими ручками.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=rectangle; object=tray; similarity_group=rectangle_tableware."
+    },
+    {
+      "visual_type_id": "rectangle_subclass_02",
+      "description": "Компактная сложенная салфетка с диагональным сгибом и окантовкой.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=rectangle; object=folded_napkin; similarity_group=rectangle_tableware."
+    },
+    {
+      "visual_type_id": "triangle_subclass_01",
+      "description": "Треугольная тарелка со скругленным двойным ободом.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=triangle; object=triangle_plate; similarity_group=none."
+    },
+    {
+      "visual_type_id": "undefined_subclass_01",
+      "description": "Чашка сбоку с верхним эллипсом и отдельной ручкой.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=undefined; object=cup; similarity_group=undefined_tableware."
+    },
+    {
+      "visual_type_id": "undefined_subclass_02",
+      "description": "Ложка с овальной чашей и узкой длинной ручкой.",
+      "notes": "Локальный ID потока heldout_03_tableware; geometric_class=undefined; object=spoon; similarity_group=undefined_tableware."
+    }
+  ],
+  "expected_element_instances": [
+    {
+      "instance_id": "inst_plate_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 18,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(55,72); difficulty_tags=similar_subclass,border_near."
+    },
+    {
+      "instance_id": "inst_bowl_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 295,
+        "y": 40,
+        "width": 71,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=bowl; geometric_class=circle; slot=1; body_color=#71C1B4; rotation_deg=0; scale=1; anchor_center=(330,72); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_cup_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 36,
+        "y": 323,
+        "width": 79,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#DB786D; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 18,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(55,72); difficulty_tags=similar_subclass,border_near."
+    },
+    {
+      "instance_id": "inst_bowl_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 295,
+        "y": 40,
+        "width": 71,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=bowl; geometric_class=circle; slot=1; body_color=#71C1B4; rotation_deg=0; scale=1; anchor_center=(330,72); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_cup_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 36,
+        "y": 323,
+        "width": 79,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#DB786D; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_saucer_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 396,
+        "y": 63,
+        "width": 69,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_plate_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_bowl_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 295,
+        "y": 40,
+        "width": 71,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=bowl; geometric_class=circle; slot=1; body_color=#71C1B4; rotation_deg=0; scale=1; anchor_center=(330,72); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_cup_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 36,
+        "y": 323,
+        "width": 79,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#DB786D; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_saucer_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 396,
+        "y": 63,
+        "width": 69,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_plate_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_bowl_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 295,
+        "y": 40,
+        "width": 71,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=bowl; geometric_class=circle; slot=1; body_color=#71C1B4; rotation_deg=0; scale=1; anchor_center=(330,72); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_cup_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 36,
+        "y": 323,
+        "width": 79,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#DB786D; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 396,
+        "y": 63,
+        "width": 69,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_plate_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 36,
+        "y": 323,
+        "width": 79,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#DB786D; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 396,
+        "y": 63,
+        "width": 69,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_plate_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 36,
+        "y": 323,
+        "width": 79,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#DB786D; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 396,
+        "y": 63,
+        "width": 69,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 396,
+        "y": 63,
+        "width": 69,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 396,
+        "y": 63,
+        "width": 69,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 168,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(225,195); difficulty_tags=similar_subclass."
+    },
+    {
+      "instance_id": "inst_plate_01_f011",
+      "frame_id": "frame_011",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f011",
+      "frame_id": "frame_011",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f011",
+      "frame_id": "frame_011",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f011",
+      "frame_id": "frame_011",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f011",
+      "frame_id": "frame_011",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f011",
+      "frame_id": "frame_011",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f011",
+      "frame_id": "frame_011",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f011",
+      "frame_id": "frame_011",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_plate_01_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f012",
+      "frame_id": "frame_012",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 435,
+        "y": 179,
+        "width": 70,
+        "height": 52
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=0; scale=1; anchor_center=(470,205); difficulty_tags=similar_subclass."
+    },
+    {
+      "instance_id": "inst_plate_01_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f013",
+      "frame_id": "frame_013",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 436,
+        "y": 174,
+        "width": 69,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=25; scale=0.85; anchor_center=(470,205); difficulty_tags=rotation,scale,similar_subclass."
+    },
+    {
+      "instance_id": "inst_plate_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_cup_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 436,
+        "y": 174,
+        "width": 69,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=25; scale=0.85; anchor_center=(470,205); difficulty_tags=rotation,scale,similar_subclass."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f014",
+      "frame_id": "frame_014",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 495,
+        "y": 317,
+        "width": 80,
+        "height": 77
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=triangle_plate; geometric_class=triangle; slot=1; body_color=#D9A0BC; rotation_deg=-8; scale=1; anchor_center=(535,355); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_01_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 436,
+        "y": 174,
+        "width": 69,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=25; scale=0.85; anchor_center=(470,205); difficulty_tags=rotation,scale,similar_subclass."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f015",
+      "frame_id": "frame_015",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 495,
+        "y": 317,
+        "width": 80,
+        "height": 77
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=triangle_plate; geometric_class=triangle; slot=1; body_color=#D9A0BC; rotation_deg=-8; scale=1; anchor_center=(535,355); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_02_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 58,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=2; body_color=#D9B76C; rotation_deg=0; scale=1; anchor_center=(230,95); difficulty_tags=count_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_spoon_01_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 436,
+        "y": 174,
+        "width": 69,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=25; scale=0.85; anchor_center=(470,205); difficulty_tags=rotation,scale,similar_subclass."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f016",
+      "frame_id": "frame_016",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 495,
+        "y": 317,
+        "width": 80,
+        "height": 77
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=triangle_plate; geometric_class=triangle; slot=1; body_color=#D9A0BC; rotation_deg=-8; scale=1; anchor_center=(535,355); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_02_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 58,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=2; body_color=#D9B76C; rotation_deg=0; scale=1; anchor_center=(230,95); difficulty_tags=count_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_cup_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 436,
+        "y": 174,
+        "width": 69,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=25; scale=0.85; anchor_center=(470,205); difficulty_tags=rotation,scale,similar_subclass."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f017",
+      "frame_id": "frame_017",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 495,
+        "y": 317,
+        "width": 80,
+        "height": 77
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=triangle_plate; geometric_class=triangle; slot=1; body_color=#D9A0BC; rotation_deg=-8; scale=1; anchor_center=(535,355); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_02_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 58,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=2; body_color=#D9B76C; rotation_deg=0; scale=1; anchor_center=(230,95); difficulty_tags=count_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_bowl_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 295,
+        "y": 40,
+        "width": 71,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=bowl; geometric_class=circle; slot=1; body_color=#71C1B4; rotation_deg=0; scale=1; anchor_center=(330,72); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_cup_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_saucer_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 388,
+        "y": 57,
+        "width": 84,
+        "height": 76
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1.25; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance,scale."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 436,
+        "y": 174,
+        "width": 69,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=25; scale=0.85; anchor_center=(470,205); difficulty_tags=rotation,scale,similar_subclass."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f018",
+      "frame_id": "frame_018",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 495,
+        "y": 317,
+        "width": 80,
+        "height": 77
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=triangle_plate; geometric_class=triangle; slot=1; body_color=#D9A0BC; rotation_deg=-8; scale=1; anchor_center=(535,355); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_02_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 58,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=2; body_color=#D9B76C; rotation_deg=0; scale=1; anchor_center=(230,95); difficulty_tags=count_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_bowl_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 295,
+        "y": 40,
+        "width": 71,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=bowl; geometric_class=circle; slot=1; body_color=#71C1B4; rotation_deg=0; scale=1; anchor_center=(330,72); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_cup_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_spoon_02_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 305,
+        "y": 366,
+        "width": 101,
+        "height": 49
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=2; body_color=#C4D0D5; rotation_deg=-18; scale=1; anchor_center=(355,390); difficulty_tags=count_change."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 436,
+        "y": 174,
+        "width": 69,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=25; scale=0.85; anchor_center=(470,205); difficulty_tags=rotation,scale,similar_subclass."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f019",
+      "frame_id": "frame_019",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 495,
+        "y": 317,
+        "width": 80,
+        "height": 77
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=triangle_plate; geometric_class=triangle; slot=1; body_color=#D9A0BC; rotation_deg=-8; scale=1; anchor_center=(535,355); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 93,
+        "y": 35,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=1; body_color=#E8C77B; rotation_deg=0; scale=1; anchor_center=(130,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_plate_02_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 193,
+        "y": 58,
+        "width": 75,
+        "height": 75
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=plate; geometric_class=circle; slot=2; body_color=#D9B76C; rotation_deg=0; scale=1; anchor_center=(230,95); difficulty_tags=count_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_bowl_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "circle_subclass_02",
+      "bbox": {
+        "x": 295,
+        "y": 40,
+        "width": 71,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=bowl; geometric_class=circle; slot=1; body_color=#71C1B4; rotation_deg=0; scale=1; anchor_center=(330,72); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_cup_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 37,
+        "y": 324,
+        "width": 77,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=cup; geometric_class=undefined; slot=1; body_color=#78B8C7; rotation_deg=0; scale=1; anchor_center=(75,355); difficulty_tags=reappearance."
+    },
+    {
+      "instance_id": "inst_spoon_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "undefined_subclass_02",
+      "bbox": {
+        "x": 173,
+        "y": 320,
+        "width": 104,
+        "height": 41
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=spoon; geometric_class=undefined; slot=1; body_color=#D9E0E3; rotation_deg=12; scale=1; anchor_center=(225,340); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_saucer_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "circle_subclass_03",
+      "bbox": {
+        "x": 396,
+        "y": 63,
+        "width": 69,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=saucer; geometric_class=circle; slot=1; body_color=#D98A75; rotation_deg=0; scale=1; anchor_center=(430,95); difficulty_tags=similar_subclass,reappearance."
+    },
+    {
+      "instance_id": "inst_oval_platter_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "oval_subclass_01",
+      "bbox": {
+        "x": 496,
+        "y": 42,
+        "width": 109,
+        "height": 61
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=oval_platter; geometric_class=oval; slot=1; body_color=#B69CDC; rotation_deg=0; scale=1; anchor_center=(550,72); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_square_plate_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 50,
+        "y": 165,
+        "width": 80,
+        "height": 80
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=square_plate; geometric_class=square; slot=1; body_color=#83B7D8; rotation_deg=6; scale=1; anchor_center=(90,205); difficulty_tags=standard."
+    },
+    {
+      "instance_id": "inst_tray_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 243,
+        "y": 166,
+        "width": 115,
+        "height": 59
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=tray; geometric_class=rectangle; slot=1; body_color=#C79B68; rotation_deg=0; scale=1; anchor_center=(300,195); difficulty_tags=position_change,similar_subclass."
+    },
+    {
+      "instance_id": "inst_folded_napkin_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 436,
+        "y": 174,
+        "width": 69,
+        "height": 62
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=folded_napkin; geometric_class=rectangle; slot=1; body_color=#75C6A7; rotation_deg=25; scale=0.85; anchor_center=(470,205); difficulty_tags=rotation,scale,similar_subclass."
+    },
+    {
+      "instance_id": "inst_triangle_plate_01_f020",
+      "frame_id": "frame_020",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 495,
+        "y": 317,
+        "width": 80,
+        "height": 77
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "object=triangle_plate; geometric_class=triangle; slot=1; body_color=#D9A0BC; rotation_deg=-8; scale=1; anchor_center=(535,355); difficulty_tags=standard."
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "expected_change_event_ids": [
+        "event_001",
+        "event_002",
+        "event_003",
+        "event_004",
+        "event_005"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "expected_change_event_ids": [
+        "event_006",
+        "event_007",
+        "event_008",
+        "event_009",
+        "event_010",
+        "event_011"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "expected_change_event_ids": [
+        "event_012",
+        "event_013",
+        "event_014",
+        "event_015",
+        "event_016",
+        "event_017"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "expected_change_event_ids": [
+        "event_018",
+        "event_019",
+        "event_020",
+        "event_021",
+        "event_022"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "expected_change_event_ids": [
+        "event_023",
+        "event_024",
+        "event_025",
+        "event_026",
+        "event_027"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "expected_change_event_ids": [
+        "event_028",
+        "event_029",
+        "event_030",
+        "event_031",
+        "event_032"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "expected_change_event_ids": [
+        "event_033",
+        "event_034",
+        "event_035",
+        "event_036",
+        "event_037",
+        "event_038"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "expected_change_event_ids": [
+        "event_039",
+        "event_040",
+        "event_041",
+        "event_042",
+        "event_043",
+        "event_044"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "expected_change_event_ids": [
+        "event_045",
+        "event_046",
+        "event_047",
+        "event_048",
+        "event_049",
+        "event_050",
+        "event_051"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "expected_change_event_ids": [
+        "event_052",
+        "event_053",
+        "event_054",
+        "event_055",
+        "event_056",
+        "event_057",
+        "event_058",
+        "event_059"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "expected_change_event_ids": [
+        "event_060",
+        "event_061",
+        "event_062",
+        "event_063",
+        "event_064",
+        "event_065",
+        "event_066",
+        "event_067"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "expected_change_event_ids": [
+        "event_068",
+        "event_069",
+        "event_070",
+        "event_071",
+        "event_072",
+        "event_073",
+        "event_074",
+        "event_075"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "expected_change_event_ids": [
+        "event_076",
+        "event_077",
+        "event_078",
+        "event_079",
+        "event_080",
+        "event_081",
+        "event_082",
+        "event_083",
+        "event_084"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "expected_change_event_ids": [
+        "event_085",
+        "event_086",
+        "event_087",
+        "event_088",
+        "event_089",
+        "event_090",
+        "event_091",
+        "event_092",
+        "event_093"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "expected_change_event_ids": [
+        "event_094",
+        "event_095",
+        "event_096",
+        "event_097",
+        "event_098",
+        "event_099",
+        "event_100",
+        "event_101",
+        "event_102"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "expected_change_event_ids": [
+        "event_103",
+        "event_104",
+        "event_105",
+        "event_106",
+        "event_107",
+        "event_108",
+        "event_109",
+        "event_110",
+        "event_111"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "expected_change_event_ids": [
+        "event_112",
+        "event_113",
+        "event_114",
+        "event_115",
+        "event_116",
+        "event_117",
+        "event_118",
+        "event_119",
+        "event_120",
+        "event_121"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "expected_change_event_ids": [
+        "event_122",
+        "event_123",
+        "event_124",
+        "event_125",
+        "event_126",
+        "event_127",
+        "event_128",
+        "event_129",
+        "event_130",
+        "event_131"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    },
+    {
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "expected_change_event_ids": [
+        "event_132",
+        "event_133",
+        "event_134",
+        "event_135",
+        "event_136",
+        "event_137",
+        "event_138",
+        "event_139",
+        "event_140",
+        "event_141",
+        "event_142"
+      ],
+      "uncertainty": "",
+      "notes": "Полная разметка всех положительных событий между соседними кадрами; отсутствие события является отрицательной меткой."
+    }
+  ],
+  "change_events": [
+    {
+      "event_id": "event_001",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_002",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_003",
+      "event_type": "appeared",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_004",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_005",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_006",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_007",
+      "event_type": "position_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Средний центр bbox смещен на 75.0 px; normalized_by_width=0.1172.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_008",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_009",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_010",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_011",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_012",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_013",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_014",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_015",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_016",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_017",
+      "event_type": "count_changed",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Количество изменилось с 1 до 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_018",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_019",
+      "event_type": "disappeared",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Количество изменилось с 1 до 0.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_020",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_021",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_022",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_023",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_024",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_025",
+      "event_type": "appeared",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_026",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_027",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_028",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_029",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_030",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_031",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_032",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_033",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_034",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_035",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_036",
+      "event_type": "appeared",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_037",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_038",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_039",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_040",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_041",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_042",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_043",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_044",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_045",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_046",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_047",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_048",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_049",
+      "event_type": "appeared",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_050",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_051",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_052",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_053",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_054",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_055",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_056",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_057",
+      "event_type": "position_changed",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "evidence": "Средний центр bbox смещен на 75.0 px; normalized_by_width=0.1172.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_058",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_059",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_010",
+      "to_frame_id": "frame_011",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_060",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_061",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_062",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_063",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_064",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_065",
+      "event_type": "appeared",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_066",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_067",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_011",
+      "to_frame_id": "frame_012",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_068",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_069",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_070",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_071",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_072",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_073",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_074",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_075",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_012",
+      "to_frame_id": "frame_013",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_076",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_077",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_078",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_079",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_080",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_081",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_082",
+      "event_type": "appeared",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_083",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_084",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_013",
+      "to_frame_id": "frame_014",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_085",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_086",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_087",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_088",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_089",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_090",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_091",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_092",
+      "event_type": "disappeared",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Количество изменилось с 1 до 0.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_093",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_014",
+      "to_frame_id": "frame_015",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_094",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_095",
+      "event_type": "count_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Количество изменилось с 1 до 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_096",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_097",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_098",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_099",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_100",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_101",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_102",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_015",
+      "to_frame_id": "frame_016",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_103",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_104",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_105",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_106",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_107",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_108",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_109",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_110",
+      "event_type": "appeared",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_111",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_016",
+      "to_frame_id": "frame_017",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_112",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_113",
+      "event_type": "appeared",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_114",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_115",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_116",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_117",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_118",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_119",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_120",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_121",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_017",
+      "to_frame_id": "frame_018",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_122",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_123",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_124",
+      "event_type": "disappeared",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Количество изменилось с 1 до 0.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_125",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_126",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_127",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_128",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_129",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_130",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_131",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_018",
+      "to_frame_id": "frame_019",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_132",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_133",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_02",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_134",
+      "event_type": "appeared",
+      "visual_type_id": "circle_subclass_03",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Количество изменилось с 0 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_135",
+      "event_type": "persisted",
+      "visual_type_id": "oval_subclass_01",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_136",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_137",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_138",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_139",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_140",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 1 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_141",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Тип присутствует в обоих кадрах: 2 -> 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    },
+    {
+      "event_id": "event_142",
+      "event_type": "count_changed",
+      "visual_type_id": "undefined_subclass_02",
+      "from_frame_id": "frame_019",
+      "to_frame_id": "frame_020",
+      "evidence": "Количество изменилось с 2 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне локального visual type."
+    }
+  ],
+  "allowed_event_types": [
+    "persisted",
+    "appeared",
+    "disappeared",
+    "count_changed",
+    "position_changed"
+  ],
+  "uncertainty": [],
+  "notes": "Полная детерминированная held-out разметка. visual_type_id локальны внутри stream_id. Цвет, масштаб и поворот записаны в notes и не создают отдельного события. Все положительные события соседних кадров перечислены; отсутствие события является отрицательной меткой."
+}

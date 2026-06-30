@@ -1,0 +1,1541 @@
+﻿{
+  "schema_version": "stream-pilot-annotation-0.1",
+  "stream_id": "probe_01_stationery",
+  "manifest_ref": "manifest.json",
+  "annotation_scope": "pilot_development",
+  "visual_types": [
+    {
+      "visual_type_id": "square_subclass_01",
+      "description": "Квадратный стикер с загнутым верхним углом.",
+      "notes": "Локальный ID потока probe_01_stationery; geometric_class=square; предмет=стикер."
+    },
+    {
+      "visual_type_id": "rectangle_subclass_01",
+      "description": "Прямоугольный блокнот с корешком, этикеткой и линиями страниц.",
+      "notes": "Локальный ID потока probe_01_stationery; geometric_class=rectangle; предмет=блокнот."
+    },
+    {
+      "visual_type_id": "rectangle_subclass_02",
+      "description": "Прямоугольный ластик со светлой бумажной полоской.",
+      "notes": "Локальный ID потока probe_01_stationery; geometric_class=rectangle; предмет=ластик."
+    },
+    {
+      "visual_type_id": "rectangle_subclass_03",
+      "description": "Вытянутый карандаш с деревянным кончиком и ластиком.",
+      "notes": "Локальный ID потока probe_01_stationery; geometric_class=rectangle; предмет=карандаш."
+    },
+    {
+      "visual_type_id": "circle_subclass_01",
+      "description": "Круглый рулон скотча с центральным отверстием.",
+      "notes": "Локальный ID потока probe_01_stationery; geometric_class=circle; предмет=рулон скотча."
+    },
+    {
+      "visual_type_id": "triangle_subclass_01",
+      "description": "Треугольный чертежный угольник с внутренним вырезом.",
+      "notes": "Локальный ID потока probe_01_stationery; geometric_class=triangle; предмет=чертежный угольник."
+    },
+    {
+      "visual_type_id": "undefined_subclass_01",
+      "description": "Ножницы с двумя лезвиями, кольцевыми ручками и общим шарниром.",
+      "notes": "Локальный ID потока probe_01_stationery; geometric_class=undefined; предмет=ножницы."
+    }
+  ],
+  "expected_element_instances": [
+    {
+      "instance_id": "inst_notebook_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 51,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_pencil_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 82,
+        "y": 361,
+        "width": 167,
+        "height": 57
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=-10; scale=1."
+    },
+    {
+      "instance_id": "inst_tape_roll_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 497,
+        "y": 57,
+        "width": 87,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: рулон скотча; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_scissors_01_f001",
+      "frame_id": "frame_001",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 420,
+        "y": 316,
+        "width": 161,
+        "height": 128
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ножницы; geometric_class=undefined; slot=1; rotation_deg=15; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 51,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_pencil_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 92,
+        "y": 335,
+        "width": 146,
+        "height": 110
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=35; scale=1."
+    },
+    {
+      "instance_id": "inst_tape_roll_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 497,
+        "y": 172,
+        "width": 87,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: рулон скотча; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_scissors_01_f002",
+      "frame_id": "frame_002",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 420,
+        "y": 316,
+        "width": 161,
+        "height": 128
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ножницы; geometric_class=undefined; slot=1; rotation_deg=15; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 25,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 51,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_pencil_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 92,
+        "y": 335,
+        "width": 146,
+        "height": 110
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=35; scale=1."
+    },
+    {
+      "instance_id": "inst_tape_roll_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 497,
+        "y": 172,
+        "width": 87,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: рулон скотча; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_scissors_01_f003",
+      "frame_id": "frame_003",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 420,
+        "y": 316,
+        "width": 161,
+        "height": 128
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ножницы; geometric_class=undefined; slot=1; rotation_deg=15; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 25,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_02_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 130,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=2; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 161,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_pencil_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 92,
+        "y": 335,
+        "width": 146,
+        "height": 110
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=35; scale=1."
+    },
+    {
+      "instance_id": "inst_tape_roll_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 497,
+        "y": 172,
+        "width": 87,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: рулон скотча; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_scissors_01_f004",
+      "frame_id": "frame_004",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 420,
+        "y": 316,
+        "width": 161,
+        "height": 128
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ножницы; geometric_class=undefined; slot=1; rotation_deg=15; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 25,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_02_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 130,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=2; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 161,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_eraser_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 59,
+        "y": 209,
+        "width": 92,
+        "height": 52
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ластик; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_pencil_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 92,
+        "y": 335,
+        "width": 146,
+        "height": 110
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=35; scale=1."
+    },
+    {
+      "instance_id": "inst_tape_roll_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 497,
+        "y": 172,
+        "width": 87,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: рулон скотча; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_scissors_01_f005",
+      "frame_id": "frame_005",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 420,
+        "y": 316,
+        "width": 161,
+        "height": 128
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ножницы; geometric_class=undefined; slot=1; rotation_deg=15; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 25,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_02_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 130,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=2; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 161,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_eraser_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 29,
+        "y": 193,
+        "width": 152,
+        "height": 84
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ластик; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1.7."
+    },
+    {
+      "instance_id": "inst_pencil_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 125,
+        "y": 309,
+        "width": 79,
+        "height": 162
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=110; scale=1."
+    },
+    {
+      "instance_id": "inst_tape_roll_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 497,
+        "y": 172,
+        "width": 87,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: рулон скотча; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_scissors_01_f006",
+      "frame_id": "frame_006",
+      "visual_type_id": "undefined_subclass_01",
+      "bbox": {
+        "x": 420,
+        "y": 316,
+        "width": 161,
+        "height": 128
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ножницы; geometric_class=undefined; slot=1; rotation_deg=15; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 25,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_02_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 130,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=2; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 161,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_eraser_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 42,
+        "y": 200,
+        "width": 126,
+        "height": 69
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ластик; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1.4."
+    },
+    {
+      "instance_id": "inst_pencil_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 125,
+        "y": 309,
+        "width": 79,
+        "height": 162
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=110; scale=1."
+    },
+    {
+      "instance_id": "inst_tape_roll_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 497,
+        "y": 172,
+        "width": 87,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: рулон скотча; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_set_square_01_f007",
+      "frame_id": "frame_007",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 438,
+        "y": 329,
+        "width": 123,
+        "height": 102
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чертежный угольник; geometric_class=triangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 25,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 161,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_eraser_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 48,
+        "y": 203,
+        "width": 114,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ластик; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1.25."
+    },
+    {
+      "instance_id": "inst_pencil_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 125,
+        "y": 309,
+        "width": 79,
+        "height": 162
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=110; scale=1."
+    },
+    {
+      "instance_id": "inst_tape_roll_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "circle_subclass_01",
+      "bbox": {
+        "x": 497,
+        "y": 172,
+        "width": 87,
+        "height": 87
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: рулон скотча; geometric_class=circle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_set_square_01_f008",
+      "frame_id": "frame_008",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 440,
+        "y": 288,
+        "width": 90,
+        "height": 154
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чертежный угольник; geometric_class=triangle; slot=1; rotation_deg=120; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 25,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 240,
+        "y": 161,
+        "width": 151,
+        "height": 109
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_eraser_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 463,
+        "y": 178,
+        "width": 114,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ластик; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1.25."
+    },
+    {
+      "instance_id": "inst_pencil_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 125,
+        "y": 309,
+        "width": 79,
+        "height": 162
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=110; scale=1."
+    },
+    {
+      "instance_id": "inst_set_square_01_f009",
+      "frame_id": "frame_009",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 440,
+        "y": 288,
+        "width": 90,
+        "height": 154
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чертежный угольник; geometric_class=triangle; slot=1; rotation_deg=120; scale=1."
+    },
+    {
+      "instance_id": "inst_sticky_note_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "square_subclass_01",
+      "bbox": {
+        "x": 25,
+        "y": 60,
+        "width": 81,
+        "height": 81
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: стикер; geometric_class=square; slot=1; rotation_deg=0; scale=1."
+    },
+    {
+      "instance_id": "inst_notebook_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "rectangle_subclass_01",
+      "bbox": {
+        "x": 195,
+        "y": 68,
+        "width": 190,
+        "height": 154
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: блокнот; geometric_class=rectangle; slot=1; rotation_deg=12; scale=1.15."
+    },
+    {
+      "instance_id": "inst_eraser_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "rectangle_subclass_02",
+      "bbox": {
+        "x": 463,
+        "y": 178,
+        "width": 114,
+        "height": 64
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: ластик; geometric_class=rectangle; slot=1; rotation_deg=0; scale=1.25."
+    },
+    {
+      "instance_id": "inst_pencil_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "rectangle_subclass_03",
+      "bbox": {
+        "x": 136,
+        "y": 307,
+        "width": 57,
+        "height": 167
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: карандаш; geometric_class=rectangle; slot=1; rotation_deg=260; scale=1."
+    },
+    {
+      "instance_id": "inst_set_square_01_f010",
+      "frame_id": "frame_010",
+      "visual_type_id": "triangle_subclass_01",
+      "bbox": {
+        "x": 440,
+        "y": 288,
+        "width": 90,
+        "height": 154
+      },
+      "characteristic_regions": [],
+      "uncertainty": "",
+      "notes": "Объект: чертежный угольник; geometric_class=triangle; slot=1; rotation_deg=120; scale=1."
+    }
+  ],
+  "frame_comparisons": [
+    {
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "expected_change_event_ids": [
+        "event_001",
+        "event_002",
+        "event_003",
+        "event_004",
+        "event_005"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "expected_change_event_ids": [
+        "event_006",
+        "event_007",
+        "event_008",
+        "event_009",
+        "event_010"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "expected_change_event_ids": [
+        "event_011",
+        "event_012",
+        "event_013",
+        "event_014",
+        "event_015",
+        "event_016",
+        "event_017"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "expected_change_event_ids": [
+        "event_018",
+        "event_019",
+        "event_020",
+        "event_021",
+        "event_022",
+        "event_023"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "expected_change_event_ids": [
+        "event_024",
+        "event_025",
+        "event_026",
+        "event_027",
+        "event_028",
+        "event_029"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "expected_change_event_ids": [
+        "event_030",
+        "event_031",
+        "event_032",
+        "event_033",
+        "event_034",
+        "event_035",
+        "event_036"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "expected_change_event_ids": [
+        "event_037",
+        "event_038",
+        "event_039",
+        "event_040",
+        "event_041",
+        "event_042",
+        "event_043",
+        "event_044"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "expected_change_event_ids": [
+        "event_045",
+        "event_046",
+        "event_047",
+        "event_048",
+        "event_049",
+        "event_050",
+        "event_051"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    },
+    {
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "expected_change_event_ids": [
+        "event_052",
+        "event_053",
+        "event_054",
+        "event_055",
+        "event_056",
+        "event_057"
+      ],
+      "uncertainty": "",
+      "notes": "Ожидаемые события между соседними кадрами согласованного probe-сценария."
+    }
+  ],
+  "change_events": [
+    {
+      "event_id": "event_001",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_002",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_003",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Подкласс circle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_004",
+      "event_type": "position_changed",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Средний центр подкласса смещен примерно на 115.0 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_005",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_001",
+      "to_frame_id": "frame_002",
+      "evidence": "Подкласс undefined_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_006",
+      "event_type": "appeared",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Подкласс square_subclass_01 отсутствует в frame_002 и присутствует в frame_003.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_007",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_008",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_009",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Подкласс circle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_010",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_002",
+      "to_frame_id": "frame_003",
+      "evidence": "Подкласс undefined_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_011",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Подкласс square_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_012",
+      "event_type": "count_changed",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Количество экземпляров изменилось с 1 до 2.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_013",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_014",
+      "event_type": "position_changed",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Средний центр подкласса смещен примерно на 110.0 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_015",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_016",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Подкласс circle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_017",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_003",
+      "to_frame_id": "frame_004",
+      "evidence": "Подкласс undefined_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_018",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Подкласс square_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_019",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_020",
+      "event_type": "appeared",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Подкласс rectangle_subclass_02 отсутствует в frame_004 и присутствует в frame_005.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_021",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_022",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Подкласс circle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_023",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_004",
+      "to_frame_id": "frame_005",
+      "evidence": "Подкласс undefined_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_024",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Подкласс square_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_025",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_026",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Подкласс rectangle_subclass_02 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_027",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_028",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Подкласс circle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_029",
+      "event_type": "persisted",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_005",
+      "to_frame_id": "frame_006",
+      "evidence": "Подкласс undefined_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_030",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Подкласс square_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_031",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_032",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Подкласс rectangle_subclass_02 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_033",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_034",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Подкласс circle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_035",
+      "event_type": "appeared",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Подкласс triangle_subclass_01 отсутствует в frame_006 и присутствует в frame_007.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_036",
+      "event_type": "disappeared",
+      "visual_type_id": "undefined_subclass_01",
+      "from_frame_id": "frame_006",
+      "to_frame_id": "frame_007",
+      "evidence": "Подкласс undefined_subclass_01 присутствует в frame_006 и отсутствует в frame_007.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_037",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Подкласс square_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_038",
+      "event_type": "count_changed",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Количество экземпляров изменилось с 2 до 1.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_039",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_040",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Подкласс rectangle_subclass_02 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_041",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_042",
+      "event_type": "persisted",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Подкласс circle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_043",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Подкласс triangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_044",
+      "event_type": "position_changed",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_007",
+      "to_frame_id": "frame_008",
+      "evidence": "Средний центр подкласса смещен примерно на 21.2 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_045",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Подкласс square_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_046",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_047",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Подкласс rectangle_subclass_02 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_048",
+      "event_type": "position_changed",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Средний центр подкласса смещен примерно на 415.8 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_049",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_050",
+      "event_type": "disappeared",
+      "visual_type_id": "circle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Подкласс circle_subclass_01 присутствует в frame_008 и отсутствует в frame_009.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_051",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_008",
+      "to_frame_id": "frame_009",
+      "evidence": "Подкласс triangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_052",
+      "event_type": "persisted",
+      "visual_type_id": "square_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Подкласс square_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_053",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Подкласс rectangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_054",
+      "event_type": "position_changed",
+      "visual_type_id": "rectangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Средний центр подкласса смещен примерно на 74.3 px.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_055",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_02",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Подкласс rectangle_subclass_02 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_056",
+      "event_type": "persisted",
+      "visual_type_id": "rectangle_subclass_03",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Подкласс rectangle_subclass_03 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    },
+    {
+      "event_id": "event_057",
+      "event_type": "persisted",
+      "visual_type_id": "triangle_subclass_01",
+      "from_frame_id": "frame_009",
+      "to_frame_id": "frame_010",
+      "evidence": "Подкласс triangle_subclass_01 присутствует в обоих соседних кадрах.",
+      "uncertainty": "",
+      "notes": "Событие размечено на уровне визуального подкласса."
+    }
+  ],
+  "allowed_event_types": [
+    "persisted",
+    "appeared",
+    "disappeared",
+    "count_changed",
+    "position_changed"
+  ],
+  "uncertainty": [],
+  "notes": "Детерминированная pilot-разметка probe_01_stationery. visual_type_id локальны внутри stream_id; изменение только поворота или масштаба не создает отдельного события."
+}

@@ -1,0 +1,85 @@
+﻿{
+  "schema_version": "stream-input-0.1",
+  "stream_id": "probe_04_technical_tools",
+  "scene_description": "Controlled flat technical-tools stream with holes, teeth, cutouts, count changes, rotation, and scale changes.",
+  "ordering": "manifest",
+  "frames": [
+    {
+      "frame_id": "frame_001",
+      "index": 1,
+      "image_path": "frames/frame_001.png",
+      "notes": "Начальная сцена: шайба, квадратная и прямоугольная пластины, гаечный ключ."
+    },
+    {
+      "frame_id": "frame_002",
+      "index": 2,
+      "image_path": "frames/frame_002.png",
+      "notes": "Шайба перемещена; гаечный ключ повернут."
+    },
+    {
+      "frame_id": "frame_003",
+      "index": 3,
+      "image_path": "frames/frame_003.png",
+      "notes": "Появилась шестеренка."
+    },
+    {
+      "frame_id": "frame_004",
+      "index": 4,
+      "image_path": "frames/frame_004.png",
+      "notes": "Добавлена вторая шайба того же подкласса."
+    },
+    {
+      "frame_id": "frame_005",
+      "index": 5,
+      "image_path": "frames/frame_005.png",
+      "notes": "Появился треугольный кронштейн; квадратная пластина немного увеличена."
+    },
+    {
+      "frame_id": "frame_006",
+      "index": 6,
+      "image_path": "frames/frame_006.png",
+      "notes": "Появился шестигранный ключ; прямоугольная пластина перемещена."
+    },
+    {
+      "frame_id": "frame_007",
+      "index": 7,
+      "image_path": "frames/frame_007.png",
+      "notes": "Гаечный ключ исчез; шестеренка значительно увеличена и повернута."
+    },
+    {
+      "frame_id": "frame_008",
+      "index": 8,
+      "image_path": "frames/frame_008.png",
+      "notes": "Одна шайба удалена; шестигранный ключ перемещен и повернут."
+    },
+    {
+      "frame_id": "frame_009",
+      "index": 9,
+      "image_path": "frames/frame_009.png",
+      "notes": "Гаечный ключ вернулся после двух кадров отсутствия; квадратная пластина исчезла."
+    },
+    {
+      "frame_id": "frame_010",
+      "index": 10,
+      "image_path": "frames/frame_010.png",
+      "notes": "Кронштейн перемещен; прямоугольная пластина значительно уменьшена."
+    }
+  ],
+  "notes": "Пробный development-поток проекта; не финальный evaluation-набор.",
+  "metadata": {
+    "source": "deterministic_pillow_generator",
+    "generator": "generate_stream.py",
+    "purpose": "stream_analysis_probe_development",
+    "frame_size": {
+      "width": 640,
+      "height": 480
+    },
+    "frame_format": "png_rgb",
+    "background": {
+      "kind": "fixed_vertical_gradient",
+      "top": "#91B9BD",
+      "bottom": "#7FA9AE"
+    },
+    "is_final_dataset": false
+  }
+}
