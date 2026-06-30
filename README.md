@@ -22,7 +22,7 @@ The included example stream contains generated image sequences with recurring ob
 
 | Input frame | Analysis overlay |
 |---|---|
-| ![Input frame](src-final/data/streams/heldout_04_technical_tools/frames/frame_014.png) | ![Analysis overlay](src-final/outputs/runs/demonstration_final_h04_dino_bbox/overlays/frame_014.png) |
+| ![Input frame](assets/visual-example/input-frame.png) | ![Analysis overlay](assets/visual-example/analysis-overlay.png) |
 
 ## Pipeline
 
