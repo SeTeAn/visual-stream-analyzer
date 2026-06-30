@@ -16,6 +16,14 @@ The project is organized as a command-line pipeline with separate validation, an
 
 Large experiment archives and model weights are intentionally not included.
 
+## Visual Example
+
+The included example stream contains generated image sequences with recurring objects. The analysis output overlays detected recurring visual types and frame-to-frame change events.
+
+| Input frame | Analysis overlay |
+|---|---|
+| ![Input frame](src-final/data/streams/heldout_04_technical_tools/frames/frame_014.png) | ![Analysis overlay](src-final/outputs/runs/demonstration_final_h04_dino_bbox/overlays/frame_014.png) |
+
 ## Pipeline
 
 1. Load an ordered frame stream and validate its manifest.
