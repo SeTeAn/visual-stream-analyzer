@@ -134,16 +134,22 @@ DRAWERS: dict[str, Callable[[str], Image.Image]] = {"round_plate": draw_round_pl
 
 
 def background() -> Image.Image:
-    top = tuple(bytes.fromhex(BACKGROUND_TOP[1:])); bottom = tuple(bytes.fromhex(BACKGROUND_BOTTOM[1:])); image = Image.new("RGB", (WIDTH*AA, HEIGHT*AA)); draw = ImageDraw.Draw(image)
+    top = tuple(bytes.fromhex(BACKGROUND_TOP[1:]))
+    bottom = tuple(bytes.fromhex(BACKGROUND_BOTTOM[1:]))
+    image = Image.new("RGB", (WIDTH*AA, HEIGHT*AA))
+    draw = ImageDraw.Draw(image)
     for y in range(HEIGHT*AA):
-        q=y/(HEIGHT*AA-1); draw.line((0,y,WIDTH*AA,y), fill=tuple(round(top[i]*(1-q)+bottom[i]*q) for i in range(3)))
+        q = y/(HEIGHT*AA-1)
+        draw.line((0,y,WIDTH*AA,y), fill=tuple(round(top[i]*(1-q)+bottom[i]*q) for i in range(3)))
     return image.convert("RGBA")
 
 
 def transformed(item: Placement) -> Image.Image:
     image = DRAWERS[item.kind](item.tone)
-    if item.scale != 1: image = image.resize((round(image.width*item.scale), round(image.height*item.scale)), Image.Resampling.LANCZOS)
-    if item.rotation: image = image.rotate(item.rotation, resample=Image.Resampling.BICUBIC, expand=True)
+    if item.scale != 1:
+        image = image.resize((round(image.width*item.scale), round(image.height*item.scale)), Image.Resampling.LANCZOS)
+    if item.rotation:
+        image = image.rotate(item.rotation, resample=Image.Resampling.BICUBIC, expand=True)
     return image.crop(image.getchannel("A").getbbox())
 
 
@@ -152,87 +158,180 @@ def too_close(a: dict[str,int], b: dict[str,int], gap: int=12) -> bool:
 
 
 def render_frame(index: int, scene: list[Placement]) -> list[dict[str,object]]:
-    base_frame=background(); base_output=base_frame.convert("RGB").resize((WIDTH,HEIGHT),Image.Resampling.LANCZOS); frame=base_frame.copy(); instances=[]; bboxes=[]
+    base_frame=background()
+    base_output=base_frame.convert("RGB").resize((WIDTH,HEIGHT),Image.Resampling.LANCZOS)
+    frame=base_frame.copy()
+    instances=[]
+    bboxes=[]
     for item in scene:
-        image=transformed(item); left=round(item.center[0]*AA-image.width/2); top=round(item.center[1]*AA-image.height/2)
-        if left<0 or top<0 or left+image.width>frame.width or top+image.height>frame.height: raise ValueError(f"{item.kind} leaves frame {index}")
-        object_frame=base_frame.copy(); object_frame.alpha_composite(image,(left,top)); object_output=object_frame.convert("RGB").resize((WIDTH,HEIGHT),Image.Resampling.LANCZOS); rendered_bbox=ImageChops.difference(object_output,base_output).convert("L").getbbox()
-        if rendered_bbox is None: raise ValueError(f"{item.kind} produced no rendered pixels in frame {index}")
-        x=max(0,rendered_bbox[0]-BBOX_PADDING); y=max(0,rendered_bbox[1]-BBOX_PADDING); right=min(WIDTH,rendered_bbox[2]+BBOX_PADDING); bottom=min(HEIGHT,rendered_bbox[3]+BBOX_PADDING); bbox={"x":x,"y":y,"width":right-x,"height":bottom-y}
-        if any(too_close(old,bbox) for old in bboxes): raise ValueError(f"Objects are too close in frame {index}: {item.kind} {bbox}")
-        bboxes.append(bbox); frame.alpha_composite(image,(left,top)); spec=TYPE_BY_KIND[item.kind]
-        instances.append({"instance_id":f"inst_{item.kind}_{item.slot:02d}_f{index:03d}","frame_id":f"frame_{index:03d}","visual_type_id":spec.visual_type_id,"bbox":bbox,"characteristic_regions":[],"uncertainty":"","notes":f"Объект: {spec.name}; geometric_class={spec.geometric_class}; slot={item.slot}; rotation_deg={item.rotation:g}; scale={item.scale:g}; tone={item.tone}."})
-    frame.convert("RGB").resize((WIDTH,HEIGHT),Image.Resampling.LANCZOS).save(FRAMES_DIR/f"frame_{index:03d}.png",optimize=True); return instances
+        image=transformed(item)
+        left=round(item.center[0]*AA-image.width/2)
+        top=round(item.center[1]*AA-image.height/2)
+        if left<0 or top<0 or left+image.width>frame.width or top+image.height>frame.height:
+            raise ValueError(f"{item.kind} leaves frame {index}")
+        object_frame=base_frame.copy()
+        object_frame.alpha_composite(image,(left,top))
+        object_output=object_frame.convert("RGB").resize((WIDTH,HEIGHT),Image.Resampling.LANCZOS)
+        rendered_bbox=ImageChops.difference(object_output,base_output).convert("L").getbbox()
+        if rendered_bbox is None:
+            raise ValueError(f"{item.kind} produced no rendered pixels in frame {index}")
+        x=max(0,rendered_bbox[0]-BBOX_PADDING)
+        y=max(0,rendered_bbox[1]-BBOX_PADDING)
+        right=min(WIDTH,rendered_bbox[2]+BBOX_PADDING)
+        bottom=min(HEIGHT,rendered_bbox[3]+BBOX_PADDING)
+        bbox={"x":x,"y":y,"width":right-x,"height":bottom-y}
+        if any(too_close(old,bbox) for old in bboxes):
+            raise ValueError(f"Objects are too close in frame {index}: {item.kind} {bbox}")
+        bboxes.append(bbox)
+        frame.alpha_composite(image,(left,top))
+        spec=TYPE_BY_KIND[item.kind]
+        instances.append({
+            "instance_id": f"inst_{item.kind}_{item.slot:02d}_f{index:03d}",
+            "frame_id": f"frame_{index:03d}",
+            "visual_type_id": spec.visual_type_id,
+            "bbox": bbox,
+            "characteristic_regions": [],
+            "uncertainty": "",
+            "notes": (
+                f"Объект: {spec.name}; geometric_class={spec.geometric_class}; "
+                f"slot={item.slot}; rotation_deg={item.rotation:g}; "
+                f"scale={item.scale:g}; tone={item.tone}."
+            ),
+        })
+    frame.convert("RGB").resize((WIDTH,HEIGHT),Image.Resampling.LANCZOS).save(FRAMES_DIR/f"frame_{index:03d}.png",optimize=True)
+    return instances
 
 
-def counts(scene: list[Placement]) -> Counter[str]: return Counter(TYPE_BY_KIND[item.kind].visual_type_id for item in scene)
+def counts(scene: list[Placement]) -> Counter[str]:
+    return Counter(TYPE_BY_KIND[item.kind].visual_type_id for item in scene)
+
+
 def average_center(scene: list[Placement], type_id: str) -> tuple[float,float]:
-    values=[item.center for item in scene if TYPE_BY_KIND[item.kind].visual_type_id==type_id]; return sum(x for x,_ in values)/len(values),sum(y for _,y in values)/len(values)
+    values=[item.center for item in scene if TYPE_BY_KIND[item.kind].visual_type_id==type_id]
+    return sum(x for x,_ in values)/len(values),sum(y for _,y in values)/len(values)
 
 
 def build_events() -> tuple[list[dict[str,object]],list[dict[str,object]]]:
-    events=[]; comparisons=[]
+    events=[]
+    comparisons=[]
     for to_index in range(2,11):
-        previous,current=SCENES[to_index-2],SCENES[to_index-1]; old,new=counts(previous),counts(current); ids=[]
+        previous,current=SCENES[to_index-2],SCENES[to_index-1]
+        old,new=counts(previous),counts(current)
+        ids=[]
         for type_id in sorted(TYPE_ORDER,key=TYPE_ORDER.get):
             kinds=[]
-            if old[type_id]==0<new[type_id]: kinds=["appeared"]
-            elif old[type_id]>0==new[type_id]: kinds=["disappeared"]
+            if old[type_id]==0<new[type_id]:
+                kinds=["appeared"]
+            elif old[type_id]>0==new[type_id]:
+                kinds=["disappeared"]
             elif old[type_id] and new[type_id]:
                 kinds=["persisted"]
-                if old[type_id]!=new[type_id]: kinds.append("count_changed")
-                if type_id in POSITION_CHANGES.get(to_index,set()): kinds.append("position_changed")
+                if old[type_id]!=new[type_id]:
+                    kinds.append("count_changed")
+                if type_id in POSITION_CHANGES.get(to_index,set()):
+                    kinds.append("position_changed")
             for kind in kinds:
-                event_id=f"event_{len(events)+1:03d}"; ids.append(event_id)
-                evidence=f"Количество экземпляров изменилось с {old[type_id]} до {new[type_id]}." if kind=="count_changed" else (f"Средний центр подкласса смещен примерно на {math.dist(average_center(previous,type_id),average_center(current,type_id)):.1f} px." if kind=="position_changed" else f"Событие {kind} установлено по присутствию подкласса в соседних кадрах.")
-                events.append({"event_id":event_id,"event_type":kind,"visual_type_id":type_id,"from_frame_id":f"frame_{to_index-1:03d}","to_frame_id":f"frame_{to_index:03d}","evidence":evidence,"uncertainty":"","notes":"Событие размечено на уровне визуального подкласса."})
-        comparisons.append({"from_frame_id":f"frame_{to_index-1:03d}","to_frame_id":f"frame_{to_index:03d}","expected_change_event_ids":ids,"uncertainty":"","notes":"Согласованный переход probe-сценария."})
+                event_id=f"event_{len(events)+1:03d}"
+                ids.append(event_id)
+                evidence=(
+                    f"Количество экземпляров изменилось с {old[type_id]} до {new[type_id]}."
+                    if kind=="count_changed"
+                    else (
+                        "Средний центр подкласса смещен примерно на "
+                        f"{math.dist(average_center(previous,type_id),average_center(current,type_id)):.1f} px."
+                        if kind=="position_changed"
+                        else f"Событие {kind} установлено по присутствию подкласса в соседних кадрах."
+                    )
+                )
+                events.append({
+                    "event_id": event_id,
+                    "event_type": kind,
+                    "visual_type_id": type_id,
+                    "from_frame_id": f"frame_{to_index-1:03d}",
+                    "to_frame_id": f"frame_{to_index:03d}",
+                    "evidence": evidence,
+                    "uncertainty": "",
+                    "notes": "Событие размечено на уровне визуального подкласса.",
+                })
+        comparisons.append({
+            "from_frame_id": f"frame_{to_index-1:03d}",
+            "to_frame_id": f"frame_{to_index:03d}",
+            "expected_change_event_ids": ids,
+            "uncertainty": "",
+            "notes": "Согласованный переход probe-сценария.",
+        })
     return comparisons,events
 
 
-def write_json(path: Path,value: dict[str,object]) -> None: path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+def write_json(path: Path,value: dict[str,object]) -> None:
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 
 
 def validate(manifest: dict[str,object],annotation: dict[str,object]) -> None:
-    errors=[]; frame_ids=[x["frame_id"] for x in manifest["frames"]]
-    if frame_ids != [f"frame_{i:03d}" for i in range(1,11)]: errors.append("Invalid frame order")
-    if manifest["stream_id"]!=annotation["stream_id"]: errors.append("stream_id mismatch")
-    known={x["visual_type_id"] for x in annotation["visual_types"]}; instances=annotation["expected_element_instances"]; by_frame={fid:[] for fid in frame_ids}
-    if len(known)!=7 or len({x["instance_id"] for x in instances})!=len(instances): errors.append("Non-unique IDs")
+    errors=[]
+    frame_ids=[x["frame_id"] for x in manifest["frames"]]
+    if frame_ids != [f"frame_{i:03d}" for i in range(1,11)]:
+        errors.append("Invalid frame order")
+    if manifest["stream_id"]!=annotation["stream_id"]:
+        errors.append("stream_id mismatch")
+    known={x["visual_type_id"] for x in annotation["visual_types"]}
+    instances=annotation["expected_element_instances"]
+    by_frame={fid:[] for fid in frame_ids}
+    if len(known)!=7 or len({x["instance_id"] for x in instances})!=len(instances):
+        errors.append("Non-unique IDs")
     for item in instances:
-        if item["frame_id"] not in by_frame or item["visual_type_id"] not in known: errors.append(f"Invalid instance: {item['instance_id']}")
-        else: by_frame[item["frame_id"]].append(item)
+        if item["frame_id"] not in by_frame or item["visual_type_id"] not in known:
+            errors.append(f"Invalid instance: {item['instance_id']}")
+        else:
+            by_frame[item["frame_id"]].append(item)
         b=item["bbox"]
-        if b["x"]<0 or b["y"]<0 or b["width"]<=0 or b["height"]<=0 or b["x"]+b["width"]>WIDTH or b["y"]+b["height"]>HEIGHT: errors.append(f"Invalid bbox: {item['instance_id']}")
+        if b["x"]<0 or b["y"]<0 or b["width"]<=0 or b["height"]<=0 or b["x"]+b["width"]>WIDTH or b["y"]+b["height"]>HEIGHT:
+            errors.append(f"Invalid bbox: {item['instance_id']}")
     base=background().convert("RGB").resize((WIDTH,HEIGHT),Image.Resampling.LANCZOS)
     for frame in manifest["frames"]:
         path=ROOT/frame["image_path"]
-        if not path.is_file(): errors.append(f"Missing {path}"); continue
+        if not path.is_file():
+            errors.append(f"Missing {path}")
+            continue
         with Image.open(path) as opened:
             image=opened.convert("RGB")
-            if opened.format!="PNG" or image.size!=(WIDTH,HEIGHT): errors.append(f"Invalid image: {path}")
-        difference=ImageChops.difference(image,base).convert("L"); mask=Image.new("L",image.size); draw=ImageDraw.Draw(mask)
+            if opened.format!="PNG" or image.size!=(WIDTH,HEIGHT):
+                errors.append(f"Invalid image: {path}")
+        difference=ImageChops.difference(image,base).convert("L")
+        mask=Image.new("L",image.size)
+        draw=ImageDraw.Draw(mask)
         for item in by_frame[frame["frame_id"]]:
             b=item["bbox"]
-            if difference.crop((b["x"],b["y"],b["x"]+b["width"],b["y"]+b["height"])).getbbox() is None: errors.append(f"Empty bbox: {item['instance_id']}")
+            if difference.crop((b["x"],b["y"],b["x"]+b["width"],b["y"]+b["height"])).getbbox() is None:
+                errors.append(f"Empty bbox: {item['instance_id']}")
             draw.rectangle((b["x"],b["y"],b["x"]+b["width"]-1,b["y"]+b["height"]-1),fill=255)
-        if ImageChops.multiply(difference,ImageOps.invert(mask)).getbbox(): errors.append(f"Pixels outside bbox: {frame['frame_id']}")
-    event_ids={x["event_id"] for x in annotation["change_events"]}; refs=[eid for c in annotation["frame_comparisons"] for eid in c["expected_change_event_ids"]]
-    if len(annotation["frame_comparisons"])!=9 or set(refs)!=event_ids or len(refs)!=len(event_ids): errors.append("Invalid event references")
-    if any(x["event_type"]=="position_changed" and " 0.0 px." in x["evidence"] for x in annotation["change_events"]): errors.append("Zero-distance position event")
-    if errors: raise ValueError("Validation failed:\n- "+"\n- ".join(errors))
+        if ImageChops.multiply(difference,ImageOps.invert(mask)).getbbox():
+            errors.append(f"Pixels outside bbox: {frame['frame_id']}")
+    event_ids={x["event_id"] for x in annotation["change_events"]}
+    refs=[eid for c in annotation["frame_comparisons"] for eid in c["expected_change_event_ids"]]
+    if len(annotation["frame_comparisons"])!=9 or set(refs)!=event_ids or len(refs)!=len(event_ids):
+        errors.append("Invalid event references")
+    if any(x["event_type"]=="position_changed" and " 0.0 px." in x["evidence"] for x in annotation["change_events"]):
+        errors.append("Zero-distance position event")
+    if errors:
+        raise ValueError("Validation failed:\n- "+"\n- ".join(errors))
 
 
 def generate() -> None:
     FRAMES_DIR.mkdir(parents=True,exist_ok=True)
-    for path in FRAMES_DIR.glob("frame_*.png"): path.unlink()
+    for path in FRAMES_DIR.glob("frame_*.png"):
+        path.unlink()
     instances=[]
-    for index,scene in enumerate(SCENES,1): instances.extend(render_frame(index,scene))
+    for index,scene in enumerate(SCENES,1):
+        instances.extend(render_frame(index,scene))
     comparisons,events=build_events()
     manifest={"schema_version":"stream-input-0.1","stream_id":STREAM_ID,"scene_description":"Controlled flat tableware stream with fixed views and changing counts of a recurring plate subclass.","ordering":"manifest","frames":[{"frame_id":f"frame_{i:03d}","index":i,"image_path":f"frames/frame_{i:03d}.png","notes":FRAME_NOTES[i-1]} for i in range(1,11)],"notes":"Пробный development-поток проекта; не финальный evaluation-набор.","metadata":{"source":"deterministic_pillow_generator","generator":"generate_stream.py","purpose":"stream_analysis_probe_development","frame_size":{"width":WIDTH,"height":HEIGHT},"frame_format":"png_rgb","background":{"kind":"fixed_vertical_gradient","top":BACKGROUND_TOP,"bottom":BACKGROUND_BOTTOM},"is_final_dataset":False}}
     annotation={"schema_version":"stream-pilot-annotation-0.1","stream_id":STREAM_ID,"manifest_ref":"manifest.json","annotation_scope":"pilot_development","visual_types":[{"visual_type_id":x.visual_type_id,"description":x.description,"notes":f"Локальный ID потока {STREAM_ID}; geometric_class={x.geometric_class}; предмет={x.name}."} for x in TYPE_SPECS],"expected_element_instances":instances,"frame_comparisons":comparisons,"change_events":events,"allowed_event_types":["persisted","appeared","disappeared","count_changed","position_changed"],"uncertainty":[],"notes":"Выбранный вид каждого подкласса постоянен; цвет и масштаб сами по себе не создают отдельное событие."}
-    write_json(ROOT/"manifest.json",manifest); write_json(ROOT/"annotation.json",annotation); validate(manifest,annotation)
+    write_json(ROOT/"manifest.json",manifest)
+    write_json(ROOT/"annotation.json",annotation)
+    validate(manifest,annotation)
     print(f"Generated 10 frames, {len(instances)} instances, and {len(events)} events in {ROOT}; validation passed")
 
 
-if __name__=="__main__": generate()
+if __name__=="__main__":
+    generate()

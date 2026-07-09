@@ -1,6 +1,6 @@
 # Optional ML dependencies for the DINOv2 representation path.
 #
-# Current local alpha environment: CUDA-enabled PyTorch for NVIDIA GPU.
+# CUDA-enabled PyTorch wheels for NVIDIA GPU environments.
 # Install from the official PyTorch CUDA 12.8 wheel index:
 #
 #   .\.venv\Scripts\python.exe -m pip install -r requirements-ml.txt
