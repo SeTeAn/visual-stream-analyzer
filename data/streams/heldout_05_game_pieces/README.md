@@ -1,47 +1,50 @@
-﻿# Held-out 05: игровые элементы
+# Held-out 05: Game Pieces
 
-Статус: независимый held-out поток для финальной оценки frozen pipeline. Не используется для настройки алгоритма.
+Status: independent held-out stream for final evaluation of the frozen
+pipeline. This stream is not used for algorithm tuning.
 
-## Назначение
+## Purpose
 
-Поток содержит 20 controlled-кадров и 10 локальных visual types настольных игровых элементов. Похожие типы различаются устойчивым контуром, рамкой, эмблемами, отверстиями или внутренними точками; мелкий текст не используется.
+This stream contains 20 controlled frames and 10 local visual types for board
+game pieces. Similar types differ by stable outline, border, emblems, holes, or
+internal dots; small text is not used.
 
-## Visual types
+## Visual Types
 
-| Объект | Класс | `visual_type_id` |
+| Object | Class | `visual_type_id` |
 | --- | --- | --- |
-| Круглая шашка | `circle` | `circle_subclass_01` |
-| Круглый жетон | `circle` | `circle_subclass_02` |
-| Квадратная плитка | `square` | `square_subclass_01` |
-| Плитка с эмблемой | `square` | `square_subclass_02` |
-| Домино | `rectangle` | `rectangle_subclass_01` |
-| Игровая карта | `rectangle` | `rectangle_subclass_02` |
-| Треугольный жетон | `triangle` | `triangle_subclass_01` |
-| Пешка | `undefined` | `undefined_subclass_01` |
-| Фишка-человечек | `undefined` | `undefined_subclass_02` |
-| Шестиугольный жетон | `undefined` | `undefined_subclass_03` |
+| Round checker | `circle` | `circle_subclass_01` |
+| Round token | `circle` | `circle_subclass_02` |
+| Square tile | `square` | `square_subclass_01` |
+| Emblem tile | `square` | `square_subclass_02` |
+| Domino | `rectangle` | `rectangle_subclass_01` |
+| Playing card | `rectangle` | `rectangle_subclass_02` |
+| Triangular token | `triangle` | `triangle_subclass_01` |
+| Pawn | `undefined` | `undefined_subclass_01` |
+| Meeple | `undefined` | `undefined_subclass_02` |
+| Hex token | `undefined` | `undefined_subclass_03` |
 
-## Сценарий
+## Scenario
 
-- F01-F05: появляется круглый жетон, шашка перемещается, добавляется квадратная плитка, домино исчезает;
-- F06-F10: появляются плитка с эмблемой, карта и треугольный жетон; жетон меняет цвет, карта поворачивается;
-- F11-F15: пешка увеличивается, появляется и перемещается meeple, появляется шестиугольный жетон, число шашек увеличивается до трех;
-- F16-F18: круглый жетон исчезает, возвращаются домино и круглый жетон;
-- F19-F20: плитка с эмблемой меняет цвет и поворот, число обычных плиток уменьшается, шестиугольный жетон перемещается.
+- F01-F05: round token appears, checker moves, square tile is added, domino disappears;
+- F06-F10: emblem tile, card, and triangular token appear; token changes color, card rotates;
+- F11-F15: pawn grows, meeple appears and moves, hex token appears, checker count increases to three;
+- F16-F18: round token disappears, domino and round token return;
+- F19-F20: emblem tile changes color and rotation, ordinary tile count decreases, hex token moves.
 
-## Технические правила
+## Technical Rules
 
-- 20 RGB PNG кадров `640 x 480`, формат `png_rgb`;
-- постоянный темный indigo-фон с легким градиентом;
-- bbox по фактическим RGB-пикселям с запасом `2 px`;
-- минимальный bbox gap `20 px`, касания и перекрытия запрещены;
-- разметка всех 19 соседних сравнений полная;
-- вариации хранятся в `notes` без расширения schema.
+- 20 RGB PNG frames at `640 x 480`, format `png_rgb`;
+- fixed dark indigo background with a light gradient;
+- bounding boxes are computed from rendered RGB pixels with a `2 px` margin;
+- minimum bounding-box gap is `20 px`; touching and overlaps are forbidden;
+- annotation is complete for all 19 neighboring-frame comparisons;
+- variations are stored in `notes` without extending the schema.
 
-## Воспроизводимость
+## Reproducibility
 
 ```powershell
 .\.venv\Scripts\python.exe data\streams\heldout_05_game_pieces\generate_stream.py
 ```
 
-Генератор не запускает pipeline или evaluator.
+The generator does not run the pipeline or evaluator.

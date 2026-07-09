@@ -1,54 +1,60 @@
-﻿# Held-out 02: фрукты, овощи и ягоды
+# Held-out 02: Fruits, Vegetables, And Berries
 
-Статус: независимый held-out поток для финальной оценки frozen pipeline. Не используется для настройки алгоритма.
+Status: independent held-out stream for final evaluation of the frozen
+pipeline. This stream is not used for algorithm tuning.
 
-## Назначение
+## Purpose
 
-Поток содержит 20 controlled-кадров и 10 локальных visual types. Он включает похожие круглые и вытянутые подклассы, несколько экземпляров, disappearance/reappearance, изменения количества, положения, цвета, размера и поворота.
+This stream contains 20 controlled frames and 10 local visual types. It includes
+similar round and elongated subtypes, multiple instances, disappearance and
+reappearance, and changes in count, position, color, size, and rotation.
 
-## Структура
+## Structure
 
-В директории находятся `generate_stream.py`, `manifest.json`, `annotation.json`, 20 файлов в `frames/` и 20 файлов в `annotation_preview/`.
+The directory contains `generate_stream.py`, `manifest.json`, `annotation.json`,
+20 files in `frames/`, and 20 files in `annotation_preview/`.
 
-## Visual types
+## Visual Types
 
-| Объект | Геометрический класс | `visual_type_id` |
+| Object | Geometric class | `visual_type_id` |
 | --- | --- | --- |
-| Яблоко | `circle` | `circle_subclass_01` |
-| Апельсин | `circle` | `circle_subclass_02` |
-| Слива | `circle` | `circle_subclass_03` |
-| Лимон | `oval` | `oval_subclass_01` |
-| Огурец | `oval` | `oval_subclass_02` |
-| Баклажан | `oval` | `oval_subclass_03` |
-| Клубника | `triangle` | `triangle_subclass_01` |
-| Морковь | `triangle` | `triangle_subclass_02` |
-| Банан | `undefined` | `undefined_subclass_01` |
-| Гроздь ягод | `undefined` | `undefined_subclass_02` |
+| Apple | `circle` | `circle_subclass_01` |
+| Orange | `circle` | `circle_subclass_02` |
+| Plum | `circle` | `circle_subclass_03` |
+| Lemon | `oval` | `oval_subclass_01` |
+| Cucumber | `oval` | `oval_subclass_02` |
+| Eggplant | `oval` | `oval_subclass_03` |
+| Strawberry | `triangle` | `triangle_subclass_01` |
+| Carrot | `triangle` | `triangle_subclass_02` |
+| Banana | `undefined` | `undefined_subclass_01` |
+| Berry cluster | `undefined` | `undefined_subclass_02` |
 
-Гроздь с общей ветвью считается одним составным объектом. Цвет, размер и поворот не создают новый visual type.
+The cluster with a shared stem is treated as one compound object. Color, size,
+and rotation do not create a new visual type.
 
-## Сценарий
+## Scenario
 
-- F01-F05: клубника и огурец появляются, яблоко меняет оттенок, число яблок увеличивается;
-- F06-F09: апельсин светлеет, лимон перемещается, появляются слива и темно-красный вариант клубники;
-- F10-F14: банан исчезает, появляются баклажан и морковь, баклажан поворачивается, число апельсинов увеличивается;
-- F15-F18: огурец исчезает, лимон увеличивается, огурец возвращается, появляется гроздь;
-- F19-F20: яблоки меняют правдоподобные оттенки, банан возвращается, клубника перемещается.
+- F01-F05: strawberry and cucumber appear, apple changes hue, apple count increases;
+- F06-F09: orange lightens, lemon moves, plum and a dark-red strawberry variant appear;
+- F10-F14: banana disappears, eggplant and carrot appear, eggplant rotates, orange count increases;
+- F15-F18: cucumber disappears, lemon grows, cucumber returns, berry cluster appears;
+- F19-F20: apples change plausible hues, banana returns, strawberry moves.
 
-## Технические правила
+## Technical Rules
 
-- 20 RGB PNG кадров `640 x 480`, формат `png_rgb`;
-- постоянный темный plum-фон с легким градиентом;
-- bbox вычисляются по фактически отрисованным RGB-пикселям с запасом `2 px`;
-- минимальный зазор bbox `20 px`, касания и перекрытия запрещены;
-- намеренные перемещения превышают normalized threshold `0.1`;
-- свойства вариаций хранятся в `notes` без расширения annotation schema;
-- разметка всех 19 соседних сравнений полная.
+- 20 RGB PNG frames at `640 x 480`, format `png_rgb`;
+- fixed dark plum background with a light gradient;
+- bounding boxes are computed from rendered RGB pixels with a `2 px` margin;
+- minimum bounding-box gap is `20 px`; touching and overlaps are forbidden;
+- intentional moves exceed the normalized `0.1` threshold;
+- variation properties are stored in `notes` without extending the annotation schema;
+- annotation is complete for all 19 neighboring-frame comparisons.
 
-## Воспроизводимость
+## Reproducibility
 
 ```powershell
 .\.venv\Scripts\python.exe data\streams\heldout_02_fruits_vegetables_berries\generate_stream.py
 ```
 
-Генератор не запускает pipeline или evaluator. Физическая идентичность экземпляров между кадрами не предполагается.
+The generator does not run the pipeline or evaluator. Physical identity between
+frames is not assumed.

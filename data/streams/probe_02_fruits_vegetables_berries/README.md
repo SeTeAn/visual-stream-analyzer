@@ -1,61 +1,63 @@
-﻿# Probe 02: фрукты, овощи и ягоды
+# Probe 02: Fruits, Vegetables, And Berries
 
-Статус: пробный development-поток проектной версии. Не является финальным evaluation-набором.
+Status: probe development stream for the project version. This is not a final
+evaluation set.
 
-## Назначение
+## Purpose
 
-Поток содержит десять кадров с целыми стилизованными плодами. Он проверяет
-сохранение визуального подкласса при изменении оттенка, повороте и масштабе, а
-также появление, исчезновение и заметное перемещение подклассов.
+This stream contains ten frames with whole stylized produce items. It checks
+visual subtype preservation under hue, rotation, and scale changes, as well as
+subtype appearance, disappearance, and noticeable motion.
 
-## Объекты и визуальные подклассы
+## Objects And Visual Subtypes
 
-`visual_type_id` локальны внутри `probe_02_fruits_vegetables_berries`.
+`visual_type_id` values are local to `probe_02_fruits_vegetables_berries`.
 
-| Объект | Геометрический класс | `visual_type_id` |
+| Object | Geometric class | `visual_type_id` |
 | --- | --- | --- |
-| Яблоко | `circle` | `circle_subclass_01` |
-| Апельсин | `circle` | `circle_subclass_02` |
-| Лимон | `oval` | `oval_subclass_01` |
-| Огурец | `oval` | `oval_subclass_02` |
-| Клубника | `triangle` | `triangle_subclass_01` |
-| Морковь | `triangle` | `triangle_subclass_02` |
-| Связанная гроздь ягод | `undefined` | `undefined_subclass_01` |
+| Apple | `circle` | `circle_subclass_01` |
+| Orange | `circle` | `circle_subclass_02` |
+| Lemon | `oval` | `oval_subclass_01` |
+| Cucumber | `oval` | `oval_subclass_02` |
+| Strawberry | `triangle` | `triangle_subclass_01` |
+| Carrot | `triangle` | `triangle_subclass_02` |
+| Linked berry cluster | `undefined` | `undefined_subclass_01` |
 
-Плодоножки, листья, семена, отметки кожуры и общая ветвь грозди являются
-частями соответствующих объектов и отдельно не размечаются. Все плоды показаны
-целиком, без разрезов.
+Stems, leaves, seeds, peel marks, and the shared berry-cluster branch are part
+of their corresponding objects and are not annotated separately. All produce is
+shown whole, without cut surfaces.
 
-## Сценарий
+## Scenario
 
-Яблоко последовательно показано темно-зеленым, зелено-красным и светло-зеленым.
-Апельсин меняет темно-оранжевый оттенок на светло-оранжевый, клубника показана
-красной и синей, огурец меняет оттенок зеленого. Эти изменения не создают новый
-подкласс или отдельное change event.
+The apple is shown as dark green, green-red, and light green. The orange changes
+from dark orange to light orange, the strawberry appears in red and blue, and
+the cucumber changes green shade. These changes do not create a new subtype or
+a separate change event.
 
-В потоке также появляются апельсин, огурец и морковь, исчезают гроздь и яблоко,
-а гроздь возвращается после двух кадров отсутствия с прежним
-`undefined_subclass_01`. Лимон и апельсин меняют размер, клубника и морковь
-заметно перемещаются.
+The stream also includes orange, cucumber, and carrot appearances; berry-cluster
+and apple disappearances; and a berry-cluster return after two missing frames
+with the same `undefined_subclass_01`. The lemon and orange change size, while
+the strawberry and carrot move noticeably.
 
-## Технические параметры
+## Technical Parameters
 
-- 10 кадров `640 x 480`, RGB PNG;
-- постоянный темный сине-индиговый вертикальный градиент;
-- плоский стиль без теней;
-- объекты не касаются и не перекрываются;
-- bbox вычисляются по фактическим пикселям с запасом `2 px`;
-- `characteristic_regions` не используются.
+- 10 RGB PNG frames at `640 x 480`;
+- fixed dark blue-indigo vertical gradient;
+- flat style without shadows;
+- objects do not touch or overlap;
+- bounding boxes are computed from rendered pixels with a `2 px` margin;
+- `characteristic_regions` are not used.
 
-## Воспроизводимость
+## Reproducibility
 
-Кадры и JSON создаются детерминированным Pillow-генератором без внешних assets:
+Frames and JSON files are produced by a deterministic Pillow generator with no
+external assets:
 
 ```powershell
 .\.venv\Scripts\python.exe data\streams\probe_02_fruits_vegetables_berries\generate_stream.py
 ```
 
-## Ограничения
+## Limitations
 
-Поток не содержит реальных фотографий, разрезов, перекрытий, изменения формы
-или разметки физической идентичности экземпляров.
+The stream does not contain real photographs, cut produce, overlaps, shape
+changes, or physical identity annotations for individual instances.

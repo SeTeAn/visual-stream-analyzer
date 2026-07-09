@@ -1,17 +1,16 @@
-﻿# Held-out 01: канцелярские принадлежности
+# Held-out 01: Stationery
 
-Статус: независимый held-out поток для финальной оценки frozen pipeline
-проектной версии. Поток не используется для настройки алгоритма.
+Status: independent held-out stream for final evaluation of the frozen project
+pipeline. This stream is not used for algorithm tuning.
 
-## Назначение
+## Purpose
 
-Поток содержит 20 кадров controlled-сцены с десятью локальными visual types.
-Он проверяет появление, исчезновение, изменение количества, заметное
-перемещение и возвращение типов после отсутствия. Изменения цвета, размера и
-поворота проверяют устойчивость visual type identity, но не являются отдельными
-change events.
+This stream contains 20 frames of a controlled scene with ten local visual
+types. It checks appearance, disappearance, count changes, noticeable motion,
+and type return after absence. Color, size, and rotation changes test visual
+type identity stability, but they are not separate change events.
 
-## Структура
+## Structure
 
 ```text
 heldout_01_stationery/
@@ -29,95 +28,96 @@ heldout_01_stationery/
     frame_020_annotation.png
 ```
 
-## Объекты и visual types
+## Objects And Visual Types
 
-`visual_type_id` локальны внутри `heldout_01_stationery`. Полная ссылка на тип
-задается парой `(stream_id, visual_type_id)`.
+`visual_type_id` values are local to `heldout_01_stationery`. A full type
+reference is the pair `(stream_id, visual_type_id)`.
 
-| Объект | Геометрический класс | `visual_type_id` |
+| Object | Geometric class | `visual_type_id` |
 | --- | --- | --- |
-| Стикер | `square` | `square_subclass_01` |
-| Блокнот | `rectangle` | `rectangle_subclass_01` |
-| Ластик | `rectangle` | `rectangle_subclass_02` |
-| Карандаш | `rectangle` | `rectangle_subclass_03` |
-| Маркер | `rectangle` | `rectangle_subclass_04` |
-| Рулон скотча | `circle` | `circle_subclass_01` |
-| Точилка | `circle` | `circle_subclass_02` |
-| Чертежный угольник | `triangle` | `triangle_subclass_01` |
-| Ножницы | `undefined` | `undefined_subclass_01` |
-| Канцелярский зажим | `undefined` | `undefined_subclass_02` |
+| Sticky note | `square` | `square_subclass_01` |
+| Notebook | `rectangle` | `rectangle_subclass_01` |
+| Eraser | `rectangle` | `rectangle_subclass_02` |
+| Pencil | `rectangle` | `rectangle_subclass_03` |
+| Marker | `rectangle` | `rectangle_subclass_04` |
+| Tape roll | `circle` | `circle_subclass_01` |
+| Pencil sharpener | `circle` | `circle_subclass_02` |
+| Drafting triangle | `triangle` | `triangle_subclass_01` |
+| Scissors | `undefined` | `undefined_subclass_01` |
+| Binder clip | `undefined` | `undefined_subclass_02` |
 
-Похожие типы различаются устойчивым контуром, пропорциями, отверстиями или
-внутренними деталями. Цвет, размер и поворот сами по себе не создают новый тип.
+Similar types differ by stable outline, proportions, holes, or internal
+details. Color, size, and rotation alone do not create a new type.
 
-## Сценарий
+## Scenario
 
-| Кадр | Основное изменение |
+| Frame | Main change |
 | --- | --- |
-| `frame_001` | Начальная сцена: блокнот, карандаш, скотч и ножницы. |
-| `frame_002` | Появляется первый стикер около левой границы. |
-| `frame_003` | Карандаш перемещается на 75 px. |
-| `frame_004` | Добавляется второй стикер. |
-| `frame_005` | Исчезает скотч. |
-| `frame_006` | Появляется точилка. |
-| `frame_007` | Карандаш поворачивается вокруг прежнего центра. |
-| `frame_008` | Появляется маркер. |
-| `frame_009` | Меняется цвет тела маркера. |
-| `frame_010` | Появляется ластик. |
-| `frame_011` | Ластик увеличивается вокруг прежнего центра. |
-| `frame_012` | Появляется чертежный угольник. |
-| `frame_013` | Ножницы перемещаются на 75 px. |
-| `frame_014` | Появляется канцелярский зажим. |
-| `frame_015` | Точилка исчезает. |
-| `frame_016` | Точилка остается отсутствующей; исчезает блокнот. |
-| `frame_017` | Точилка возвращается; меняется цвет карандаша. |
-| `frame_018` | Добавляется третий стикер; маркер перемещается на 75 px. |
-| `frame_019` | Возвращается блокнот. |
-| `frame_020` | Возвращается скотч; зажим поворачивается вокруг прежнего центра. |
+| `frame_001` | Initial scene: notebook, pencil, tape roll, and scissors. |
+| `frame_002` | First sticky note appears near the left edge. |
+| `frame_003` | Pencil moves by 75 px. |
+| `frame_004` | Second sticky note is added. |
+| `frame_005` | Tape roll disappears. |
+| `frame_006` | Pencil sharpener appears. |
+| `frame_007` | Pencil rotates around its previous center. |
+| `frame_008` | Marker appears. |
+| `frame_009` | Marker body color changes. |
+| `frame_010` | Eraser appears. |
+| `frame_011` | Eraser scales up around its previous center. |
+| `frame_012` | Drafting triangle appears. |
+| `frame_013` | Scissors move by 75 px. |
+| `frame_014` | Binder clip appears. |
+| `frame_015` | Pencil sharpener disappears. |
+| `frame_016` | Pencil sharpener stays absent; notebook disappears. |
+| `frame_017` | Pencil sharpener returns; pencil color changes. |
+| `frame_018` | Third sticky note is added; marker moves by 75 px. |
+| `frame_019` | Notebook returns. |
+| `frame_020` | Tape roll returns; binder clip rotates around its previous center. |
 
-## Правила событий
+## Event Rules
 
-- тип присутствует в обоих кадрах: `persisted`;
-- переход `N -> M`, где оба значения ненулевые: `persisted` и
+- type present in both frames: `persisted`;
+- transition `N -> M` where both values are non-zero: `persisted` and
   `count_changed`;
-- переход `0 -> N`: `appeared`;
-- переход `N -> 0`: `disappeared`;
-- намеренное перемещение: `persisted` и `position_changed`;
-- изменение только цвета, размера или поворота: только `persisted`.
+- transition `0 -> N`: `appeared`;
+- transition `N -> 0`: `disappeared`;
+- intentional motion: `persisted` and `position_changed`;
+- color-only, size-only, or rotation-only change: `persisted` only.
 
-Разметка всех 19 сравнений соседних кадров является полной. Отсутствие
-положительного события означает отрицательную метку этого вида.
+Annotation is complete for all 19 neighboring-frame comparisons. The absence of
+a positive event means a negative label for that event kind.
 
-## Технические параметры
+## Technical Parameters
 
-- 20 кадров `640 x 480`;
-- формат `png_rgb`;
-- постоянный темный petrol-фон с легким вертикальным градиентом;
-- плоские стилизованные объекты без теней и сложных текстур;
-- нерегулярные координаты без фиксированной сетки;
-- объекты не пересекаются и имеют зазор bbox не менее `20 px`;
-- bbox вычисляются по фактически отрисованным RGB-пикселям и получают внешний
-  запас `2 px`;
-- изменения размера и поворота сохраняют anchor center;
-- намеренные перемещения составляют 75 px и превышают нормализованный порог
-  `0.1` относительно ширины кадра;
-- дополнительные свойства хранятся в `notes`, схема annotation не расширена.
+- 20 frames at `640 x 480`;
+- `png_rgb` format;
+- fixed dark petrol background with a light vertical gradient;
+- flat stylized objects without shadows or complex textures;
+- irregular coordinates without a fixed grid;
+- objects do not overlap and have at least `20 px` bounding-box gap;
+- bounding boxes are computed from rendered RGB pixels and include an external
+  `2 px` margin;
+- size and rotation changes preserve the anchor center;
+- intentional moves are 75 px and exceed the normalized `0.1` frame-width
+  threshold;
+- additional variation properties are stored in `notes`; the annotation schema
+  is not extended.
 
-## Воспроизводимость
+## Reproducibility
 
-Поток не использует внешние assets. Кадры, JSON и previews создаются одним
-детерминированным Pillow-генератором:
+The stream does not use external assets. Frames, JSON files, and previews are
+created by one deterministic Pillow generator:
 
 ```powershell
 .\.venv\Scripts\python.exe data\streams\heldout_01_stationery\generate_stream.py
 ```
 
-Генератор выполняет структурные, геометрические и семантические проверки. Он
-не запускает candidate extraction, ML-representation, pipeline или evaluator.
+The generator runs structural, geometric, and semantic checks. It does not run
+candidate extraction, ML representation, the pipeline, or the evaluator.
 
-## Ограничения
+## Limitations
 
-- поток относится только к controlled-domain;
-- реальные фотографии, касания и перекрытия отсутствуют;
-- физическая идентичность экземпляров между кадрами не размечается;
-- поток является одной из пяти частей включенного held-out dataset.
+- the stream belongs to a controlled domain only;
+- real photographs, touching, and overlaps are absent;
+- physical identity of instances between frames is not annotated;
+- the stream is one of five included held-out dataset parts.

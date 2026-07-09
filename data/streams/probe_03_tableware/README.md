@@ -1,55 +1,55 @@
-﻿# Probe 03: посуда
+# Probe 03: Tableware
 
-Статус: пробный development-поток проектной версии. Не является финальным evaluation-набором.
+Status: probe development stream for the project version. This is not a final
+evaluation set.
 
-## Назначение
+## Purpose
 
-Поток содержит десять кадров стилизованной посуды. Он фиксирует постоянный
-выбранный вид предметов и несколько раздельно расположенных экземпляров одного
-подкласса с изменением их количества.
+This stream contains ten frames of stylized tableware. It fixes a stable
+appearance for each object type and includes several separated instances of one
+subtype whose count changes over time.
 
-## Объекты и визуальные подклассы
+## Objects And Visual Subtypes
 
-| Объект | Вид | Геометрический класс | `visual_type_id` |
+| Object | View | Geometric class | `visual_type_id` |
 | --- | --- | --- | --- |
-| Круглая тарелка | Сверху | `circle` | `circle_subclass_01` |
-| Миска | Сверху | `circle` | `circle_subclass_02` |
-| Овальное блюдо | Сверху | `oval` | `oval_subclass_01` |
-| Квадратная тарелка | Сверху | `square` | `square_subclass_01` |
-| Прямоугольный поднос | Сверху | `rectangle` | `rectangle_subclass_01` |
-| Треугольная тарелка | Сверху | `triangle` | `triangle_subclass_01` |
-| Чашка | Сбоку | `undefined` | `undefined_subclass_01` |
+| Round plate | Top | `circle` | `circle_subclass_01` |
+| Bowl | Top | `circle` | `circle_subclass_02` |
+| Oval serving dish | Top | `oval` | `oval_subclass_01` |
+| Square plate | Top | `square` | `square_subclass_01` |
+| Rectangular tray | Top | `rectangle` | `rectangle_subclass_01` |
+| Triangular plate | Top | `triangle` | `triangle_subclass_01` |
+| Cup | Side | `undefined` | `undefined_subclass_01` |
 
-Ободы, канты, ручки и декоративные элементы являются внутренними частями
-предметов и отдельно не размечаются. `visual_type_id` локальны внутри потока.
+Rims, borders, handles, and decorative details are internal object parts and are
+not annotated separately. `visual_type_id` values are local to the stream.
 
-## Сценарий
+## Scenario
 
-Число круглых тарелок изменяется по последовательности `1 -> 2 -> 3 -> 2 -> 1`.
-Тарелки разных цветов остаются экземплярами `circle_subclass_01`. Последовательно
-появляются квадратная тарелка, миска, поднос и треугольная тарелка. Чашка
-исчезает на два кадра и возвращается с прежним подклассом. Овальное блюдо
-значительно увеличивается, квадратная тарелка немного увеличивается, поднос и
-миска перемещаются.
+The number of round plates follows `1 -> 2 -> 3 -> 2 -> 1`. Plates with
+different colors remain instances of `circle_subclass_01`. The square plate,
+bowl, tray, and triangular plate appear over the stream. The cup disappears for
+two frames and returns with the same subtype. The oval serving dish grows
+substantially, the square plate grows slightly, and the tray and bowl move.
 
-## Технические параметры
+## Technical Parameters
 
-- 10 кадров `640 x 480`, RGB PNG;
-- постоянный темный сливовый вертикальный градиент;
-- чашка всегда показана сбоку, остальные предметы сверху;
-- плоский стиль без теней, касаний и перекрытий;
-- bbox вычисляются по фактическим пикселям с запасом `2 px`;
-- `characteristic_regions` не используются.
+- 10 RGB PNG frames at `640 x 480`;
+- fixed dark plum vertical gradient;
+- cup is always shown from the side, all other items are top-down;
+- flat style without shadows, touching, or overlaps;
+- bounding boxes are computed from rendered pixels with a `2 px` margin;
+- `characteristic_regions` are not used.
 
-## Воспроизводимость
+## Reproducibility
 
 ```powershell
 .\.venv\Scripts\python.exe data\streams\probe_03_tableware\generate_stream.py
 ```
 
-Генератор использует Pillow и не требует внешних assets.
+The generator uses Pillow and does not require external assets.
 
-## Ограничения
+## Limitations
 
-Поток не размечает физическую идентичность отдельных тарелок и не содержит
-реальных фотографий, перспективных преобразований или перекрытий.
+The stream does not annotate physical identity for individual plates and does
+not contain real photographs, perspective transforms, or overlaps.

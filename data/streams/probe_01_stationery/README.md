@@ -1,20 +1,19 @@
-﻿# Probe 01: канцелярские принадлежности
+# Probe 01: Stationery
 
-Статус: пробный development-поток проектной версии. Не является финальным
-evaluation-набором.
+Status: probe development stream for the project version. This is not a final
+evaluation set.
 
-## Назначение
+## Purpose
 
-Поток содержит десять кадров одной управляемой сцены с плоскими стилизованными
-канцелярскими предметами. Он фиксирует согласованный пример данных для
-разработки и проверки pipeline.
+This stream contains ten frames of one controlled scene with flat, stylized
+stationery objects. It provides an agreed data example for pipeline development
+and checks.
 
-Поток проверяет только согласованный состав данных: сохранение визуальных
-подклассов при повороте и изменении размера, появление и исчезновение типов,
-изменение количества экземпляров и заметное перемещение между соседними
-кадрами.
+The stream exercises the agreed data scope only: visual subtype preservation
+under rotation and scale changes, type appearance and disappearance, instance
+count changes, and noticeable motion between neighboring frames.
 
-## Структура
+## Structure
 
 ```text
 probe_01_stationery/
@@ -28,68 +27,68 @@ probe_01_stationery/
     frame_010.png
 ```
 
-## Объекты и визуальные подклассы
+## Objects And Visual Subtypes
 
-`visual_type_id` являются локальными внутри `probe_01_stationery`.
+`visual_type_id` values are local to `probe_01_stationery`.
 
-| Объект | Геометрический класс | `visual_type_id` |
+| Object | Geometric class | `visual_type_id` |
 | --- | --- | --- |
-| Стикер | `square` | `square_subclass_01` |
-| Блокнот | `rectangle` | `rectangle_subclass_01` |
-| Ластик | `rectangle` | `rectangle_subclass_02` |
-| Карандаш | `rectangle` | `rectangle_subclass_03` |
-| Рулон скотча | `circle` | `circle_subclass_01` |
-| Чертежный угольник | `triangle` | `triangle_subclass_01` |
-| Ножницы | `undefined` | `undefined_subclass_01` |
+| Sticky note | `square` | `square_subclass_01` |
+| Notebook | `rectangle` | `rectangle_subclass_01` |
+| Eraser | `rectangle` | `rectangle_subclass_02` |
+| Pencil | `rectangle` | `rectangle_subclass_03` |
+| Tape roll | `circle` | `circle_subclass_01` |
+| Drafting triangle | `triangle` | `triangle_subclass_01` |
+| Scissors | `undefined` | `undefined_subclass_01` |
 
-Внутренние детали, включая отверстия, этикетки, линии, кольцевые ручки и
-шарниры, являются частью соответствующего объекта.
+Internal details, including holes, labels, lines, ring handles, and hinges, are
+part of their corresponding objects.
 
-## Сценарий
+## Scenario
 
-| Кадр | Основное изменение |
+| Frame | Main change |
 | --- | --- |
-| `frame_001` | Начальное состояние: блокнот, карандаш, скотч и ножницы. |
-| `frame_002` | Скотч перемещен, карандаш повернут. |
-| `frame_003` | Появился первый стикер. |
-| `frame_004` | Добавлен второй стикер, блокнот перемещен. |
-| `frame_005` | Появился ластик обычного размера. |
-| `frame_006` | Ластик значительно увеличен, карандаш повернут без перемещения. |
-| `frame_007` | Ножницы исчезли, появился чертежный угольник. |
-| `frame_008` | Один стикер удален, угольник перемещен и повернут. |
-| `frame_009` | Скотч исчез, ластик перемещен и уменьшен. |
-| `frame_010` | Блокнот перемещен, повернут и немного увеличен; карандаш повернут. |
+| `frame_001` | Initial state: notebook, pencil, tape roll, and scissors. |
+| `frame_002` | Tape roll moves, pencil rotates. |
+| `frame_003` | First sticky note appears. |
+| `frame_004` | Second sticky note is added, notebook moves. |
+| `frame_005` | Regular-size eraser appears. |
+| `frame_006` | Eraser becomes much larger, pencil rotates without moving. |
+| `frame_007` | Scissors disappear, drafting triangle appears. |
+| `frame_008` | One sticky note is removed, drafting triangle moves and rotates. |
+| `frame_009` | Tape roll disappears, eraser moves and shrinks. |
+| `frame_010` | Notebook moves, rotates, and grows slightly; pencil rotates. |
 
-Изменение только поворота или размера не образует отдельное change event.
+Rotation-only or scale-only changes do not create separate change events.
 
-## Технические параметры
+## Technical Parameters
 
 - `stream_id`: `probe_01_stationery`;
-- 10 кадров `640 x 480`;
-- RGB PNG без прозрачности;
-- постоянный темный бирюзово-синий фон с мягким вертикальным градиентом;
-- плоский стиль без теней;
-- объекты не касаются и не перекрываются;
-- bbox охватывают фактически нарисованный объект вместе с контуром и запасом
-  `2 px` для сглаженных краев;
-- `characteristic_regions` не используются.
+- 10 frames at `640 x 480`;
+- RGB PNG without transparency;
+- fixed dark teal-blue background with a soft vertical gradient;
+- flat style without shadows;
+- objects do not touch or overlap;
+- bounding boxes cover the rendered object, outline, and a `2 px` antialiasing
+  margin;
+- `characteristic_regions` are not used.
 
-## Воспроизводимость
+## Reproducibility
 
-Кадры, `manifest.json` и `annotation.json` создаются одним детерминированным
-генератором без внешних assets:
+Frames, `manifest.json`, and `annotation.json` are produced by one deterministic
+generator with no external assets:
 
 ```powershell
 .\.venv\Scripts\python.exe data\streams\probe_01_stationery\generate_stream.py
 ```
 
-Генератор использует Pillow, рисует изображения в увеличенном разрешении для
-сглаживания, затем сохраняет итоговые кадры и фактические bbox.
+The generator uses Pillow, draws at a larger resolution for antialiasing, then
+saves the final frames and measured bounding boxes.
 
-## Ограничения
+## Limitations
 
-- поток содержит только контролируемые плоские изображения;
-- фон и стиль постоянны внутри потока;
-- плотные перекрытия отсутствуют;
-- физическая идентичность экземпляров не размечается;
-- поток не предназначен для финальных выводов о качестве системы.
+- the stream contains only controlled flat images;
+- the background and style are fixed within the stream;
+- dense overlaps are absent;
+- physical identity of individual instances is not annotated;
+- the stream is not intended for final system-quality conclusions.

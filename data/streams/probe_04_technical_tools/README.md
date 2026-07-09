@@ -1,55 +1,54 @@
-﻿# Probe 04: технические инструменты и крепеж
+# Probe 04: Technical Tools And Fasteners
 
-Статус: пробный development-поток проектной версии. Не является финальным evaluation-набором.
+Status: probe development stream for the project version. This is not a final
+evaluation set.
 
-## Назначение
+## Purpose
 
-Поток содержит десять кадров плоских стилизованных технических предметов с
-отверстиями, зубцами, вырезами и разнообразными силуэтами. Общее название
-«ключ» уточнено как Г-образный шестигранный ключ; второй подкласс представляет
-двусторонний гаечный ключ.
+This stream contains ten frames of flat, stylized technical objects with holes,
+teeth, cutouts, and varied silhouettes. The generic wrench wording is split into
+an L-shaped hex key and a double-ended wrench.
 
-## Объекты и визуальные подклассы
+## Objects And Visual Subtypes
 
-| Объект | Геометрический класс | `visual_type_id` |
+| Object | Geometric class | `visual_type_id` |
 | --- | --- | --- |
-| Шайба | `circle` | `circle_subclass_01` |
-| Шестеренка | `circle` | `circle_subclass_02` |
-| Квадратная монтажная пластина | `square` | `square_subclass_01` |
-| Прямоугольная монтажная пластина | `rectangle` | `rectangle_subclass_01` |
-| Треугольный кронштейн | `triangle` | `triangle_subclass_01` |
-| Г-образный шестигранный ключ | `undefined` | `undefined_subclass_01` |
-| Двусторонний гаечный ключ | `undefined` | `undefined_subclass_02` |
+| Washer | `circle` | `circle_subclass_01` |
+| Gear | `circle` | `circle_subclass_02` |
+| Square mounting plate | `square` | `square_subclass_01` |
+| Rectangular mounting plate | `rectangle` | `rectangle_subclass_01` |
+| Triangular bracket | `triangle` | `triangle_subclass_01` |
+| L-shaped hex key | `undefined` | `undefined_subclass_01` |
+| Double-ended wrench | `undefined` | `undefined_subclass_02` |
 
-Отверстия, зубцы и вырезы являются частями объектов и отдельно не размечаются.
-`visual_type_id` локальны внутри потока.
+Holes, teeth, and cutouts are object parts and are not annotated separately.
+`visual_type_id` values are local to the stream.
 
-## Сценарий
+## Scenario
 
-В потоке появляются шестеренка, кронштейн и шестигранный ключ. Количество шайб
-изменяется `1 -> 2 -> 1`. Гаечный ключ исчезает на два кадра и возвращается с
-прежним `undefined_subclass_02`; квадратная пластина исчезает. Шестеренка
-значительно увеличивается, квадратная пластина немного увеличивается,
-прямоугольная пластина значительно уменьшается. Несколько подклассов
-перемещаются или поворачиваются.
+The gear, bracket, and hex key appear. Washer count changes as `1 -> 2 -> 1`.
+The double-ended wrench disappears for two frames and returns with the same
+`undefined_subclass_02`; the square plate disappears. The gear grows
+substantially, the square plate grows slightly, and the rectangular plate
+shrinks substantially. Several subtypes move or rotate.
 
-## Технические параметры
+## Technical Parameters
 
-- 10 кадров `640 x 480`, RGB PNG;
-- постоянный светлый приглушенный сине-зеленый вертикальный градиент;
-- плоский стиль без теней, бликов, касаний и перекрытий;
-- bbox вычисляются по фактическим пикселям с запасом `2 px`;
-- `characteristic_regions` не используются.
+- 10 RGB PNG frames at `640 x 480`;
+- fixed light muted blue-green vertical gradient;
+- flat style without shadows, highlights, touching, or overlaps;
+- bounding boxes are computed from rendered pixels with a `2 px` margin;
+- `characteristic_regions` are not used.
 
-## Воспроизводимость
+## Reproducibility
 
 ```powershell
 .\.venv\Scripts\python.exe data\streams\probe_04_technical_tools\generate_stream.py
 ```
 
-Генератор использует Pillow и не требует внешних assets.
+The generator uses Pillow and does not require external assets.
 
-## Ограничения
+## Limitations
 
-Поток не моделирует трехмерную перспективу, реальный металл, плотные
-перекрытия или физическую идентичность экземпляров.
+The stream does not model 3D perspective, real metal, dense overlaps, or
+physical identity of individual instances.

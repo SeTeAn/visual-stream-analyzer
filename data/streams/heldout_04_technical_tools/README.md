@@ -1,47 +1,50 @@
-﻿# Held-out 04: технические инструменты и крепеж
+# Held-out 04: Technical Tools And Fasteners
 
-Статус: независимый held-out поток для финальной оценки frozen pipeline. Не используется для настройки алгоритма.
+Status: independent held-out stream for final evaluation of the frozen
+pipeline. This stream is not used for algorithm tuning.
 
-## Назначение
+## Purpose
 
-Поток содержит 20 controlled-кадров и 10 локальных visual types. Основной stress-case — различение круглых деталей по контуру, отверстиям и внутреннему устройству, а также нескольких вытянутых ручных инструментов.
+This stream contains 20 controlled frames and 10 local visual types. The main
+stress case is distinguishing round technical parts by outline, holes, and
+internal structure, together with several elongated hand tools.
 
-## Visual types
+## Visual Types
 
-| Объект | Класс | `visual_type_id` |
+| Object | Class | `visual_type_id` |
 | --- | --- | --- |
-| Шайба | `circle` | `circle_subclass_01` |
-| Шестерня | `circle` | `circle_subclass_02` |
-| Подшипник | `circle` | `circle_subclass_03` |
-| Квадратная пластина | `square` | `square_subclass_01` |
-| Прямоугольная пластина | `rectangle` | `rectangle_subclass_01` |
-| Направляющая | `rectangle` | `rectangle_subclass_02` |
-| Кронштейн | `triangle` | `triangle_subclass_01` |
-| Шестигранный ключ | `undefined` | `undefined_subclass_01` |
-| Гаечный ключ | `undefined` | `undefined_subclass_02` |
-| Отвертка | `undefined` | `undefined_subclass_03` |
+| Washer | `circle` | `circle_subclass_01` |
+| Gear | `circle` | `circle_subclass_02` |
+| Bearing | `circle` | `circle_subclass_03` |
+| Square plate | `square` | `square_subclass_01` |
+| Rectangular plate | `rectangle` | `rectangle_subclass_01` |
+| Rail | `rectangle` | `rectangle_subclass_02` |
+| Bracket | `triangle` | `triangle_subclass_01` |
+| Hex key | `undefined` | `undefined_subclass_01` |
+| Wrench | `undefined` | `undefined_subclass_02` |
+| Screwdriver | `undefined` | `undefined_subclass_03` |
 
-## Сценарий
+## Scenario
 
-- F01-F05: появляется подшипник, добавляется шайба, гаечный ключ перемещается, шестерня исчезает;
-- F06-F10: появляется и поворачивается шестигранный ключ, появляются направляющая и кронштейн, пластина меняет цвет;
-- F11-F15: подшипник увеличивается, появляются второй подшипник, квадратная пластина и отвертка; отвертка перемещается, добавляется третья шайба;
-- F16-F18: шестигранный ключ исчезает, возвращаются шестерня и ключ, число подшипников уменьшается;
-- F19-F20: направляющая меняет цвет и поворот, число шайб уменьшается, квадратная пластина перемещается.
+- F01-F05: bearing appears, washer is added, wrench moves, gear disappears;
+- F06-F10: hex key appears and rotates, rail and bracket appear, plate changes color;
+- F11-F15: bearing grows, second bearing, square plate, and screwdriver appear; screwdriver moves, third washer is added;
+- F16-F18: hex key disappears, gear and wrench return, bearing count decreases;
+- F19-F20: rail changes color and rotation, washer count decreases, square plate moves.
 
-## Технические правила
+## Technical Rules
 
-- 20 RGB PNG кадров `640 x 480`, формат `png_rgb`;
-- постоянный темный burgundy-graphite фон с легким градиентом;
-- bbox по фактическим RGB-пикселям с запасом `2 px`;
-- минимальный bbox gap `20 px`, касания и перекрытия запрещены;
-- разметка 19 соседних сравнений полная;
-- цвет, размер и поворот остаются в `notes` и не создают новый visual type.
+- 20 RGB PNG frames at `640 x 480`, format `png_rgb`;
+- fixed dark burgundy-graphite background with a light gradient;
+- bounding boxes are computed from rendered RGB pixels with a `2 px` margin;
+- minimum bounding-box gap is `20 px`; touching and overlaps are forbidden;
+- annotation is complete for all 19 neighboring-frame comparisons;
+- color, size, and rotation remain in `notes` and do not create a new visual type.
 
-## Воспроизводимость
+## Reproducibility
 
 ```powershell
 .\.venv\Scripts\python.exe data\streams\heldout_04_technical_tools\generate_stream.py
 ```
 
-Генератор не запускает pipeline или evaluator.
+The generator does not run the pipeline or evaluator.
