@@ -6,11 +6,11 @@ The project is organized as a command-line pipeline with separate validation, an
 
 ## What Is Included
 
-- Source code for the stream analysis package: `src-final/app/stream_analysis`
-- Unit and integration tests: `src-final/tests`
-- Data streams with frames, manifests, and annotations: `src-final/data/streams`
-- A compact example run: `src-final/outputs/runs/demonstration_final_h04_dino_bbox`
-- A compact evaluation matrix: `src-final/outputs/evaluations/demonstration_final_matrix`
+- Source code for the stream analysis package: `src/stream_analysis`
+- Unit and integration tests: `tests`
+- Data streams with frames, manifests, and annotations: `data/streams`
+- A compact example run: `outputs/runs/demonstration_final_h04_dino_bbox`
+- A compact evaluation matrix: `outputs/evaluations/demonstration_final_matrix`
 - Base Python dependencies: `requirements.txt`
 - Optional DINOv2/PyTorch dependencies: `requirements-ml.txt`
 
@@ -49,14 +49,13 @@ The included example stream contains generated image sequences with recurring ob
 ## Repository Layout
 
 ```text
-src-final/
-  app/stream_analysis/      # CLI, pipeline, matching, grouping, reporting, evaluation
-  data/streams/             # image streams, manifests, annotations
-  outputs/
-    runs/                   # curated example analysis run
-    evaluations/            # curated example evaluation summary
-  tests/                    # unit and integration tests
-  tools/                    # helper scripts
+src/stream_analysis/        # CLI, pipeline, matching, grouping, reporting, evaluation
+data/streams/               # image streams, manifests, annotations
+outputs/
+  runs/                     # curated example analysis run
+  evaluations/              # curated example evaluation summary
+tests/                      # unit and integration tests
+tools/                      # helper scripts
 ```
 
 ## Setup
@@ -71,7 +70,7 @@ python -m venv .venv
 Set `PYTHONPATH` before running the package from the repository root:
 
 ```powershell
-$env:PYTHONPATH = "src-final\app"
+$env:PYTHONPATH = "src"
 ```
 
 ## Run A Handcrafted Example
@@ -80,14 +79,14 @@ The handcrafted path does not require external model weights:
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m stream_analysis validate `
-  src-final\data\streams\probe_01_stationery `
-  --config src-final\outputs\evaluations\demonstration_final_matrix\config_handcrafted_bbox_v1.json `
+  data\streams\probe_01_stationery `
+  --config outputs\evaluations\demonstration_final_matrix\config_handcrafted_bbox_v1.json `
   --representation-family handcrafted `
   --variant handcrafted_bbox_v1
 
 .\.venv\Scripts\python.exe -B -m stream_analysis analyze `
-  src-final\data\streams\probe_01_stationery `
-  --config src-final\outputs\evaluations\demonstration_final_matrix\config_handcrafted_bbox_v1.json `
+  data\streams\probe_01_stationery `
+  --config outputs\evaluations\demonstration_final_matrix\config_handcrafted_bbox_v1.json `
   --representation-family handcrafted `
   --variant handcrafted_bbox_v1 `
   --device cpu `
@@ -100,7 +99,7 @@ Evaluate the saved run:
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m stream_analysis evaluate `
-  src-final\data\streams\probe_01_stationery `
+  data\streams\probe_01_stationery `
   --run-directory .local_outputs\runs\smoke_handcrafted_bbox `
   --output-root .local_outputs `
   --evaluation-id smoke_handcrafted_bbox_eval
@@ -125,7 +124,7 @@ When running DINOv2 analysis, pass explicit local paths:
 The curated evaluation matrix contains 20 completed analyze/evaluate entries across five held-out streams and four representation variants. The full numeric table is stored in:
 
 ```text
-src-final/outputs/evaluations/demonstration_final_matrix/variant_macro_summary.csv
+outputs/evaluations/demonstration_final_matrix/variant_macro_summary.csv
 ```
 
 Selected values from that table:
@@ -144,8 +143,8 @@ These results describe the included evaluation artifacts. They should not be rea
 Run the test suite from the repository root:
 
 ```powershell
-$env:PYTHONPATH = "src-final\app"
-.\.venv\Scripts\python.exe -B -m unittest discover -s src-final\tests
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -B -m unittest discover -s tests
 ```
 
 Some DINOv2 integration tests require local model assets. The base handcrafted pipeline can be exercised without model weights.
