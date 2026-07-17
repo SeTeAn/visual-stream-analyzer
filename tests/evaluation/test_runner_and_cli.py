@@ -109,6 +109,45 @@ class EvaluationRunnerTest(unittest.TestCase):
         self.assertIn("retrieval", representation)
         self.assertIn("diagnostic_pair_scores", result.report["artifact_digests"])
 
+    def test_candidate_only_annotation_skips_type_and_event_metrics(self) -> None:
+        payload = _tiny_annotation()
+        payload.update({
+            "annotation_scope": "candidate_extraction_bbox_only",
+            "frame_comparisons": [],
+            "change_events": [],
+            "supported_event_types": [],
+        })
+        annotation_path = self.root / "candidate_only_annotation.json"
+        annotation_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        result = evaluate_saved_run(EvaluationRequest(
+            stream_directory=self.stream,
+            run_directory=self.run_dir,
+            output_root=self.root / "outputs",
+            evaluation_id="eval_candidate_only",
+            annotation_path=annotation_path,
+        ))
+
+        metrics = result.report["metrics"]
+        self.assertEqual(metrics["candidate_extraction"]["status"], "supported")
+        for stage in ("representations", "matching", "grouping", "events"):
+            self.assertEqual(
+                metrics[stage]["status"],
+                "not_supported_by_annotation_scope",
+            )
+        saved_report = json.loads(
+            (result.artifacts.evaluation_directory / "evaluation_report.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(
+            saved_report["data"]["annotation_scope"],
+            "candidate_extraction_bbox_only",
+        )
+        self.assertFalse(
+            any("pair-score" in item for item in saved_report["limitations"])
+        )
+
     def test_evaluator_rejects_unbound_or_malformed_pair_score_diagnostics(self) -> None:
         args = [
             "analyze",

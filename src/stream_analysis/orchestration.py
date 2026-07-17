@@ -9,7 +9,14 @@ from pathlib import Path
 from time import perf_counter
 from typing import Literal
 
-from .candidates import CandidateExtractionConfig, CandidateExtractionSnapshot, extract_candidates
+from .candidates import (
+    CandidateExtractionConfig,
+    CandidateExtractionSnapshot,
+    LocalMaskRCNNProvider,
+    MaskRCNNCandidateExtractionConfig,
+    extract_candidates,
+    extract_maskrcnn_candidates,
+)
 from .config import AnalysisRunConfig, StageConfig, semantic_config_digest
 from .contracts import (
     ArtifactReference, DinoEmbeddingPayload, EmissionStatus, FramePair,
@@ -52,6 +59,7 @@ RUNTIME_POLICY_SCHEMA_ID = "stream_analysis.runtime_policy.v1"
 STREAM_INPUT_CONFIG_SCHEMA_ID = "stream_analysis.stream_input_config.v1"
 
 RepresentationConfig = HandcraftedRepresentationConfig | DinoV2RepresentationConfig
+CandidateExtractionConfiguration = CandidateExtractionConfig | MaskRCNNCandidateExtractionConfig
 
 _WINDOWS_RESERVED_NAMES = {
     "CON", "PRN", "AUX", "NUL",
@@ -78,7 +86,7 @@ def _validate_portable_run_segment(run_id: str) -> None:
 class AnalyzePipelineConfig:
     """Typed aggregate over the already-versioned F03-F12 configurations."""
 
-    candidate_extraction: CandidateExtractionConfig
+    candidate_extraction: CandidateExtractionConfiguration
     representation: RepresentationConfig
     scoring: PairScoringConfig
     matching: MatchingConfig
@@ -88,8 +96,11 @@ class AnalyzePipelineConfig:
     diagnostic_level: Literal["none", "standard"] = "none"
 
     def __post_init__(self) -> None:
-        if not isinstance(self.candidate_extraction, CandidateExtractionConfig):
-            raise TypeError("candidate_extraction must be CandidateExtractionConfig.")
+        if not isinstance(
+            self.candidate_extraction,
+            (CandidateExtractionConfig, MaskRCNNCandidateExtractionConfig),
+        ):
+            raise TypeError("candidate_extraction must be a supported candidate config.")
         if not isinstance(self.representation, (HandcraftedRepresentationConfig, DinoV2RepresentationConfig)):
             raise TypeError("representation must be a supported representation config.")
         for name, expected in (
@@ -150,6 +161,11 @@ class DinoV2AssetPaths:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
+class CandidateExtractorAssetPaths:
+    checkpoint_path: Path
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
 class AnalyzeRequest:
     stream_directory: Path
     output_root: Path
@@ -157,6 +173,7 @@ class AnalyzeRequest:
     config: AnalyzePipelineConfig
     source_provenance: SourceProvenance
     environment_provenance: EnvironmentProvenance
+    candidate_extractor_assets: CandidateExtractorAssetPaths | None = None
     dinov2_assets: DinoV2AssetPaths | None = None
 
     def __post_init__(self) -> None:
@@ -175,12 +192,35 @@ class AnalyzeRequest:
             raise TypeError("environment_provenance must be EnvironmentProvenance.")
         if isinstance(self.config.representation, DinoV2RepresentationConfig) and self.dinov2_assets is None:
             raise ValueError("DINOv2 analyze requires explicit local source and checkpoint paths.")
+        if (
+            isinstance(self.config.candidate_extraction, MaskRCNNCandidateExtractionConfig)
+            and self.candidate_extractor_assets is None
+        ):
+            raise ValueError("Mask R-CNN candidate extraction requires an explicit checkpoint path.")
+        if (
+            isinstance(self.config.candidate_extraction, CandidateExtractionConfig)
+            and self.candidate_extractor_assets is not None
+        ):
+            raise ValueError("Candidate extractor assets are invalid for controlled-background extraction.")
         requested = self.environment_provenance.requested_device
-        if isinstance(self.config.representation, DinoV2RepresentationConfig):
-            if requested != self.config.representation.device_policy:
-                raise ValueError("Environment requested_device must match DINOv2 device_policy.")
-        elif requested != "cpu":
-            raise ValueError("Handcrafted analyze requires requested_device='cpu'.")
+        expected_device = (
+            self.config.representation.device_policy
+            if isinstance(self.config.representation, DinoV2RepresentationConfig)
+            else (
+                self.config.candidate_extraction.device_policy
+                if isinstance(self.config.candidate_extraction, MaskRCNNCandidateExtractionConfig)
+                else "cpu"
+            )
+        )
+        if (
+            isinstance(self.config.candidate_extraction, MaskRCNNCandidateExtractionConfig)
+            and isinstance(self.config.representation, DinoV2RepresentationConfig)
+            and self.config.candidate_extraction.device_policy
+            != self.config.representation.device_policy
+        ):
+            raise ValueError("Learned candidate extraction and DINOv2 must use one device policy.")
+        if requested != expected_device:
+            raise ValueError("Environment requested_device must match the learned pipeline device policy.")
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -276,15 +316,47 @@ def _compact_event(event: ChangeEvent) -> ChangeEvent:
     return replace(event, evidence=replace(event.evidence, details=details))
 
 
-def _build_model_provenance(config: RepresentationConfig) -> tuple[ModelProvenance, ...]:
-    if not isinstance(config, DinoV2RepresentationConfig):
-        return ()
-    return (ModelProvenance(
-        model_id=DINO_MODEL_NAME, model_version=DINO_MODEL_VERSION,
-        source_fingerprint=Fingerprint(algorithm="sha256", value=config.expected_source_tree_fingerprint),
-        checkpoint_fingerprint=Fingerprint(algorithm="sha256", value=config.expected_checkpoint_sha256),
-        metadata={"checkpoint_size_bytes": config.expected_checkpoint_size_bytes},
-    ),)
+def _build_model_provenance(config: AnalyzePipelineConfig) -> tuple[ModelProvenance, ...]:
+    models: list[ModelProvenance] = []
+    candidate_config = config.candidate_extraction
+    if isinstance(candidate_config, MaskRCNNCandidateExtractionConfig):
+        models.append(ModelProvenance(
+            model_id=candidate_config.model_name,
+            model_version=candidate_config.model_version,
+            source_fingerprint=Fingerprint(
+                algorithm="sha256",
+                value=candidate_config.source_identity_sha256,
+            ),
+            checkpoint_fingerprint=Fingerprint(
+                algorithm="sha256",
+                value=candidate_config.expected_checkpoint_sha256,
+            ),
+            metadata={
+                "checkpoint_size_bytes": candidate_config.expected_checkpoint_size_bytes,
+                "torchvision_version": candidate_config.expected_torchvision_version,
+                "semantic_classes": "COCO_closed_vocabulary",
+                "source_fingerprint_semantics": "torchvision_version_and_model_identifier",
+            },
+        ))
+    representation_config = config.representation
+    if isinstance(representation_config, DinoV2RepresentationConfig):
+        models.append(ModelProvenance(
+            model_id=representation_config.model_name,
+            model_version=representation_config.model_version,
+            source_fingerprint=Fingerprint(
+                algorithm="sha256",
+                value=representation_config.expected_source_tree_fingerprint,
+            ),
+            checkpoint_fingerprint=Fingerprint(
+                algorithm="sha256",
+                value=representation_config.expected_checkpoint_sha256,
+            ),
+            metadata={
+                "checkpoint_size_bytes": representation_config.expected_checkpoint_size_bytes,
+                "embedding_dimension": representation_config.embedding_dimension,
+            },
+        ))
+    return tuple(models)
 
 
 def _run_analysis(request: AnalyzeRequest, started: datetime, started_clock: float) -> AnalyzeOutcome:
@@ -300,12 +372,30 @@ def _run_analysis(request: AnalyzeRequest, started: datetime, started_clock: flo
     decoded = load_decoded_stream(ManifestLoadRequest(
         stream_root=request.stream_directory, producer=input_producer,
     ))
-    snapshot = extract_candidates(decoded, request.config.candidate_extraction)
+    candidate_resolved_device = "cpu"
+    if isinstance(request.config.candidate_extraction, MaskRCNNCandidateExtractionConfig):
+        candidate_assets = request.candidate_extractor_assets
+        assert candidate_assets is not None
+        candidate_provider = LocalMaskRCNNProvider(
+            checkpoint_path=candidate_assets.checkpoint_path,
+            config=request.config.candidate_extraction,
+        )
+        try:
+            snapshot = extract_maskrcnn_candidates(
+                decoded,
+                candidate_provider,
+                request.config.candidate_extraction,
+            )
+            candidate_resolved_device = candidate_provider.resolved_device or "unresolved"
+        finally:
+            candidate_provider.close()
+    else:
+        snapshot = extract_candidates(decoded, request.config.candidate_extraction)
 
     if isinstance(request.config.representation, HandcraftedRepresentationConfig):
         representation_batch = build_handcrafted_representations(decoded, snapshot, request.config.representation)
         scorer = HandcraftedCanonicalScorer(request.config.representation)
-        resolved_device = "cpu"
+        resolved_device = candidate_resolved_device
     else:
         assets = request.dinov2_assets
         assert assets is not None
@@ -315,6 +405,8 @@ def _run_analysis(request: AnalyzeRequest, started: datetime, started_clock: flo
             expected_checkpoint_sha256=request.config.representation.expected_checkpoint_sha256,
             expected_source_tree_fingerprint=request.config.representation.expected_source_tree_fingerprint,
             expected_checkpoint_size_bytes=request.config.representation.expected_checkpoint_size_bytes,
+            model_name=request.config.representation.model_name,
+            embedding_dimension=request.config.representation.embedding_dimension,
             device_policy=request.config.representation.device_policy,
             batch_size=request.config.representation.batch_size,
         )
@@ -408,7 +500,7 @@ def _run_analysis(request: AnalyzeRequest, started: datetime, started_clock: flo
             VersionedMetadata(identifier=model.model_id, version=model.model_version, details={
                 "model_name": model.model_id, "model_version": model.model_version,
                 "checkpoint_digest": model.checkpoint_fingerprint.value,
-            }) for model in _build_model_provenance(request.config.representation)
+            }) for model in _build_model_provenance(request.config)
         ),
         runtime_summary=runtime,
         candidate_extraction_result_id=snapshot.result.envelope.record_id,
@@ -441,7 +533,7 @@ def _run_analysis(request: AnalyzeRequest, started: datetime, started_clock: flo
         timestamps=RunTimestamps(started_at=started.isoformat(), finished_at=finished.isoformat()),
         source=request.source_provenance, data=data,
         stage_configs=tuple(_fingerprint_stage(item) for item in analysis_config.stage_configs),
-        models=_build_model_provenance(request.config.representation),
+        models=_build_model_provenance(request.config),
         environment=resolved_environment,
         output_schema_versions=output_schema_versions,
     )
@@ -507,5 +599,5 @@ def run_analysis(request: AnalyzeRequest) -> AnalyzeOutcome:
 __all__ = [
     "PIPELINE_VERSION", "AnalyzeOutcome", "AnalyzePipelineConfig", "AnalyzeRequest",
     "AnalyzeRunError",
-    "DinoV2AssetPaths", "run_analysis",
+    "CandidateExtractorAssetPaths", "DinoV2AssetPaths", "run_analysis",
 ]

@@ -32,6 +32,8 @@ class _FakeProvider:
             expected_checkpoint_sha256=kwargs["expected_checkpoint_sha256"],
             expected_source_tree_fingerprint=kwargs["expected_source_tree_fingerprint"],
             expected_checkpoint_size_bytes=kwargs["expected_checkpoint_size_bytes"],
+            model_name=kwargs["model_name"],
+            embedding_dimension=kwargs["embedding_dimension"],
         )
         self.requested_device = kwargs["device_policy"]
         self.batch_size = kwargs["batch_size"]

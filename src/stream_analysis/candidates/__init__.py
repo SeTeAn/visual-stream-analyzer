@@ -34,6 +34,18 @@ from .extraction import (
     ComponentPolicy,
     extract_candidates,
 )
+from .maskrcnn import (
+    MASKRCNN_CANDIDATE_SOURCE,
+    MASKRCNN_CONFIG_SCHEMA_ID,
+    MASKRCNN_MODEL_NAME,
+    MASKRCNN_MODEL_VERSION,
+    LocalMaskRCNNProvider,
+    MaskRCNNCandidateExtractionConfig,
+    MaskRCNNFrameOutput,
+    MaskRCNNPrediction,
+    MaskRCNNProviderProtocol,
+    extract_maskrcnn_candidates,
+)
 
 __all__ = [
     "BackgroundAggregation",
@@ -48,6 +60,10 @@ __all__ = [
     "FRAME_CANDIDATE_DIAGNOSTICS_SCHEMA_VERSION",
     "HysteresisMaskConfig",
     "MASK_DIGEST_ENCODING_ID",
+    "MASKRCNN_CANDIDATE_SOURCE",
+    "MASKRCNN_CONFIG_SCHEMA_ID",
+    "MASKRCNN_MODEL_NAME",
+    "MASKRCNN_MODEL_VERSION",
     "MorphologyCleanupConfig",
     "MorphologyKernelShape",
     "ResidualMaskConfig",
@@ -55,6 +71,11 @@ __all__ = [
     "CandidateExtractionConfig",
     "CandidateExtractionSnapshot",
     "CandidateMaskRecord",
+    "LocalMaskRCNNProvider",
+    "MaskRCNNCandidateExtractionConfig",
+    "MaskRCNNFrameOutput",
+    "MaskRCNNPrediction",
+    "MaskRCNNProviderProtocol",
     "ComponentConnectivity",
     "ComponentPolicy",
     "candidate_mask_digest",
@@ -62,6 +83,7 @@ __all__ = [
     "compute_residual",
     "estimate_background_model",
     "extract_candidates",
+    "extract_maskrcnn_candidates",
     "hysteresis_threshold_mask",
     "threshold_residual_mask",
 ]

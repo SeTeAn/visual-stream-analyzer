@@ -9,7 +9,7 @@ from typing import Any, TypeVar
 
 from .candidates import (
     BackgroundModelConfig, CandidateExtractionConfig, HysteresisMaskConfig,
-    MorphologyCleanupConfig,
+    MaskRCNNCandidateExtractionConfig, MorphologyCleanupConfig,
 )
 from .matching import EventConfig, GroupingConfig, MatchingConfig, PairScoringConfig
 from .orchestration import AnalyzePipelineConfig
@@ -66,14 +66,34 @@ def load_analyze_configuration(path: Path) -> LoadedAnalyzeConfiguration:
     if missing:
         raise ValueError(f"config is missing fields: {', '.join(sorted(missing))}.")
 
-    candidate_values = _object(root["candidate_extraction"], "candidate_extraction")
-    if "background" in candidate_values:
-        candidate_values["background"] = _construct(BackgroundModelConfig, candidate_values["background"], "candidate_extraction.background")
-    if "hysteresis" in candidate_values:
-        candidate_values["hysteresis"] = _construct(HysteresisMaskConfig, candidate_values["hysteresis"], "candidate_extraction.hysteresis")
-    if "morphology" in candidate_values:
-        candidate_values["morphology"] = _construct(MorphologyCleanupConfig, candidate_values["morphology"], "candidate_extraction.morphology")
-    candidate = _construct(CandidateExtractionConfig, candidate_values, "candidate_extraction")
+    candidate_document = _object(root["candidate_extraction"], "candidate_extraction")
+    if "family" in candidate_document:
+        if set(candidate_document) != {"family", "parameters"}:
+            raise ValueError("Typed candidate_extraction requires exactly family and parameters.")
+        candidate_family = candidate_document["family"]
+        candidate_values = _object(
+            candidate_document["parameters"],
+            "candidate_extraction.parameters",
+        )
+    else:
+        candidate_family = "controlled_background"
+        candidate_values = candidate_document
+    if candidate_family == "torchvision_maskrcnn":
+        candidate = _construct(
+            MaskRCNNCandidateExtractionConfig,
+            candidate_values,
+            "candidate_extraction.parameters",
+        )
+    elif candidate_family == "controlled_background":
+        if "background" in candidate_values:
+            candidate_values["background"] = _construct(BackgroundModelConfig, candidate_values["background"], "candidate_extraction.background")
+        if "hysteresis" in candidate_values:
+            candidate_values["hysteresis"] = _construct(HysteresisMaskConfig, candidate_values["hysteresis"], "candidate_extraction.hysteresis")
+        if "morphology" in candidate_values:
+            candidate_values["morphology"] = _construct(MorphologyCleanupConfig, candidate_values["morphology"], "candidate_extraction.morphology")
+        candidate = _construct(CandidateExtractionConfig, candidate_values, "candidate_extraction")
+    else:
+        raise ValueError("candidate_extraction.family must be controlled_background or torchvision_maskrcnn.")
 
     representation_object = _object(root["representation"], "representation")
     if set(representation_object) != {"family", "variant", "parameters"}:

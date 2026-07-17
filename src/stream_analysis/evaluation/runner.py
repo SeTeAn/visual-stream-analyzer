@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import math
-import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -34,6 +33,10 @@ from .ranking import PairRankingRecord, evaluate_pair_ranking
 
 EVALUATOR_VERSION = "1.0.0"
 METRIC_SPEC_VERSION = "stream_analysis_evaluation_protocol.v1"
+CANDIDATE_ONLY_ANNOTATION_SCOPES = frozenset({
+    "candidate_extraction_bbox_only",
+    "ocid_candidate_extraction_bbox_from_instance_masks",
+})
 
 PRIMARY_IOU_THRESHOLD = 0.50
 DIAGNOSTIC_IOU_LEVELS = (0.25, 0.75)
@@ -83,6 +86,181 @@ class CandidateAssignment:
     visual_type_id: str
 
 
+def evaluate_candidate_predictions(
+    annotation: StreamAnnotation,
+    predicted: tuple[PredictedCandidate, ...],
+) -> dict[str, Any]:
+    """Evaluate in-memory candidates for an isolated extractor gate."""
+
+    if not isinstance(annotation, StreamAnnotation):
+        raise TypeError("annotation must be StreamAnnotation.")
+    values = tuple(predicted)
+    if not all(isinstance(item, PredictedCandidate) for item in values):
+        raise TypeError("predicted must contain PredictedCandidate values.")
+    return _strip_internal(_evaluate_candidates(annotation, values))
+
+
+def evaluate_physical_instance_continuity(
+    annotation: StreamAnnotation,
+    predicted: tuple[PredictedCandidate, ...],
+    primary_result: dict[str, Any],
+) -> dict[str, Any]:
+    """Evaluate neighboring matches against an evaluation-only identity proxy.
+
+    This metric is intentionally separate from visual-type grouping and event
+    evaluation. It is valid only for candidate-only annotations whose IDs mean
+    physical continuity across neighboring frames.
+    """
+
+    if annotation.annotation_scope not in CANDIDATE_ONLY_ANNOTATION_SCOPES:
+        raise ValueError("Physical continuity requires a candidate-only annotation scope.")
+    if not isinstance(primary_result, dict):
+        raise TypeError("primary_result must be a dictionary.")
+    values = tuple(predicted)
+    if not all(isinstance(item, PredictedCandidate) for item in values):
+        raise TypeError("predicted must contain PredictedCandidate values.")
+    candidate_evaluation = _evaluate_candidates(annotation, values)
+    assignment_by_candidate = {
+        item.candidate_id: item for item in candidate_evaluation["assignments"]
+    }
+    candidate_ids_by_frame = _candidate_ids_by_frame(values)
+    gt_counts = _gt_counts_by_frame(annotation)
+    policy_rows: dict[str, list[dict[str, Any]]] = {
+        "accepted_strict": [],
+        "selected_including_uncertain": [],
+    }
+    withheld = 0
+    uncertain_count = 0
+    for comparison in _frame_comparisons(primary_result):
+        pair = _mapping(comparison, "frame_pair")
+        left = _text(pair, "from_frame_id")
+        right = _text(pair, "to_frame_id")
+        expected = sum(
+            min(gt_counts[left].get(identity_id, 0), gt_counts[right].get(identity_id, 0))
+            for identity_id in annotation.visual_type_ids
+        )
+        if comparison.get("emission_status") == "withheld":
+            withheld += 1
+            for rows in policy_rows.values():
+                rows.append({"tp": 0, "fp": 0, "fn": expected})
+            continue
+        accepted = tuple(str(item) for item in (comparison.get("accepted_match_ids") or ()))
+        uncertain = tuple(str(item) for item in (comparison.get("uncertain_match_ids") or ()))
+        uncertain_count += len(uncertain)
+        accepted_tp, accepted_fp = _physical_match_counts(
+            accepted,
+            assignment_by_candidate,
+            comparison,
+            candidate_ids_by_frame,
+        )
+        selected_tp, selected_fp = _physical_match_counts(
+            accepted + uncertain,
+            assignment_by_candidate,
+            comparison,
+            candidate_ids_by_frame,
+        )
+        policy_rows["accepted_strict"].append({
+            "tp": accepted_tp,
+            "fp": accepted_fp + len(uncertain),
+            "fn": max(0, expected - accepted_tp),
+        })
+        policy_rows["selected_including_uncertain"].append({
+            "tp": selected_tp,
+            "fp": selected_fp,
+            "fn": max(0, expected - selected_tp),
+        })
+
+    def aggregate(rows: list[dict[str, int]]) -> dict[str, Any]:
+        tp = sum(item["tp"] for item in rows)
+        fp = sum(item["fp"] for item in rows)
+        fn = sum(item["fn"] for item in rows)
+        return {
+            "tp": tp,
+            "fp": fp,
+            "fn": fn,
+            "precision": _safe_div(tp, tp + fp),
+            "recall": _safe_div(tp, tp + fn),
+            "f1": _f1(tp, fp, fn),
+        }
+
+    return {
+        "status": "supported_physical_instance_proxy_evaluation_only",
+        "identity_semantics": "physical_instance_continuity_not_visual_type_ground_truth",
+        "candidate_iou_threshold": PRIMARY_IOU_THRESHOLD,
+        "bbox_matched_candidate_count": len(assignment_by_candidate),
+        "frame_pair_count": len(_frame_comparisons(primary_result)),
+        "uncertain_selected_count": uncertain_count,
+        "withheld_comparison_count": withheld,
+        **{name: aggregate(rows) for name, rows in policy_rows.items()},
+        "limitations": [
+            "Includes candidate-extraction misses in continuity false negatives.",
+            "Uses compact match IDs because full MatchRecord artifacts are not saved.",
+            "Must not be interpreted as visual-type grouping or event quality.",
+        ],
+    }
+
+
+def _physical_match_counts(
+    match_ids: tuple[str, ...],
+    assignment_by_candidate: dict[str, CandidateAssignment],
+    comparison: dict[str, Any],
+    candidate_ids_by_frame: dict[str, tuple[str, ...]],
+) -> tuple[int, int]:
+    true_positive = 0
+    false_positive = 0
+    for match_id in match_ids:
+        parsed = _resolve_match_endpoints(
+            match_id,
+            comparison,
+            candidate_ids_by_frame,
+        )
+        if parsed is None:
+            false_positive += 1
+            continue
+        left = assignment_by_candidate.get(parsed[0])
+        right = assignment_by_candidate.get(parsed[1])
+        if left is not None and right is not None and left.visual_type_id == right.visual_type_id:
+            true_positive += 1
+        else:
+            false_positive += 1
+    return true_positive, false_positive
+
+
+def aggregate_candidate_metrics(metrics: tuple[dict[str, Any], ...]) -> dict[str, Any]:
+    """Micro-aggregate candidate-only reports from disjoint streams."""
+
+    values = tuple(metrics)
+    if not values:
+        raise ValueError("metrics must not be empty.")
+    tp = sum(int(item["tp"]) for item in values)
+    fp = sum(int(item["fp"]) for item in values)
+    fn = sum(int(item["fn"]) for item in values)
+    frame_count = sum(len(item["per_frame"]) for item in values)
+    iou_count = sum(int(item["tp_iou"]["count"]) for item in values)
+    iou_total = sum(
+        int(item["tp_iou"]["count"]) * float(item["tp_iou"]["mean"] or 0.0)
+        for item in values
+    )
+    diagnostic_keys = ("duplicate", "split", "merge", "fragment", "noise", "miss")
+    diagnostics = {
+        key: sum(int(item["diagnostics"][key]) for item in values)
+        for key in diagnostic_keys
+    }
+    precision = _safe_div(tp, tp + fp)
+    recall = _safe_div(tp, tp + fn)
+    return {
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "precision": precision,
+        "recall": recall,
+        "f1": _harmonic(precision, recall),
+        "false_per_frame": None if frame_count == 0 else fp / frame_count,
+        "weighted_mean_tp_iou": None if iou_count == 0 else iou_total / iou_count,
+        "diagnostics": diagnostics,
+    }
+
+
 def evaluate_saved_run(request: EvaluationRequest) -> EvaluationResult:
     """Evaluate existing files under ``outputs/runs/<run_id>``."""
 
@@ -110,17 +288,36 @@ def evaluate_saved_run(request: EvaluationRequest) -> EvaluationResult:
     assignment_by_candidate = {
         item.candidate_id: item for item in candidate_eval["assignments"]
     }
-    representation_eval = _evaluate_representations(
-        run_dir,
-        annotation,
-        assignment_by_candidate,
-        primary_result,
-        run_manifest,
-        predicted,
-    )
-    matching_eval = _evaluate_matching(annotation, assignment_by_candidate, primary_result)
-    grouping_eval = _evaluate_grouping(annotation, assignment_by_candidate, primary_result)
-    event_eval = _evaluate_events(annotation, assignment_by_candidate, grouping_eval, primary_result)
+    if annotation.annotation_scope in CANDIDATE_ONLY_ANNOTATION_SCOPES:
+        representation_eval = _unsupported_by_annotation_scope("representations")
+        matching_eval = _unsupported_by_annotation_scope("matching")
+        grouping_eval = _unsupported_by_annotation_scope("grouping")
+        event_eval = {
+            **_unsupported_by_annotation_scope("events"),
+            "false_negative_keys": [],
+            "false_positive_keys": [],
+        }
+    else:
+        representation_eval = _evaluate_representations(
+            run_dir,
+            annotation,
+            assignment_by_candidate,
+            primary_result,
+            run_manifest,
+            predicted,
+        )
+        matching_eval = _evaluate_matching(
+            annotation,
+            assignment_by_candidate,
+            primary_result,
+            predicted,
+        )
+        grouping_eval = _evaluate_grouping(
+            annotation, assignment_by_candidate, primary_result
+        )
+        event_eval = _evaluate_events(
+            annotation, assignment_by_candidate, grouping_eval, primary_result
+        )
     error_ledger = _error_ledger(candidate_eval, event_eval)
     now = datetime.now(timezone.utc).isoformat()
     evaluation_config = _default_evaluation_config(request.data_role)
@@ -191,6 +388,19 @@ def evaluate_saved_run(request: EvaluationRequest) -> EvaluationResult:
         manifest=manifest,
     )
     return EvaluationResult(report=report, error_ledger=error_ledger, artifacts=artifacts)
+
+
+def _unsupported_by_annotation_scope(stage: str) -> dict[str, Any]:
+    return {
+        "status": "not_supported_by_annotation_scope",
+        "reason": (
+            f"{stage} metrics require type/event ground truth; this annotation "
+            "contains physical-instance boxes for candidate evaluation only."
+        ),
+        "limitations": [
+            "OCID numeric instance labels are not ground-truth visual types."
+        ],
+    }
 
 
 def _default_evaluation_config(role: EvaluationDataRole) -> EvaluationConfig:
@@ -769,9 +979,11 @@ def _evaluate_matching(
     annotation: StreamAnnotation,
     assignment_by_candidate: dict[str, CandidateAssignment],
     primary_result: dict[str, Any],
+    predicted: tuple[PredictedCandidate, ...],
 ) -> dict[str, Any]:
     comparisons = _frame_comparisons(primary_result)
     gt_counts = _gt_counts_by_frame(annotation)
+    candidate_ids_by_frame = _candidate_ids_by_frame(predicted)
     totals = Counter()
     rows = []
     for comparison in comparisons:
@@ -791,7 +1003,11 @@ def _evaluate_matching(
         tp = 0
         fp = 0
         for match_id in accepted:
-            parsed = _parse_match_id(str(match_id))
+            parsed = _resolve_match_endpoints(
+                str(match_id),
+                comparison,
+                candidate_ids_by_frame,
+            )
             if parsed is None:
                 fp += 1
                 continue
@@ -816,7 +1032,9 @@ def _evaluate_matching(
         "uncertain_selected_count": totals["uncertain"],
         "withheld_comparison_count": totals["withheld"],
         "per_comparison": rows,
-        "limitations": ["Endpoint parsing relies on current compact match_id format because full MatchRecord artifacts are not saved."],
+        "limitations": [
+            "Endpoints are resolved against candidates from the declared frame pair because full MatchRecord artifacts are not saved."
+        ],
     }
 
 
@@ -1017,11 +1235,48 @@ def _change_events(primary_result: dict[str, Any]) -> tuple[dict[str, Any], ...]
     return tuple(item for item in values if isinstance(item, dict))
 
 
-def _parse_match_id(match_id: str) -> tuple[str, str] | None:
-    match = re.fullmatch(r"match:comparison:[^:]+:[^:]+:(.+):(.+)", match_id)
-    if not match:
+def _candidate_ids_by_frame(
+    predicted: tuple[PredictedCandidate, ...],
+) -> dict[str, tuple[str, ...]]:
+    values: dict[str, list[str]] = defaultdict(list)
+    seen: set[str] = set()
+    for candidate in predicted:
+        if candidate.candidate_id in seen:
+            raise EvaluationError(
+                f"Duplicate candidate_id in candidate manifest: {candidate.candidate_id}."
+            )
+        seen.add(candidate.candidate_id)
+        values[candidate.frame_id].append(candidate.candidate_id)
+    return {
+        frame_id: tuple(sorted(candidate_ids))
+        for frame_id, candidate_ids in values.items()
+    }
+
+
+def _resolve_match_endpoints(
+    match_id: str,
+    comparison: dict[str, Any],
+    candidate_ids_by_frame: dict[str, tuple[str, ...]],
+) -> tuple[str, str] | None:
+    pair = _mapping(comparison, "frame_pair")
+    from_frame_id = _text(pair, "from_frame_id")
+    to_frame_id = _text(pair, "to_frame_id")
+    comparison_id = _text(comparison, "comparison_id")
+    prefix = f"match:{comparison_id}:"
+    if not match_id.startswith(prefix):
         return None
-    return match.group(1), match.group(2)
+    right_ids = set(candidate_ids_by_frame.get(to_frame_id, ()))
+    possibilities: list[tuple[str, str]] = []
+    for left_id in candidate_ids_by_frame.get(from_frame_id, ()):
+        left_prefix = f"{prefix}{left_id}:"
+        if not match_id.startswith(left_prefix):
+            continue
+        right_id = match_id[len(left_prefix):]
+        if right_id in right_ids:
+            possibilities.append((left_id, right_id))
+    if len(possibilities) != 1:
+        return None
+    return possibilities[0]
 
 
 def _gt_counts_by_frame(annotation: StreamAnnotation) -> dict[str, Counter[str]]:
@@ -1083,6 +1338,8 @@ def _jsonable(value: Any) -> Any:
         return [_jsonable(item) for item in value]
     if isinstance(value, list):
         return [_jsonable(item) for item in value]
+    if isinstance(value, (set, frozenset)):
+        return [_jsonable(item) for item in sorted(value, key=repr)]
     if isinstance(value, dict):
         return {str(key): _jsonable(item) for key, item in value.items()}
     return value
@@ -1109,8 +1366,12 @@ def _summary_text(report: dict[str, Any]) -> str:
 
 def _limitations(representation_eval: dict[str, Any], grouping_eval: dict[str, Any]) -> list[str]:
     rows = []
-    if representation_eval.get("status") != "supported":
+    if representation_eval.get("status") == "not_supported_by_saved_artifacts":
         rows.append("Representation ranking metrics require saved pair-score diagnostics; compact primary JSON is insufficient.")
+    elif representation_eval.get("status") == "not_supported_by_annotation_scope":
+        rows.append(str(representation_eval.get("reason")))
+    elif representation_eval.get("status") != "supported":
+        rows.append("Representation metrics are unavailable for this evaluation.")
     rows.extend(grouping_eval.get("limitations") or [])
     rows.append("Probe/development metrics are not final held-out claims unless data_role=final_held_out and freeze rules were followed.")
     return rows

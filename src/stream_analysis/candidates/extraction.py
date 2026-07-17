@@ -53,7 +53,7 @@ DEFAULT_CANDIDATE_SOURCE = "controlled_background_components_v1"
 
 ComponentConnectivity = Literal[4, 8]
 ComponentPolicy = Literal["allow", "warn", "reject"]
-BackgroundStrategy = Literal["stream_model", "frame_border_median"]
+BackgroundStrategy = Literal["stream_model", "frame_border_median", "first_frame"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,9 +95,14 @@ class CandidateExtractionConfig:
 
     def __post_init__(self) -> None:
         _require_version(self.config_version, "config_version")
-        if self.background_strategy not in {"stream_model", "frame_border_median"}:
+        if self.background_strategy not in {
+            "stream_model",
+            "frame_border_median",
+            "first_frame",
+        }:
             raise ValueError(
-                "background_strategy must be 'stream_model' or 'frame_border_median'."
+                "background_strategy must be 'stream_model', "
+                "'frame_border_median' or 'first_frame'."
             )
         if not isinstance(self.background, BackgroundModelConfig):
             raise TypeError("background must be BackgroundModelConfig.")
@@ -258,11 +263,15 @@ def extract_candidates(
 
     frames = decoded_stream.frames
     frame_arrays = tuple(_frame_to_rgb_array(frame) for frame in frames)
-    stream_background = (
-        estimate_background_model(frame_arrays, effective_config.background)
-        if effective_config.background_strategy == "stream_model"
-        else None
-    )
+    stream_background = None
+    if effective_config.background_strategy == "stream_model":
+        stream_background = estimate_background_model(
+            frame_arrays, effective_config.background
+        )
+    elif effective_config.background_strategy == "first_frame":
+        stream_background = estimate_background_model(
+            frame_arrays[:1], effective_config.background
+        )
     producer = effective_config.producer
     stream_id = decoded_stream.stream.stream_id
 
@@ -490,9 +499,11 @@ def _background_for_frame(
     stream_background: BackgroundModel | None,
     config: CandidateExtractionConfig,
 ) -> BackgroundModel:
-    if config.background_strategy == "stream_model":
+    if config.background_strategy in {"stream_model", "first_frame"}:
         if stream_background is None:
-            raise ValueError("stream_background is required for stream_model strategy.")
+            raise ValueError(
+                "stream_background is required for stream_model and first_frame strategies."
+            )
         return stream_background
     return BackgroundModel(
         rgb=_frame_border_median_background(

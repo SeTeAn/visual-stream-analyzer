@@ -21,6 +21,10 @@ from .runner import (
     EvaluationError,
     EvaluationRequest,
     EvaluationResult,
+    PredictedCandidate,
+    aggregate_candidate_metrics,
+    evaluate_candidate_predictions,
+    evaluate_physical_instance_continuity,
     evaluate_saved_run,
 )
 
@@ -38,7 +42,11 @@ __all__ = [
     "EvaluationResult",
     "ExpectedChangeEvent",
     "PairRankingRecord",
+    "PredictedCandidate",
     "StreamAnnotation",
+    "aggregate_candidate_metrics",
+    "evaluate_candidate_predictions",
+    "evaluate_physical_instance_continuity",
     "evaluate_pair_ranking",
     "evaluate_saved_run",
     "load_annotation",

@@ -10,6 +10,7 @@ import numpy as np
 
 from stream_analysis.representations import (
     DINO_EMBEDDING_DIMENSION,
+    DinoV2ModelSpec,
     DinoV2ProviderError,
     DinoV2ProviderOutput,
     LocalDinoV2Provider,
@@ -56,6 +57,28 @@ class _FakeModel:
 
 
 class DinoV2ProviderAssetTest(unittest.TestCase):
+    def test_model_spec_accepts_official_vit_base_dimension(self) -> None:
+        spec = DinoV2ModelSpec(
+            expected_checkpoint_sha256="0" * 64,
+            expected_source_tree_fingerprint="1" * 64,
+            model_name="dinov2_vitb14",
+            embedding_dimension=768,
+        )
+
+        self.assertEqual(spec.model_name, "dinov2_vitb14")
+        self.assertEqual(spec.embedding_dimension, 768)
+
+    def test_provider_output_supports_selected_backbone_dimension(self) -> None:
+        embedding = np.full((1, 768), 1.0 / np.sqrt(768), dtype=np.float32)
+
+        output = DinoV2ProviderOutput(
+            embeddings=embedding,
+            runtime_details={},
+            embedding_dimension=768,
+        )
+
+        self.assertEqual(output.embeddings.shape, (1, 768))
+
     def test_provider_output_rejects_float64_without_implicit_conversion(self) -> None:
         embedding = np.full(
             (1, DINO_EMBEDDING_DIMENSION),

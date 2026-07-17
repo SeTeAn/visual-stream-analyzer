@@ -455,7 +455,10 @@ class CandidateExtractionTest(unittest.TestCase):
         self.assertNotEqual(config.config_digest, previous_like.config_digest)
 
     def test_background_strategy_and_border_ratio_are_validated(self) -> None:
-        self.assertEqual(BackgroundStrategy.__args__, ("stream_model", "frame_border_median"))
+        self.assertEqual(
+            BackgroundStrategy.__args__,
+            ("stream_model", "frame_border_median", "first_frame"),
+        )
         invalid_configs = (
             {"background_strategy": "unknown"},
             {"background_border_ratio": 0.0},
@@ -520,6 +523,35 @@ class CandidateExtractionTest(unittest.TestCase):
         self.assertEqual(
             snapshot.result.frame_diagnostics[0].summary["background_frame_count"],
             3,
+        )
+
+    def test_first_frame_strategy_uses_initial_frame_as_fixed_background(self) -> None:
+        base = _base_frame(height=80, width=100)
+        object_frame = base.copy()
+        object_frame[20:42, 30:56] = (230, 20, 20)
+
+        snapshot = extract_candidates(
+            _decoded_stream([base.copy(), object_frame, object_frame.copy()]),
+            CandidateExtractionConfig(
+                background_strategy="first_frame",
+                bbox_padding=0,
+            ),
+        )
+
+        per_frame = {
+            diagnostic.frame_id: diagnostic.summary["accepted_candidate_count"]
+            for diagnostic in snapshot.result.frame_diagnostics
+        }
+        self.assertEqual(per_frame["frame_001"], 0)
+        self.assertEqual(per_frame["frame_002"], 1)
+        self.assertEqual(per_frame["frame_003"], 1)
+        self.assertEqual(
+            snapshot.result.frame_diagnostics[0].summary["background_strategy"],
+            "first_frame",
+        )
+        self.assertEqual(
+            snapshot.result.frame_diagnostics[0].summary["background_frame_count"],
+            1,
         )
 
     def test_development_defaults_filter_narrow_noise_without_losing_object(self) -> None:

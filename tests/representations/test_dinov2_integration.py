@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -34,11 +35,21 @@ SOURCE_HASH = "b" * 64
 
 
 class FakeDinoProvider:
-    def __init__(self, *, device="cpu", batch_size=4, auto_fallback=False) -> None:
+    def __init__(
+        self,
+        *,
+        device="cpu",
+        batch_size=4,
+        auto_fallback=False,
+        model_name="dinov2_vits14",
+        embedding_dimension=DINO_EMBEDDING_DIMENSION,
+    ) -> None:
         self.model_spec = DinoV2ModelSpec(
             expected_checkpoint_sha256=CHECKPOINT_HASH,
             expected_source_tree_fingerprint=SOURCE_HASH,
             expected_checkpoint_size_bytes=123,
+            model_name=model_name,
+            embedding_dimension=embedding_dimension,
         )
         self.requested_device = "auto" if auto_fallback else device
         self.batch_size = batch_size
@@ -52,7 +63,7 @@ class FakeDinoProvider:
     def embed_batch(self, normalized_batch):
         batch = np.asarray(normalized_batch, dtype=np.float32)
         self.calls.append(batch.copy())
-        vectors = np.zeros((len(batch), DINO_EMBEDDING_DIMENSION), dtype=np.float32)
+        vectors = np.zeros((len(batch), self.model_spec.embedding_dimension), dtype=np.float32)
         means = batch.mean(axis=(2, 3))
         vectors[:, :3] = means
         vectors[:, 3] = 1.0
@@ -67,6 +78,7 @@ class FakeDinoProvider:
                 "provider": "fake_no_assets",
             },
             warning_code="DEVICE_FALLBACK_CPU" if self.requested_device == "auto" else None,
+            embedding_dimension=self.model_spec.embedding_dimension,
         )
 
     def provider_metadata(self):
@@ -79,10 +91,10 @@ class FakeDinoProvider:
 
     def model_metadata(self):
         return {
-            "model_name": "fake_dinov2_vits14",
+            "model_name": self.model_spec.model_name,
             "expected_checkpoint_sha256": CHECKPOINT_HASH,
             "expected_source_tree_fingerprint": SOURCE_HASH,
-            "embedding_dimension": DINO_EMBEDDING_DIMENSION,
+            "embedding_dimension": self.model_spec.embedding_dimension,
         }
 
 
@@ -91,6 +103,8 @@ def config_for(provider, *, variant=DINO_BBOX_VARIANT):
         expected_checkpoint_sha256=provider.model_spec.expected_checkpoint_sha256,
         expected_source_tree_fingerprint=provider.model_spec.expected_source_tree_fingerprint,
         expected_checkpoint_size_bytes=provider.model_spec.expected_checkpoint_size_bytes,
+        model_name=provider.model_spec.model_name,
+        embedding_dimension=provider.model_spec.embedding_dimension,
         variant=variant,
         device_policy=provider.requested_device,
         batch_size=provider.batch_size,
@@ -151,12 +165,39 @@ class DinoV2IntegrationTest(unittest.TestCase):
         )
         self.assertEqual(cpu.config_digest, cuda.config_digest)
         self.assertNotEqual(cpu.config_digest, mask.config_digest)
+        vitb = DinoV2RepresentationConfig(
+            expected_checkpoint_sha256=CHECKPOINT_HASH,
+            expected_source_tree_fingerprint=SOURCE_HASH,
+            model_name="dinov2_vitb14",
+            embedding_dimension=768,
+        )
+        self.assertNotEqual(cpu.config_digest, vitb.config_digest)
         self.assertEqual(cpu.config_digest, DinoV2RepresentationConfig(
             expected_checkpoint_sha256=CHECKPOINT_HASH,
             expected_source_tree_fingerprint=SOURCE_HASH,
             device_policy="cpu",
             batch_size=1,
         ).config_digest)
+
+    def test_vitb_provider_builds_768_dimensional_model_specific_record(self) -> None:
+        decoded, snapshot = make_fixture(np.ones((8, 8), dtype=bool))
+        provider = FakeDinoProvider(
+            batch_size=1,
+            model_name="dinov2_vitb14",
+            embedding_dimension=768,
+        )
+
+        record = build_dinov2_representations(
+            decoded,
+            snapshot,
+            provider,
+            config_for(provider),
+        ).records[0]
+
+        self.assertEqual(record.payload.embedding_dimension, 768)
+        self.assertEqual(record.representation_type, "dinov2_vitb14_cls")
+        self.assertEqual(record.representation_version, "dinov2-vitb14-cls-1.0")
+        self.assertEqual(record.model_metadata.identifier, "dinov2_vitb14")
 
     def test_fake_provider_builds_contract_with_batch_order_and_lineage(self) -> None:
         mask = np.zeros((12, 16), dtype=bool)
@@ -202,6 +243,36 @@ class DinoV2IntegrationTest(unittest.TestCase):
         self.assertIsNone(batch.records[0].payload)
         self.assertEqual(batch.errors[0].code, "MASK_REQUIRED")
         self.assertEqual(batch.records[0].input_variant, DINO_MASK_NEUTRAL_VARIANT)
+
+    def test_bbox_only_candidate_is_valid_for_bbox_variant_and_invalid_for_mask_variant(self) -> None:
+        decoded, original = make_fixture(np.ones((8, 8), dtype=bool))
+        bbox_only = type(original)(
+            result=replace(
+                original.result,
+                candidates=(replace(original.result.candidates[0], mask=None),),
+            ),
+            masks={},
+        )
+        bbox_provider = FakeDinoProvider(batch_size=1)
+        bbox_batch = build_dinov2_representations(
+            decoded,
+            bbox_only,
+            bbox_provider,
+            config_for(bbox_provider, variant=DINO_BBOX_VARIANT),
+        )
+        mask_provider = FakeDinoProvider(batch_size=1)
+        mask_batch = build_dinov2_representations(
+            decoded,
+            bbox_only,
+            mask_provider,
+            config_for(mask_provider, variant=DINO_MASK_NEUTRAL_VARIANT),
+        )
+
+        self.assertIs(bbox_batch.records[0].envelope.validity_status, ValidityStatus.VALID)
+        self.assertEqual(len(bbox_provider.calls), 1)
+        self.assertIs(mask_batch.records[0].envelope.validity_status, ValidityStatus.INVALID)
+        self.assertEqual(mask_batch.errors[0].code, "MASK_REQUIRED")
+        self.assertEqual(mask_provider.calls, [])
 
     def test_auto_cpu_fallback_is_an_explicit_record_warning(self) -> None:
         decoded, snapshot = make_fixture(np.ones((8, 8), dtype=bool))

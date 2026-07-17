@@ -432,7 +432,13 @@ def build_handcrafted_representations(
         frame = frames[candidate.frame_id]
         try:
             if effective_config.variant == HANDCRAFTED_MASK_VARIANT:
-                mask_record = candidate_snapshot.mask_for_candidate(candidate.candidate_id)
+                try:
+                    mask_record = candidate_snapshot.mask_for_candidate(candidate.candidate_id)
+                except KeyError as error:
+                    raise _ExpectedRepresentationFailure(
+                        "MASK_REQUIRED",
+                        "Mask-aware handcrafted representation requires an in-memory candidate mask.",
+                    ) from error
                 payload, preprocessing_details, structure_valid = _mask_payload(
                     frame,
                     candidate,

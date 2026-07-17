@@ -23,6 +23,12 @@ import numpy as np
 
 DINO_MODEL_NAME: Final = "dinov2_vits14"
 DINO_EMBEDDING_DIMENSION: Final = 384
+DINO_MODEL_EMBEDDING_DIMENSIONS: Final = {
+    "dinov2_vits14": 384,
+    "dinov2_vitb14": 768,
+    "dinov2_vitl14": 1024,
+    "dinov2_vitg14": 1536,
+}
 DINO_PROVIDER_ID: Final = "local_dinov2_torch_provider"
 DINO_PROVIDER_VERSION: Final = "1.2"
 DINO_MODEL_VERSION: Final = "dinov2-vits14-pretrained-1.0"
@@ -76,10 +82,13 @@ class DinoV2ModelSpec:
             size = self.expected_checkpoint_size_bytes
             if isinstance(size, bool) or not isinstance(size, int) or size <= 0:
                 raise ValueError("expected_checkpoint_size_bytes must be a positive integer or None.")
-        if self.model_name != DINO_MODEL_NAME:
-            raise ValueError(f"model_name must be {DINO_MODEL_NAME!r} for F08.")
-        if self.embedding_dimension != DINO_EMBEDDING_DIMENSION:
-            raise ValueError(f"embedding_dimension must be {DINO_EMBEDDING_DIMENSION} for F08.")
+        expected_dimension = DINO_MODEL_EMBEDDING_DIMENSIONS.get(self.model_name)
+        if expected_dimension is None:
+            raise ValueError("model_name must identify a supported official DINOv2 backbone.")
+        if self.embedding_dimension != expected_dimension:
+            raise ValueError(
+                f"embedding_dimension must be {expected_dimension} for {self.model_name!r}."
+            )
 
 
 @dataclass(frozen=True, slots=True, eq=False)
@@ -89,15 +98,22 @@ class DinoV2ProviderOutput:
     embeddings: np.ndarray
     runtime_details: Mapping[str, object] = field(hash=False)
     warning_code: str | None = None
+    embedding_dimension: int = DINO_EMBEDDING_DIMENSION
 
     def __post_init__(self) -> None:
         embeddings = np.asarray(self.embeddings)
         if embeddings.dtype != np.dtype(np.float32):
             raise TypeError("embeddings dtype must be float32; implicit conversion is forbidden.")
         embeddings = np.ascontiguousarray(embeddings)
-        if embeddings.ndim != 2 or embeddings.shape[1] != DINO_EMBEDDING_DIMENSION:
+        if (
+            isinstance(self.embedding_dimension, bool)
+            or not isinstance(self.embedding_dimension, int)
+            or self.embedding_dimension <= 0
+        ):
+            raise ValueError("embedding_dimension must be a positive integer.")
+        if embeddings.ndim != 2 or embeddings.shape[1] != self.embedding_dimension:
             raise ValueError(
-                f"embeddings must have shape (batch, {DINO_EMBEDDING_DIMENSION})."
+                f"embeddings must have shape (batch, {self.embedding_dimension})."
             )
         if embeddings.shape[0] <= 0:
             raise ValueError("embeddings batch must not be empty.")
@@ -289,7 +305,7 @@ def _strict_offline_network_guard(torch_module: Any):
 
 
 class LocalDinoV2Provider:
-    """Lazy local-only ``dinov2_vits14`` provider with stable batch ordering."""
+    """Lazy local-only official DINOv2 provider with stable batch ordering."""
 
     def __init__(
         self,
@@ -299,6 +315,8 @@ class LocalDinoV2Provider:
         expected_checkpoint_sha256: str,
         expected_source_tree_fingerprint: str,
         expected_checkpoint_size_bytes: int | None = None,
+        model_name: str = DINO_MODEL_NAME,
+        embedding_dimension: int = DINO_EMBEDDING_DIMENSION,
         device_policy: DevicePolicy = "auto",
         batch_size: int = 32,
     ) -> None:
@@ -312,6 +330,8 @@ class LocalDinoV2Provider:
             expected_checkpoint_sha256=expected_checkpoint_sha256,
             expected_source_tree_fingerprint=expected_source_tree_fingerprint,
             expected_checkpoint_size_bytes=expected_checkpoint_size_bytes,
+            model_name=model_name,
+            embedding_dimension=embedding_dimension,
         )
         self.requested_device: DevicePolicy = device_policy
         self.batch_size = batch_size
@@ -497,7 +517,7 @@ class LocalDinoV2Provider:
             ):
                 raise DinoV2ProviderError(
                     "INVALID_EMBEDDING_SHAPE",
-                    "DINOv2 output must have shape B x 384.",
+                    "DINOv2 output shape does not match the selected backbone.",
                     {"shape": tuple(output.shape)},
                 )
             if output.dtype != torch_module.float32:
@@ -551,6 +571,7 @@ class LocalDinoV2Provider:
             embeddings=embeddings,
             runtime_details=details,
             warning_code=self._fallback_warning,
+            embedding_dimension=self.model_spec.embedding_dimension,
         )
 
     def provider_metadata(self) -> Mapping[str, object]:
@@ -573,9 +594,10 @@ class LocalDinoV2Provider:
         return details
 
     def model_metadata(self) -> Mapping[str, object]:
+        model_version = f"{self.model_spec.model_name.replace('_', '-')}-pretrained-1.0"
         return {
             "model_name": self.model_spec.model_name,
-            "model_version": DINO_MODEL_VERSION,
+            "model_version": model_version,
             "embedding_dimension": self.model_spec.embedding_dimension,
             "output_token": "cls",
             "frozen": True,
@@ -658,6 +680,7 @@ def _validate_sha256(value: str, field_name: str) -> str:
 
 __all__ = [
     "DINO_EMBEDDING_DIMENSION",
+    "DINO_MODEL_EMBEDDING_DIMENSIONS",
     "DINO_MODEL_NAME",
     "DINO_MODEL_VERSION",
     "DINO_PROVIDER_ID",

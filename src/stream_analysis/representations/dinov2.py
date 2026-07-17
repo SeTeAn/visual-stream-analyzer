@@ -71,6 +71,8 @@ class DinoV2RepresentationConfig:
     expected_checkpoint_sha256: str
     expected_source_tree_fingerprint: str
     expected_checkpoint_size_bytes: int | None = None
+    model_name: str = DINO_MODEL_NAME
+    embedding_dimension: int = DINO_EMBEDDING_DIMENSION
     variant: DinoV2Variant = DINO_BBOX_VARIANT
     config_version: str = "1.0"
     input_size: int = DINO_INPUT_SIZE
@@ -136,19 +138,33 @@ class DinoV2RepresentationConfig:
             expected_checkpoint_sha256=self.expected_checkpoint_sha256,
             expected_source_tree_fingerprint=self.expected_source_tree_fingerprint,
             expected_checkpoint_size_bytes=self.expected_checkpoint_size_bytes,
+            model_name=self.model_name,
+            embedding_dimension=self.embedding_dimension,
         )
+
+    @property
+    def representation_type(self) -> str:
+        return f"{self.model_name}_cls"
+
+    @property
+    def representation_version(self) -> str:
+        return f"{self.model_name.replace('_', '-')}-cls-1.0"
+
+    @property
+    def model_version(self) -> str:
+        return f"{self.model_name.replace('_', '-')}-pretrained-1.0"
 
     @property
     def semantic_parameters(self) -> Mapping[str, object]:
         return {
             "variant": self.variant,
-            "representation_type": DINO_REPRESENTATION_TYPE,
-            "representation_version": DINO_REPRESENTATION_VERSION,
+            "representation_type": self.representation_type,
+            "representation_version": self.representation_version,
             "model": {
-                "model_name": DINO_MODEL_NAME,
-                "model_version": DINO_MODEL_VERSION,
+                "model_name": self.model_name,
+                "model_version": self.model_version,
                 "output_token": "cls",
-                "embedding_dimension": DINO_EMBEDDING_DIMENSION,
+                "embedding_dimension": self.embedding_dimension,
                 "expected_checkpoint_sha256": self.model_spec.expected_checkpoint_sha256,
                 "expected_source_tree_fingerprint": self.model_spec.expected_source_tree_fingerprint,
                 "expected_checkpoint_size_bytes": self.expected_checkpoint_size_bytes,
@@ -193,7 +209,7 @@ class DinoV2RepresentationConfig:
     def producer(self) -> ProducerProvenance:
         return ProducerProvenance(
             producer_stage="representation",
-            producer_version=DINO_REPRESENTATION_VERSION,
+            producer_version=self.representation_version,
             config_version=self.config_version,
             config_digest=self.config_digest,
         )
@@ -267,6 +283,8 @@ def build_dinov2_representations(
         expected_checkpoint_sha256=provider.model_spec.expected_checkpoint_sha256,
         expected_source_tree_fingerprint=provider.model_spec.expected_source_tree_fingerprint,
         expected_checkpoint_size_bytes=provider.model_spec.expected_checkpoint_size_bytes,
+        model_name=provider.model_spec.model_name,
+        embedding_dimension=provider.model_spec.embedding_dimension,
         device_policy=provider.requested_device,
         batch_size=provider.batch_size,
     )
@@ -328,7 +346,11 @@ def build_dinov2_representations(
         ).astype(np.float32, copy=False)
         try:
             output = provider.embed_batch(normalized)
-            _validate_provider_output(output, len(chunk))
+            _validate_provider_output(
+                output,
+                len(chunk),
+                embedding_dimension=effective_config.embedding_dimension,
+            )
         except DinoV2ProviderError as failure:
             for item in prepared[start:]:
                 error = _error(
@@ -467,13 +489,13 @@ def _valid_record(
         candidate_id=candidate.candidate_id,
         frame_id=candidate.frame_id,
         family=RepresentationFamily.DINO_V2,
-        representation_type=DINO_REPRESENTATION_TYPE,
-        representation_version=DINO_REPRESENTATION_VERSION,
+        representation_type=config.representation_type,
+        representation_version=config.representation_version,
         input_variant=config.variant,
         semantic_config_digest=config.config_digest,
         payload=DinoEmbeddingPayload(
             embedding=vector,
-            embedding_dimension=DINO_EMBEDDING_DIMENSION,
+            embedding_dimension=config.embedding_dimension,
             l2_normalized=True,
         ),
         preprocessing_metadata=VersionedMetadata(
@@ -487,8 +509,8 @@ def _valid_record(
             details=provider.provider_metadata(),
         ),
         model_metadata=VersionedMetadata(
-            identifier=DINO_MODEL_NAME,
-            version=DINO_MODEL_VERSION,
+            identifier=config.model_name,
+            version=config.model_version,
             details=provider.model_metadata(),
         ),
         runtime_metadata=RuntimeMetadata(
@@ -540,8 +562,8 @@ def _invalid_record(
         candidate_id=candidate.candidate_id,
         frame_id=candidate.frame_id,
         family=RepresentationFamily.DINO_V2,
-        representation_type=DINO_REPRESENTATION_TYPE,
-        representation_version=DINO_REPRESENTATION_VERSION,
+        representation_type=config.representation_type,
+        representation_version=config.representation_version,
         input_variant=config.variant,
         semantic_config_digest=config.config_digest,
         payload=None,
@@ -556,8 +578,8 @@ def _invalid_record(
             details=provider.provider_metadata(),
         ),
         model_metadata=VersionedMetadata(
-            identifier=DINO_MODEL_NAME,
-            version=DINO_MODEL_VERSION,
+            identifier=config.model_name,
+            version=config.model_version,
             details=provider.model_metadata(),
         ),
         runtime_metadata=RuntimeMetadata(
@@ -597,13 +619,20 @@ def _validate_provider_config(
         raise ValueError("Provider batch size must match config runtime policy.")
 
 
-def _validate_provider_output(output: DinoV2ProviderOutput, expected_count: int) -> None:
+def _validate_provider_output(
+    output: DinoV2ProviderOutput,
+    expected_count: int,
+    *,
+    embedding_dimension: int,
+) -> None:
     if not isinstance(output, DinoV2ProviderOutput):
         raise TypeError("provider output must be DinoV2ProviderOutput.")
     embeddings = output.embeddings
     if embeddings.dtype != np.dtype(np.float32):
         raise ValueError("provider embeddings must use float32.")
-    if embeddings.shape != (expected_count, DINO_EMBEDDING_DIMENSION):
+    if output.embedding_dimension != embedding_dimension:
+        raise ValueError("provider output declares an unexpected embedding dimension.")
+    if embeddings.shape != (expected_count, embedding_dimension):
         raise ValueError("provider embeddings have an unexpected shape.")
     if not np.isfinite(embeddings).all():
         raise ValueError("provider embeddings contain non-finite values.")

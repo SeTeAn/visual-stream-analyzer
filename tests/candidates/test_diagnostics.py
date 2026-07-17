@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import replace
 
 import numpy as np
 
@@ -14,6 +15,7 @@ from stream_analysis import (
     StageContext,
 )
 from stream_analysis.candidates import candidate_mask_digest
+from tests.matching._fixtures import candidate
 
 
 def _producer() -> ProducerProvenance:
@@ -99,6 +101,41 @@ class CandidateDiagnosticsTest(unittest.TestCase):
         snapshot = CandidateExtractionSnapshot(result=result, masks={})
         self.assertIs(snapshot.result, result)
         self.assertEqual(dict(snapshot.masks), {})
+
+    def test_bbox_only_candidate_accepts_empty_mask_store(self) -> None:
+        item = candidate("bbox_only", 0, 10)
+        result = CandidateExtractionResult(
+            envelope=RecordEnvelope(
+                record_id="candidate_result_stream",
+                schema_version="candidate-extraction-result-1.0",
+                stream_id="stream",
+                producer=_producer(),
+                context=StageContext(),
+            ),
+            extractor_source="learned_bbox_extractor_v1",
+            candidates=(replace(item, mask=None),),
+            frame_diagnostics=(
+                FrameCandidateDiagnostics(
+                    envelope=RecordEnvelope(
+                        record_id="candidate_diag_frame_000",
+                        schema_version="frame-candidate-diagnostics-1.0",
+                        stream_id="stream",
+                        producer=_producer(),
+                        context=StageContext(frame_id="frame_000"),
+                    ),
+                    frame_id="frame_000",
+                    frame_index=0,
+                    image_size=ImageSize(100, 100),
+                    summary={"accepted_candidate_count": 1},
+                ),
+            ),
+        )
+
+        snapshot = CandidateExtractionSnapshot(result=result, masks={})
+
+        self.assertEqual(snapshot.result.candidates[0].candidate_id, "bbox_only")
+        with self.assertRaises(KeyError):
+            snapshot.mask_for_candidate("bbox_only")
 
 
 if __name__ == "__main__":

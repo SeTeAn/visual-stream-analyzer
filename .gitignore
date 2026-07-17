@@ -21,6 +21,11 @@ outputs/evaluations/*
 *.onnx
 models/
 
+# External datasets are local-only. Keep lightweight provenance/readme files tracked.
+data/ocid/raw/
+data/ocid/derived/
+data/ocid/*.tar.gz
+
 # Editor and OS files.
 .idea/
 .vscode/

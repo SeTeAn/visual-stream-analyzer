@@ -119,6 +119,26 @@ When running DINOv2 analysis, pass explicit local paths:
 --dinov2-source <path-to-dinov2-source> --dinov2-checkpoint <path-to-checkpoint>
 ```
 
+## Learned Candidate Extraction
+
+The real-image path can replace the controlled-background extractor with the
+typed `torchvision_maskrcnn` candidate family in the analysis JSON config. Its
+parameters must pin the Torchvision version, checkpoint SHA-256 and checkpoint
+size; the model weights are local assets and are not downloaded by `analyze`.
+
+Pass the verified checkpoint explicitly together with the DINOv2 assets:
+
+```powershell
+--candidate-checkpoint <path-to-maskrcnn-checkpoint> `
+--dinov2-source <path-to-dinov2-source> `
+--dinov2-checkpoint <path-to-dinov2-checkpoint>
+```
+
+The implemented working configuration uses Mask R-CNN only as a
+COCO closed-vocabulary provider. It must not be described as a general
+open-world extractor. Candidate-only OCID annotations are evaluation inputs and
+must remain outside the RGB stream passed to `analyze`.
+
 ## Example Results
 
 The curated evaluation matrix contains 20 completed analyze/evaluate entries across five held-out streams and four representation variants. The full numeric table is stored in:

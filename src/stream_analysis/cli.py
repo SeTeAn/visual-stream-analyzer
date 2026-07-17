@@ -19,10 +19,12 @@ from .evaluation import (
 from .input import ManifestLoadRequest, StreamInputError, load_decoded_stream
 from .integration_config import load_analyze_configuration
 from .orchestration import (
-    AnalyzeRequest, AnalyzeRunError, DinoV2AssetPaths, run_analysis,
+    AnalyzeRequest, AnalyzeRunError, CandidateExtractorAssetPaths,
+    DinoV2AssetPaths, run_analysis,
 )
 from .reporting import OutputCollisionError
 from .representations import DinoV2RepresentationConfig
+from .candidates import MaskRCNNCandidateExtractionConfig
 
 EXIT_OK = 0
 EXIT_USAGE_OR_CONFIG = 2
@@ -56,6 +58,7 @@ def _parser() -> argparse.ArgumentParser:
     analyze.add_argument("--run-id", required=True)
     analyze.add_argument("--dinov2-source", type=Path)
     analyze.add_argument("--dinov2-checkpoint", type=Path)
+    analyze.add_argument("--candidate-checkpoint", type=Path)
     evaluate.add_argument("stream_directory", type=Path)
     evaluate.add_argument("--run-directory", type=Path, required=True)
     evaluate.add_argument("--output-root", type=Path, required=True)
@@ -76,15 +79,28 @@ def _load_and_check(args: argparse.Namespace):
     if args.representation_family != actual_family or args.variant != representation.variant:
         raise ValueError("CLI representation family/variant must match the typed configuration.")
     if args.device is not None:
-        if not isinstance(representation, DinoV2RepresentationConfig):
-            if args.device != "cpu":
-                raise ValueError("Handcrafted representation supports only cpu.")
-        else:
-            loaded = replace(
-                loaded,
-                pipeline=replace(loaded.pipeline, representation=replace(representation, device_policy=args.device)),
-                environment=replace(loaded.environment, requested_device=args.device),
-            )
+        candidate_config = loaded.pipeline.candidate_extraction
+        learned_candidate = isinstance(candidate_config, MaskRCNNCandidateExtractionConfig)
+        learned_representation = isinstance(representation, DinoV2RepresentationConfig)
+        if not learned_candidate and not learned_representation and args.device != "cpu":
+            raise ValueError("The selected pipeline supports only cpu.")
+        loaded = replace(
+            loaded,
+            pipeline=replace(
+                loaded.pipeline,
+                candidate_extraction=(
+                    replace(candidate_config, device_policy=args.device)
+                    if learned_candidate
+                    else candidate_config
+                ),
+                representation=(
+                    replace(representation, device_policy=args.device)
+                    if learned_representation
+                    else representation
+                ),
+            ),
+            environment=replace(loaded.environment, requested_device=args.device),
+        )
     if args.diagnostic_level is not None:
         loaded = replace(
             loaded,
@@ -127,6 +143,16 @@ def main(argv: list[str] | None = None) -> int:
             return EXIT_OK
 
         representation = loaded.pipeline.representation
+        candidate_config = loaded.pipeline.candidate_extraction
+        candidate_assets = None
+        if isinstance(candidate_config, MaskRCNNCandidateExtractionConfig):
+            if args.candidate_checkpoint is None:
+                raise ValueError("Mask R-CNN candidate extraction requires --candidate-checkpoint.")
+            candidate_assets = CandidateExtractorAssetPaths(
+                checkpoint_path=args.candidate_checkpoint,
+            )
+        elif args.candidate_checkpoint is not None:
+            raise ValueError("--candidate-checkpoint is invalid for controlled-background extraction.")
         assets = None
         if isinstance(representation, DinoV2RepresentationConfig):
             if args.dinov2_source is None or args.dinov2_checkpoint is None:
@@ -141,7 +167,9 @@ def main(argv: list[str] | None = None) -> int:
             stream_directory=args.stream_directory, output_root=args.output_root,
             run_id=args.run_id, config=loaded.pipeline,
             source_provenance=loaded.source,
-            environment_provenance=loaded.environment, dinov2_assets=assets,
+            environment_provenance=loaded.environment,
+            candidate_extractor_assets=candidate_assets,
+            dinov2_assets=assets,
         ))
         print(json.dumps({"run_id": outcome.result.run_id, "status": outcome.result.run_status.value,
                           "run_directory": str(outcome.artifacts.run_directory)}, sort_keys=True))

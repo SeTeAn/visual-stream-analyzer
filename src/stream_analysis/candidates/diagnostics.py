@@ -11,6 +11,7 @@ from ..contracts import (
     BBox,
     CandidateExtractionResult,
     CandidateRecord,
+    ValidityStatus,
 )
 
 
@@ -82,7 +83,10 @@ class CandidateExtractionSnapshot:
     def mask_for_candidate(self, candidate_id: str) -> CandidateMaskRecord:
         for candidate in self.result.candidates:
             if candidate.candidate_id == candidate_id:
-                if candidate.mask is None or candidate.mask.mask_ref is None:
+                if (
+                    candidate.mask is None
+                    or candidate.mask.mask_ref is None
+                ):
                     raise KeyError(candidate_id)
                 return self.masks[candidate.mask.mask_ref]
         raise KeyError(candidate_id)
@@ -107,8 +111,12 @@ def _validate_candidate_mask(
     candidate: CandidateRecord,
     masks: Mapping[str, CandidateMaskRecord],
 ) -> None:
-    if candidate.mask is None or candidate.mask.mask_ref is None:
-        raise ValueError("Every F05 candidate must carry a valid MaskReference.")
+    if candidate.mask is None:
+        return
+    if candidate.mask.validity_status is not ValidityStatus.VALID and candidate.mask.mask_ref is None:
+        return
+    if candidate.mask.mask_ref is None:
+        raise ValueError("A valid candidate MaskReference must contain mask_ref.")
     record = masks.get(candidate.mask.mask_ref)
     if record is None:
         raise ValueError("Every candidate mask_ref must resolve in the snapshot mask store.")
