@@ -153,6 +153,63 @@ The benchmark helpers require explicit local model paths and verified SHA-256
 digests. They do not register experimental providers in the production
 `analyze` command and do not download model weights at runtime.
 
+## Frozen OCID Gate D Protocol
+
+The final real-image evaluation is controlled by
+`data/ocid/benchmark/ocid_gate_d_protocol_v1.json`. It pins the benchmark
+split, local model assets, preprocessing, thresholds, matching and grouping
+configuration, metrics, and supported claim scope. The runner exposes no CLI
+overrides for those semantic values.
+
+Validate the protocol, benchmark metadata, model digests, and Git state
+without opening stream frames or evaluation annotations:
+
+```powershell
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d preflight `
+  --output .local_outputs\gate_d\preflight.json
+```
+
+The development integration check runs the one stream fixed by the protocol.
+Inference persists and hashes every prediction artifact before the separate
+evaluation command is allowed to read its annotation:
+
+```powershell
+.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d smoke-development `
+  --output-root .local_outputs\gate_d\runs `
+  --run-id development-smoke
+
+.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d evaluate-development-smoke `
+  --run-directory .local_outputs\gate_d\runs\development-smoke
+```
+
+Held-out inference additionally requires a single-use author-approval artifact
+bound to the exact protocol SHA-256, clean Git commit, branch, run ID, and
+frozen stream inventory. The inference command consumes that approval before
+reading held-out RGB; evaluation then verifies all persisted artifact hashes
+before opening held-out annotations. A failed attempt is retained and is not
+retried automatically.
+
+After that approval has been created out of band, the two commands remain
+mechanically separate. The approval and held-out run directory stay outside
+the Git repository so their audit receipts cannot alter the frozen worktree:
+
+```powershell
+.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d infer-heldout `
+  --output-root ..\.gate_d\runs `
+  --run-id gate-d-heldout-v1 `
+  --unlock ..\.gate_d\author-unlock.json
+
+.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d evaluate-heldout `
+  --run-directory ..\.gate_d\runs\gate-d-heldout-v1 `
+  --unlock ..\.gate_d\author-unlock.json
+```
+
+The reviewed OCID streams and local model weights are intentionally not
+included in Git. Their expected paths and cryptographic digests are recorded
+in the protocol. The source label images used only for mask evaluation are
+separately pinned by `ocid_gate_d_source_label_inventory_v1.json`.
+
 ## Example Results
 
 The curated evaluation matrix contains 20 completed analyze/evaluate entries across five held-out streams and four representation variants. The full numeric table is stored in:
@@ -181,4 +238,6 @@ $env:PYTHONPATH = "src"
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests
 ```
 
-Some DINOv2 integration tests require local model assets. The base handcrafted pipeline can be exercised without model weights.
+Some DINOv2 and Gate D integration tests require local model or OCID assets
+and are skipped when those assets are absent. The base handcrafted pipeline
+can be exercised without model weights.

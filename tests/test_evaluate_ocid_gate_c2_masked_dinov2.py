@@ -255,11 +255,16 @@ class GateC2MaskedDinoTest(unittest.TestCase):
     def test_false_positive_gets_unique_identity(self) -> None:
         values = (_named_input("a", "frame_001", 1), _named_input("b", "frame_001", 1))
         evaluation = {"assignments": [{"candidate_id": "a", "visual_type_id": "id3", "iou": .8}]}
-        with mock.patch.object(subject, "_evaluate_candidates", return_value=evaluation):
-            identities, ious, returned = subject._assignment_identity(object(), values)
+        with mock.patch.object(subject, "_evaluate_candidates", return_value=evaluation) as evaluator:
+            identities, ious, returned = subject._assignment_identity(
+                object(),
+                values,
+                iou_threshold=0.70,
+            )
         self.assertEqual(identities["b"], "fp:stream:b")
         self.assertEqual(ious["a"], .8)
         self.assertIs(returned, evaluation)
+        self.assertEqual(evaluator.call_args.kwargs["iou_threshold"], 0.70)
 
     def test_mask_pair_slices_have_scores_and_gate_rates(self) -> None:
         a0 = _named_input("a0", "f0", 0); a1 = _named_input("a1", "f1", 1)

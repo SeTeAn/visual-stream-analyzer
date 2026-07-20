@@ -410,12 +410,15 @@ def run_predicted_mask_inference(
 
 
 def _assignment_identity(
-    annotation: Any, candidates: Sequence[CandidateInput]
+    annotation: Any,
+    candidates: Sequence[CandidateInput],
+    *,
+    iou_threshold: float = 0.50,
 ) -> tuple[dict[str, str], dict[str, float], dict[str, Any]]:
     predictions = tuple(PredictedCandidate(item.candidate.candidate_id, item.candidate.frame_id,
                                             item.candidate.bbox, "valid", (), (), item.candidate.frame_index)
                         for item in candidates)
-    result = _evaluate_candidates(annotation, predictions, iou_threshold=0.50)
+    result = _evaluate_candidates(annotation, predictions, iou_threshold=iou_threshold)
     assignments = result.get("assignments", [])
     identities = {
         (row["candidate_id"] if isinstance(row, Mapping) else row.candidate_id):
