@@ -6,8 +6,17 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from stream_analysis.contracts import BBox, ImageSize
 from stream_analysis.cli import EXIT_OK, EXIT_OUTPUT_COLLISION, main
-from stream_analysis.evaluation import EvaluationError, EvaluationRequest, evaluate_saved_run
+from stream_analysis.evaluation import (
+    aggregate_candidate_metrics,
+    EvaluationError,
+    EvaluationRequest,
+    PredictedCandidate,
+    evaluate_candidate_predictions,
+    evaluate_saved_run,
+)
+from stream_analysis.evaluation.annotation import AnnotationInstance, StreamAnnotation
 
 try:
     from ..integration._helpers import config_document, create_tiny_stream
@@ -318,6 +327,107 @@ class EvaluationRunnerTest(unittest.TestCase):
         self.assertEqual(main(args), EXIT_OK)
         self.assertEqual(main(args), EXIT_OUTPUT_COLLISION)
 
+    def test_candidate_assignment_maximizes_valid_pair_count_before_iou(self) -> None:
+        annotation = _candidate_annotation(
+            (
+                AnnotationInstance("gt_1", "frame_001", "object_1", BBox(1, 0, 10, 10)),
+                AnnotationInstance("gt_2", "frame_001", "object_2", BBox(4, 0, 10, 10)),
+            ),
+        )
+        predicted = (
+            PredictedCandidate("pred_1", "frame_001", BBox(1.5, 0, 10, 10), "valid", (), ()),
+            PredictedCandidate("pred_2", "frame_001", BBox(0, 0, 10, 10), "valid", (), ()),
+        )
+
+        metrics = evaluate_candidate_predictions(
+            annotation,
+            predicted,
+            iou_threshold=0.50,
+        )
+
+        # Raw-IoU Hungarian matching would select pred_1->gt_1 and
+        # pred_2->gt_2, then lose the latter after thresholding.  The valid
+        # matching pred_1->gt_2 and pred_2->gt_1 keeps both pairs.
+        self.assertEqual(metrics["tp"], 2)
+        self.assertEqual(metrics["fp"], 0)
+        self.assertEqual(metrics["fn"], 0)
+        self.assertEqual(metrics["f1"], 1.0)
+
+    def test_candidate_evaluation_honors_caller_iou_threshold_for_metrics_and_diagnostics(self) -> None:
+        annotation = _candidate_annotation((
+            AnnotationInstance("gt_1", "frame_001", "object_1", BBox(0, 0, 10, 10)),
+        ))
+        predicted = (
+            PredictedCandidate("pred_1", "frame_001", BBox(2.5, 0, 10, 10), "valid", (), ()),
+        )
+
+        at_050 = evaluate_candidate_predictions(annotation, predicted, iou_threshold=0.50)
+        at_070 = evaluate_candidate_predictions(annotation, predicted, iou_threshold=0.70)
+
+        self.assertEqual(at_050["primary_iou_threshold"], 0.50)
+        self.assertEqual(at_050["tp"], 1)
+        self.assertEqual(at_050["diagnostics"]["fragment"], 0)
+        self.assertEqual(at_070["primary_iou_threshold"], 0.70)
+        self.assertEqual(at_070["tp"], 0)
+        self.assertEqual(at_070["diagnostics"]["fragment"], 1)
+        for threshold in (0.50, 0.60, 0.70, 0.80, 0.90):
+            with self.subTest(threshold=threshold):
+                self.assertEqual(
+                    evaluate_candidate_predictions(
+                        annotation,
+                        predicted,
+                        iou_threshold=threshold,
+                    )["primary_iou_threshold"],
+                    threshold,
+                )
+
+    def test_candidate_assignment_maximizes_total_iou_after_cardinality(self) -> None:
+        annotation = _candidate_annotation(
+            (
+                AnnotationInstance("gt_1", "frame_001", "object_1", BBox(0, 0, 10, 10)),
+                AnnotationInstance("gt_2", "frame_001", "object_2", BBox(2, 0, 10, 10)),
+            ),
+        )
+        predicted = (
+            PredictedCandidate("pred_1", "frame_001", BBox(0, 0, 10, 10), "valid", (), ()),
+            PredictedCandidate("pred_2", "frame_001", BBox(2, 0, 10, 10), "valid", (), ()),
+        )
+
+        metrics = evaluate_candidate_predictions(annotation, predicted, iou_threshold=0.50)
+
+        self.assertEqual(metrics["tp"], 2)
+        self.assertEqual(metrics["tp_iou"]["mean"], 1.0)
+
+    def test_candidate_evaluation_rejects_invalid_iou_threshold(self) -> None:
+        annotation = _candidate_annotation((
+            AnnotationInstance("gt_1", "frame_001", "object_1", BBox(0, 0, 10, 10)),
+        ))
+        predicted = (
+            PredictedCandidate("pred_1", "frame_001", BBox(0, 0, 10, 10), "valid", (), ()),
+        )
+
+        for threshold, error_type in ((True, TypeError), (float("nan"), ValueError), (1.1, ValueError)):
+            with self.subTest(threshold=threshold):
+                with self.assertRaises(error_type):
+                    evaluate_candidate_predictions(
+                        annotation,
+                        predicted,
+                        iou_threshold=threshold,
+                    )
+
+    def test_candidate_aggregate_handles_no_predictions(self) -> None:
+        annotation = _candidate_annotation((
+            AnnotationInstance("gt_1", "frame_001", "object_1", BBox(2, 2, 4, 4)),
+        ))
+        empty = evaluate_candidate_predictions(annotation, (), iou_threshold=0.50)
+
+        pooled = aggregate_candidate_metrics((empty, empty))
+
+        self.assertEqual((pooled["tp"], pooled["fp"], pooled["fn"]), (0, 0, 2))
+        self.assertIsNone(pooled["precision"])
+        self.assertEqual(pooled["recall"], 0.0)
+        self.assertIsNone(pooled["f1"])
+
 
 def _tiny_annotation() -> dict:
     return {
@@ -362,6 +472,25 @@ def _tiny_annotation() -> dict:
         "supported_event_types": ["persisted", "appeared", "disappeared", "count_changed", "position_changed"],
         "uncertainty": [],
     }
+
+
+def _candidate_annotation(instances: tuple[AnnotationInstance, ...]) -> StreamAnnotation:
+    return StreamAnnotation(
+        path=Path("annotation.json"),
+        digest_sha256="0" * 64,
+        schema_version="test",
+        stream_id="stream",
+        manifest_ref="manifest.json",
+        annotation_scope="candidate_extraction_bbox_only",
+        visual_type_ids=("object_1", "object_2"),
+        frame_ids=("frame_001",),
+        frame_size=ImageSize(32, 24),
+        instances=instances,
+        frame_comparisons=(),
+        change_events=(),
+        supported_event_types=(),
+        raw={},
+    )
 
 
 if __name__ == "__main__":

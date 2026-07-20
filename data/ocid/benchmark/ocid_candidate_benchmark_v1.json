@@ -1,0 +1,206 @@
+{
+  "schema_version": "ocid-candidate-benchmark-spec-1.0",
+  "benchmark_id": "ocid_candidate_benchmark_v1",
+  "status": "approved_gate_a_ocid_scope",
+  "purpose": "Candidate extraction and real-image pipeline evaluation on incrementally cluttered OCID scenes.",
+  "source": {
+    "dataset": "OCID",
+    "source_url": "https://researchdata.tuwien.at/records/pcbjd-4wa12",
+    "source_fingerprint_sha256": "e463941973d162099bd9b3a338d7d1ffbc59ca1d3d7c5e44f3a6c2c41fe1fae9",
+    "structural_audit_path": ".local_outputs/gate_a/ocid_structural_audit_v1/structural_audit.json",
+    "structural_audit_sha256": "4bbc69521bda90c7b260b52610df7f8bc407761bb87076616631c9a6e8e841c2",
+    "component_decisions_path": "data/ocid/benchmark/ocid_candidate_component_decisions_v1.json",
+    "component_decisions_status": "frozen_complete",
+    "component_decisions_sha256": "8ad134666fcc9cf9100720c8276ae57d74081e06bfd8f20870457cbf211d5ae4"
+  },
+  "ground_truth_boundary": {
+    "allowed_consumers": [
+      "dataset_audit",
+      "annotation",
+      "evaluation"
+    ],
+    "forbidden_consumer": "analyze",
+    "analysis_input_policy": "RGB frames and an annotation-free stream-input-0.1 manifest only.",
+    "evaluation_policy": "Instance masks, boxes and physical-instance proxies stay outside analysis_streams."
+  },
+  "split_policy": {
+    "unit": "scene_group_id",
+    "paired_camera_policy": "Top and bottom views of one physical scene remain in the same split.",
+    "generalization_claim": "scene_disjoint_but_object_overlapping",
+    "model_selection_role": "development_only",
+    "heldout_annotation_policy": "Held-out ground truth may be prepared, previewed and frozen before experiments.",
+    "heldout_prediction_policy": "No held-out prediction, overlay or metric may be generated or inspected before explicit author unlock."
+  },
+  "roles": {
+    "development": [
+      {
+        "scene_group_id": "ocid_scene_67e7332468859c77",
+        "scene_group_key": "ARID10/table/box/seq05",
+        "frames_per_stream": 11,
+        "member_streams": [
+          "ARID10/table/bottom/box/seq05",
+          "ARID10/table/top/box/seq05"
+        ],
+        "reason": "Existing ARID10 probe with boxed objects and touching clutter."
+      },
+      {
+        "scene_group_id": "ocid_scene_6a6729cabfadc15f",
+        "scene_group_key": "ARID20/table/seq01",
+        "frames_per_stream": 21,
+        "member_streams": [
+          "ARID20/table/bottom/seq01",
+          "ARID20/table/top/seq01"
+        ],
+        "reason": "Existing high-count ARID20 probe with progression from separated to touching and stacked objects."
+      },
+      {
+        "scene_group_id": "ocid_scene_01999514657409c0",
+        "scene_group_key": "YCB10/table/mixed/seq21",
+        "frames_per_stream": 11,
+        "member_streams": [
+          "YCB10/table/bottom/mixed/seq21",
+          "YCB10/table/top/mixed/seq21"
+        ],
+        "reason": "Existing YCB10 probe with mixed shapes and small objects."
+      },
+      {
+        "scene_group_id": "ocid_scene_f7d39e2505b6391e",
+        "scene_group_key": "ARID20/floor/seq12",
+        "frames_per_stream": 20,
+        "member_streams": [
+          "ARID20/floor/bottom/seq12",
+          "ARID20/floor/top/seq12"
+        ],
+        "reason": "Partial-occlusion diagnostic; one visible mask falls to about 4.6 percent of its maximum area."
+      },
+      {
+        "scene_group_id": "ocid_scene_4cf33ec197c80081",
+        "scene_group_key": "ARID10/table/fruits/seq10",
+        "frames_per_stream": 11,
+        "member_streams": [
+          "ARID10/table/bottom/fruits/seq10",
+          "ARID10/table/top/fruits/seq10"
+        ],
+        "reason": "Appearance-domain diversity with organic objects; not strict duplicate visual-type evidence."
+      }
+    ],
+    "heldout": [
+      {
+        "scene_group_id": "ocid_scene_23a59cbced235497",
+        "scene_group_key": "ARID10/floor/box/seq33",
+        "frames_per_stream": 10,
+        "member_streams": [
+          "ARID10/floor/bottom/box/seq33",
+          "ARID10/floor/top/box/seq33"
+        ],
+        "reason": "Unseen floor and background configuration with box-dominant clutter and strong partial occlusions."
+      },
+      {
+        "scene_group_id": "ocid_scene_1c61bc6ac2af4116",
+        "scene_group_key": "ARID20/table/seq02",
+        "frames_per_stream": 21,
+        "member_streams": [
+          "ARID20/table/bottom/seq02",
+          "ARID20/table/top/seq02"
+        ],
+        "reason": "Independent 20-object table scene with varied object sizes and heavy final clutter."
+      },
+      {
+        "scene_group_id": "ocid_scene_df01cacf271309a3",
+        "scene_group_key": "YCB10/floor/cuboid/seq09",
+        "frames_per_stream": 10,
+        "member_streams": [
+          "YCB10/floor/bottom/cuboid/seq09",
+          "YCB10/floor/top/cuboid/seq09"
+        ],
+        "reason": "Independent YCB cuboid scene on a floor background with compact clutter."
+      }
+    ]
+  },
+  "expected_totals": {
+    "development_scene_groups": 5,
+    "development_streams": 10,
+    "development_frames": 148,
+    "heldout_scene_groups": 3,
+    "heldout_streams": 6,
+    "heldout_frames": 82,
+    "benchmark_scene_groups": 8,
+    "benchmark_streams": 16,
+    "benchmark_frames": 230
+  },
+  "annotation_contract": {
+    "schema_version": "stream-pilot-annotation-0.1",
+    "annotation_scope": "ocid_candidate_extraction_bbox_from_instance_masks",
+    "object_label_rule": "source_label_greater_than_detected_support_label",
+    "support_label_rule": "unique_dominant_nonzero_label_in_first_mask",
+    "bbox_derivation": "tight_axis_aligned_bbox_from_reviewed_instance_mask_components",
+    "component_review_policy": "largest_plus_reviewed_components_v1",
+    "component_connectivity": 4,
+    "secondary_area_ratio": 0.05,
+    "review_candidate_rule": "raw_bbox_differs_from_largest_component_bbox",
+    "identity_proxy": "sequence_local_physical_instance_id",
+    "visual_type_claim": "not_assessed",
+    "object_exclusion_policy": "none at frame or observation level; all low-visibility and fragmented observations are retained; only explicitly reviewed disconnected mask components may be excluded from the bbox union"
+  },
+  "review_contract": {
+    "frame_coverage": "all_230_frames",
+    "component_review_expected_observations": 261,
+    "component_review_protocol": {
+      "primary_reviews_per_observation": 2,
+      "primary_reviews_are_blind_to_automatic_proposal": true,
+      "secondary_component_decisions": [
+        "KEEP",
+        "DROP",
+        "UNRESOLVED",
+        "INTEGRITY_ALERT"
+      ],
+      "adjudication_rule": "Every disagreement, UNRESOLVED or INTEGRITY_ALERT requires independent adjudication before final annotation build.",
+      "author_attention_rule": "Any case unresolved after adjudication requires an author decision; all materially changed boxes are included in the author preview."
+    },
+    "overlay_contents": [
+      "reviewed_instance_component_union",
+      "reviewed_tight_bbox",
+      "raw_bbox_for_audit",
+      "source_label",
+      "sequence_local_physical_instance_id"
+    ],
+    "automatic_flags": [
+      "relative_visible_area_below_0_10",
+      "connected_component_count_above_1",
+      "border_touch",
+      "visible_to_absent",
+      "returned_visible",
+      "severe_interframe_visibility_drop"
+    ],
+    "author_review_status": "pending"
+  },
+  "event_support": {
+    "first_visible_or_added": "supported_as_observation",
+    "persisted_visible": "supported_as_observation",
+    "count_changed_visible": "supported_as_observation",
+    "visibility_reduced": "supported_as_mask_visibility_diagnostic",
+    "visibility_lost": "qualitative_outside_primary_split_only",
+    "physical_removed": "unsupported",
+    "returned_after_physical_removal": "unsupported",
+    "object_motion": "unsupported",
+    "interpretation": "OCID labels observable mask changes; it does not prove physical removal or return."
+  },
+  "heldout_lock": {
+    "predictions_unlocked": false,
+    "allowed_before_unlock": [
+      "structural_audit",
+      "annotation_generation",
+      "ground_truth_preview",
+      "annotation_correction",
+      "artifact_freeze"
+    ],
+    "forbidden_before_unlock": [
+      "model_prediction",
+      "prediction_overlay",
+      "metric_computation",
+      "model_selection",
+      "threshold_selection",
+      "postprocessing_selection"
+    ]
+  }
+}

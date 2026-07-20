@@ -13,6 +13,7 @@ The project is organized as a command-line pipeline with separate validation, an
 - A compact evaluation matrix: `outputs/evaluations/demonstration_final_matrix`
 - Base Python dependencies: `requirements.txt`
 - Optional DINOv2/PyTorch dependencies: `requirements-ml.txt`
+- Optional OCID Gate C1 benchmark dependencies: `requirements-gate-c1.txt`
 
 Large experiment archives and model weights are intentionally not included.
 
@@ -138,6 +139,19 @@ The implemented working configuration uses Mask R-CNN only as a
 COCO closed-vocabulary provider. It must not be described as a general
 open-world extractor. Candidate-only OCID annotations are evaluation inputs and
 must remain outside the RGB stream passed to `analyze`.
+
+The isolated OCID Gate C1 comparison additionally uses local MobileSAM, SAM2
+and Grounding DINO assets. Install its Python-only additions after the CUDA
+dependencies:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-ml.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-gate-c1.txt
+```
+
+The benchmark helpers require explicit local model paths and verified SHA-256
+digests. They do not register experimental providers in the production
+`analyze` command and do not download model weights at runtime.
 
 ## Example Results
 

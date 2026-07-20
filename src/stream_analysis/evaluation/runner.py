@@ -89,15 +89,24 @@ class CandidateAssignment:
 def evaluate_candidate_predictions(
     annotation: StreamAnnotation,
     predicted: tuple[PredictedCandidate, ...],
+    *,
+    iou_threshold: float = PRIMARY_IOU_THRESHOLD,
 ) -> dict[str, Any]:
-    """Evaluate in-memory candidates for an isolated extractor gate."""
+    """Evaluate in-memory candidates for an isolated extractor gate.
+
+    Callers may evaluate the same predictions at several fixed IoU thresholds
+    by calling this function once per threshold.  Candidate matching is
+    maximum-cardinality first, then maximum-IoU among matchings with that
+    cardinality.
+    """
 
     if not isinstance(annotation, StreamAnnotation):
         raise TypeError("annotation must be StreamAnnotation.")
     values = tuple(predicted)
     if not all(isinstance(item, PredictedCandidate) for item in values):
         raise TypeError("predicted must contain PredictedCandidate values.")
-    return _strip_internal(_evaluate_candidates(annotation, values))
+    threshold = _validated_iou_threshold(iou_threshold)
+    return _strip_internal(_evaluate_candidates(annotation, values, threshold))
 
 
 def evaluate_physical_instance_continuity(
@@ -254,7 +263,7 @@ def aggregate_candidate_metrics(metrics: tuple[dict[str, Any], ...]) -> dict[str
         "fn": fn,
         "precision": precision,
         "recall": recall,
-        "f1": _harmonic(precision, recall),
+        "f1": _f1(tp, fp, fn),
         "false_per_frame": None if frame_count == 0 else fp / frame_count,
         "weighted_mean_tp_iou": None if iou_count == 0 else iou_total / iou_count,
         "diagnostics": diagnostics,
@@ -488,7 +497,12 @@ def _predicted_candidates(candidate_manifest: dict[str, Any]) -> tuple[Predicted
     return tuple(sorted(parsed, key=lambda item: (item.frame_id, item.candidate_id)))
 
 
-def _evaluate_candidates(annotation: StreamAnnotation, predicted: tuple[PredictedCandidate, ...]) -> dict[str, Any]:
+def _evaluate_candidates(
+    annotation: StreamAnnotation,
+    predicted: tuple[PredictedCandidate, ...],
+    iou_threshold: float = PRIMARY_IOU_THRESHOLD,
+) -> dict[str, Any]:
+    threshold = _validated_iou_threshold(iou_threshold)
     gt_by_frame = annotation.instances_by_frame
     pred_by_frame: dict[str, list[PredictedCandidate]] = {frame_id: [] for frame_id in annotation.frame_ids}
     for candidate in predicted:
@@ -504,14 +518,24 @@ def _evaluate_candidates(annotation: StreamAnnotation, predicted: tuple[Predicte
     for frame_id in annotation.frame_ids:
         gt = gt_by_frame.get(frame_id, ())
         pred = tuple(pred_by_frame.get(frame_id, ()))
-        matched_pred, matched_gt, frame_assignments = _assign_frame_candidates(pred, gt, PRIMARY_IOU_THRESHOLD)
+        matched_pred, matched_gt, frame_assignments = _assign_frame_candidates(
+            pred,
+            gt,
+            threshold,
+        )
         assignments.extend(frame_assignments)
         tp_ious.extend(item.iou for item in frame_assignments)
         frame_fp = [item.candidate_id for index, item in enumerate(pred) if index not in matched_pred]
         frame_fn = [item.instance_id for index, item in enumerate(gt) if index not in matched_gt]
         fp_ids.extend(frame_fp)
         fn_ids.extend(frame_fn)
-        frame_diag = _candidate_overlap_diagnostics(pred, gt, matched_pred, matched_gt)
+        frame_diag = _candidate_overlap_diagnostics(
+            pred,
+            gt,
+            matched_pred,
+            matched_gt,
+            iou_threshold=threshold,
+        )
         for key in diagnostics:
             diagnostics[key] += frame_diag[key]
         rows.append(
@@ -531,7 +555,7 @@ def _evaluate_candidates(annotation: StreamAnnotation, predicted: tuple[Predicte
     fn = len(fn_ids)
     summary = {
         "status": "supported",
-        "primary_iou_threshold": PRIMARY_IOU_THRESHOLD,
+        "primary_iou_threshold": threshold,
         "diagnostic_iou_levels": DIAGNOSTIC_IOU_LEVELS,
         "tp": tp,
         "fp": fp,
@@ -556,19 +580,33 @@ def _assign_frame_candidates(
     gt: tuple[AnnotationInstance, ...],
     threshold: float,
 ) -> tuple[set[int], set[int], list[CandidateAssignment]]:
+    threshold = _validated_iou_threshold(threshold)
     if not predicted or not gt:
         return set(), set(), []
     matrix = np.zeros((len(predicted), len(gt)), dtype=np.float64)
     for i, pred in enumerate(predicted):
         for j, expected in enumerate(gt):
             matrix[i, j] = _iou(pred.bbox, expected.bbox)
-    rows, cols = linear_sum_assignment(-matrix)
+    # Add dummy rows and columns so either side may remain unmatched.  A valid
+    # edge receives a bonus larger than every possible total IoU contribution,
+    # making the Hungarian optimum lexicographic: first maximum cardinality,
+    # then maximum summed IoU among those maximum-cardinality matchings.
+    max_cardinality = min(len(predicted), len(gt))
+    cardinality_bonus = float(max_cardinality + 1)
+    rewards = np.zeros((len(predicted) + len(gt), len(predicted) + len(gt)), dtype=np.float64)
+    valid = matrix >= threshold
+    rewards[:len(predicted), :len(gt)] = np.where(
+        valid,
+        cardinality_bonus + matrix,
+        0.0,
+    )
+    rows, cols = linear_sum_assignment(-rewards)
     matched_pred: set[int] = set()
     matched_gt: set[int] = set()
     assignments: list[CandidateAssignment] = []
     for row, col in zip(rows.tolist(), cols.tolist()):
-        value = float(matrix[row, col])
-        if value >= threshold:
+        if row < len(predicted) and col < len(gt) and valid[row, col]:
+            value = float(matrix[row, col])
             matched_pred.add(row)
             matched_gt.add(col)
             expected = gt[col]
@@ -589,7 +627,10 @@ def _candidate_overlap_diagnostics(
     gt: tuple[AnnotationInstance, ...],
     matched_pred: set[int],
     matched_gt: set[int],
+    *,
+    iou_threshold: float = PRIMARY_IOU_THRESHOLD,
 ) -> dict[str, int]:
+    threshold = _validated_iou_threshold(iou_threshold)
     duplicate_gt: set[int] = set()
     split_gt: set[int] = set()
     split_pred: set[int] = set()
@@ -604,7 +645,7 @@ def _candidate_overlap_diagnostics(
                 edges[j].append(i)
                 reverse_edges[i].append(j)
     for j, expected in enumerate(gt):
-        iou_hits = [i for i, pred in enumerate(predicted) if _iou(pred.bbox, expected.bbox) >= PRIMARY_IOU_THRESHOLD]
+        iou_hits = [i for i, pred in enumerate(predicted) if _iou(pred.bbox, expected.bbox) >= threshold]
         if len(iou_hits) >= 2:
             duplicate_gt.add(j)
             continue
@@ -619,7 +660,7 @@ def _candidate_overlap_diagnostics(
         if i in matched_pred or i in merge_pred or i in split_pred:
             continue
         related = reverse_edges.get(i, [])
-        if len(related) == 1 and _iou(pred.bbox, gt[related[0]].bbox) < PRIMARY_IOU_THRESHOLD:
+        if len(related) == 1 and _iou(pred.bbox, gt[related[0]].bbox) < threshold:
             fragment_pred.add(i)
         elif not related:
             noise_pred.add(i)
@@ -1389,6 +1430,15 @@ def _iou(left: BBox, right: BBox) -> float:
     return 0.0 if union <= 0.0 else intersection.area / union
 
 
+def _validated_iou_threshold(value: float) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError("iou_threshold must be a real number in [0.0, 1.0].")
+    threshold = float(value)
+    if not math.isfinite(threshold) or not 0.0 <= threshold <= 1.0:
+        raise ValueError("iou_threshold must be finite and in [0.0, 1.0].")
+    return threshold
+
+
 def _significant_overlap(pred: BBox, gt: BBox) -> bool:
     intersection = pred.intersection(gt)
     if intersection is None:
@@ -1401,7 +1451,7 @@ def _significant_overlap(pred: BBox, gt: BBox) -> bool:
 def _union_coverage(gt: BBox, fragments: tuple[BBox, ...]) -> float:
     if not fragments:
         return 0.0
-    # Exact rectangle union within GT by sweep over x-coordinates. Small n in probes.
+    # Exact rectangle union within GT by sweeping over x-coordinates.
     clipped = [fragment.intersection(gt) for fragment in fragments]
     boxes = [box for box in clipped if box is not None]
     xs = sorted({gt.left, gt.right, *(x for box in boxes for x in (box.left, box.right))})

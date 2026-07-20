@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
+import math
 import os
 import tempfile
 import time
@@ -27,8 +29,22 @@ from stream_analysis.evaluation import (
     load_annotation,
 )
 
+try:  # Supports both ``python tools/...py`` and ``import tools....``.
+    from tools.ocid_gate_c1_common import (
+        DEFAULT_BENCHMARK_SPEC,
+        DEFAULT_REVIEWED_ROOT,
+        validate_development_input_pairs,
+    )
+except ModuleNotFoundError:  # pragma: no cover - exercised by direct CLI use.
+    from ocid_gate_c1_common import (  # type: ignore[no-redef]
+        DEFAULT_BENCHMARK_SPEC,
+        DEFAULT_REVIEWED_ROOT,
+        validate_development_input_pairs,
+    )
 
-SCHEMA_VERSION = "ocid-learned-extractor-gate-0.1"
+
+SCHEMA_VERSION = "ocid-learned-extractor-gate-0.2"
+DEFAULT_IOU_THRESHOLDS = (0.50, 0.60, 0.70, 0.80, 0.90)
 
 
 @dataclass(frozen=True, slots=True)
@@ -182,6 +198,54 @@ def _load_generator(
     )
 
 
+def _percentile(values: list[float], percentile: float) -> float | None:
+    """Return a deterministic linearly interpolated percentile."""
+    if not values:
+        return None
+    ordered = sorted(values)
+    position = (len(ordered) - 1) * percentile
+    lower = math.floor(position)
+    upper = math.ceil(position)
+    if lower == upper:
+        return ordered[lower]
+    fraction = position - lower
+    return ordered[lower] + (ordered[upper] - ordered[lower]) * fraction
+
+
+def _latency_summary(values: list[float]) -> dict[str, float | int | None]:
+    return {
+        "count": len(values),
+        "mean_seconds": None if not values else sum(values) / len(values),
+        "p50_seconds": _percentile(values, 0.50),
+        "p95_seconds": _percentile(values, 0.95),
+    }
+
+
+def _process_rss_sampler():
+    """Return an RSS sampler when psutil is locally installed, otherwise None."""
+    try:
+        import psutil
+    except ImportError:
+        return None
+    process = psutil.Process(os.getpid())
+    return lambda: int(process.memory_info().rss)
+
+
+def _module_provenance(module_name: str) -> dict[str, str | None]:
+    """Record the local Python source used by a lazily imported provider."""
+    module = importlib.import_module(module_name)
+    module_file = getattr(module, "__file__", None)
+    source_path = Path(module_file).resolve(strict=True) if module_file else None
+    return {
+        "module": module_name,
+        "module_version": getattr(module, "__version__", None),
+        "module_file": None if source_path is None else source_path.as_posix(),
+        "module_file_sha256": (
+            None if source_path is None or not source_path.is_file() else _sha256(source_path)
+        ),
+    }
+
+
 def _infer_stream(
     decoded: Any,
     generator: Any,
@@ -190,6 +254,9 @@ def _infer_stream(
 ) -> tuple[tuple[RawPrediction, ...], dict[str, Any]]:
     raw: list[RawPrediction] = []
     frame_rows: list[dict[str, Any]] = []
+    latencies: list[float] = []
+    rss_sampler = _process_rss_sampler()
+    rss_samples: list[int] = []
     if device == "cuda":
         torch_module.cuda.reset_peak_memory_stats()
     started_stream = time.perf_counter()
@@ -200,6 +267,7 @@ def _infer_stream(
         if device == "cuda":
             torch_module.cuda.synchronize()
         elapsed = time.perf_counter() - started
+        latencies.append(elapsed)
         accepted = 0
         image_area = frame.image_size.width * frame.image_size.height
         for prediction_index, mask_record in enumerate(masks):
@@ -224,20 +292,34 @@ def _infer_stream(
                 "frame_id": frame.frame_id,
                 "raw_prediction_count": accepted,
                 "inference_seconds": elapsed,
+                "process_rss_bytes": None if rss_sampler is None else rss_sampler(),
             }
         )
+        if rss_sampler is not None:
+            rss_samples.append(frame_rows[-1]["process_rss_bytes"])
         del image, masks
     elapsed_stream = time.perf_counter() - started_stream
     return tuple(raw), {
         "frame_count": len(decoded.frames),
         "elapsed_seconds": elapsed_stream,
+        "total_seconds": elapsed_stream,
         "mean_seconds_per_frame": elapsed_stream / len(decoded.frames),
+        "frame_latency_seconds": _latency_summary(latencies),
+        "timing_scope": (
+            "frame inference_seconds covers generator.generate plus CUDA synchronization; "
+            "total_seconds also includes RGB decoding, mask-to-box conversion, and reporting."
+        ),
         "peak_gpu_memory_allocated_bytes": (
             int(torch_module.cuda.max_memory_allocated()) if device == "cuda" else None
         ),
         "peak_gpu_memory_reserved_bytes": (
             int(torch_module.cuda.max_memory_reserved()) if device == "cuda" else None
         ),
+        "process_rss": {
+            "available": rss_sampler is not None,
+            "peak_bytes": None if not rss_samples else max(rss_samples),
+            "final_bytes": None if not rss_samples else rss_samples[-1],
+        },
         "frames": frame_rows,
     }
 
@@ -270,18 +352,38 @@ def run_benchmark(
     checkpoint_path: Path,
     expected_checkpoint_sha256: str,
     profiles: tuple[FilterProfile, ...],
+    iou_thresholds: tuple[float, ...] = DEFAULT_IOU_THRESHOLDS,
     points_per_side: int,
     points_per_batch: int,
     device: str,
     output_path: Path,
+    benchmark_spec_path: Path = DEFAULT_BENCHMARK_SPEC,
+    reviewed_root: Path = DEFAULT_REVIEWED_ROOT,
 ) -> dict[str, Any]:
+    # This is intentionally the first operation: no checkpoint, model or
+    # annotation may be accessed before the exact development-only contract
+    # has accepted all supplied input pairs.
+    development_inventory = validate_development_input_pairs(
+        stream_directories,
+        annotation_paths,
+        benchmark_spec_path=benchmark_spec_path,
+        reviewed_root=reviewed_root,
+    )
     if len(stream_directories) != len(annotation_paths) or not stream_directories:
         raise ValueError("Supply one annotation for every stream.")
     if not profiles or len({item.profile_id for item in profiles}) != len(profiles):
         raise ValueError("profiles must have unique profile IDs and must not be empty.")
+    if (
+        not iou_thresholds
+        or len(set(iou_thresholds)) != len(iou_thresholds)
+        or any(not 0.0 <= threshold <= 1.0 for threshold in iou_thresholds)
+    ):
+        raise ValueError("iou_thresholds must contain unique values in [0, 1].")
     if points_per_side <= 0 or points_per_batch <= 0:
         raise ValueError("point sampling values must be positive.")
     checkpoint = checkpoint_path.resolve(strict=True)
+    benchmark_spec = Path(benchmark_spec_path).resolve(strict=True)
+    canonical_reviewed_root = Path(reviewed_root).resolve(strict=True)
     actual_hash = _sha256(checkpoint)
     if actual_hash != expected_checkpoint_sha256.casefold():
         raise ValueError("MobileSAM checkpoint SHA-256 mismatch.")
@@ -298,11 +400,24 @@ def run_benchmark(
         points_per_batch=points_per_batch,
     )
     stream_payloads: dict[str, Any] = {}
-    metrics_by_profile: dict[str, list[dict[str, Any]]] = {
-        profile.profile_id: [] for profile in profiles
+    ordered_inputs = tuple(
+        sorted(
+            zip(stream_directories, annotation_paths, strict=True),
+            key=lambda pair: pair[0].resolve(strict=False).as_posix(),
+        )
+    )
+    metrics_by_key: dict[tuple[str, str], list[dict[str, Any]]] = {
+        (profile.profile_id, f"{threshold:.2f}"): []
+        for profile in profiles
+        for threshold in iou_thresholds
     }
+    all_frame_latencies: list[float] = []
+    peak_allocated: list[int] = []
+    peak_reserved: list[int] = []
+    peak_rss: list[int] = []
+    rss_reporting_available = False
     total_started = time.perf_counter()
-    for stream_directory, annotation_path in zip(stream_directories, annotation_paths, strict=True):
+    for stream_directory, annotation_path in ordered_inputs:
         decoded = _load_stream(stream_directory)
         raw, runtime = _infer_stream(decoded, generator, torch, device)
         annotation = load_annotation(
@@ -313,12 +428,34 @@ def run_benchmark(
             raise ValueError("Annotation and stream_id mismatch.")
         evaluations: dict[str, Any] = {}
         for profile in profiles:
-            metrics = evaluate_candidate_predictions(
-                annotation,
-                predictions_for_profile(raw, profile=profile),
-            )
-            evaluations[profile.profile_id] = metrics
-            metrics_by_profile[profile.profile_id].append(metrics)
+            by_iou: dict[str, Any] = {}
+            filtered_predictions = predictions_for_profile(raw, profile=profile)
+            for threshold in iou_thresholds:
+                key = f"{threshold:.2f}"
+                metrics = evaluate_candidate_predictions(
+                    annotation,
+                    filtered_predictions,
+                    iou_threshold=threshold,
+                )
+                by_iou[key] = metrics
+                metrics_by_key[(profile.profile_id, key)].append(metrics)
+            evaluations[profile.profile_id] = by_iou
+        all_frame_latencies.extend(
+            row["inference_seconds"] for row in runtime["frames"]
+        )
+        for metric_key, values in (
+            ("peak_gpu_memory_allocated_bytes", peak_allocated),
+            ("peak_gpu_memory_reserved_bytes", peak_reserved),
+        ):
+            value = runtime[metric_key]
+            if value is not None:
+                values.append(value)
+        rss_peak = runtime["process_rss"]["peak_bytes"]
+        rss_reporting_available = (
+            rss_reporting_available or runtime["process_rss"]["available"]
+        )
+        if rss_peak is not None:
+            peak_rss.append(rss_peak)
         stream_payloads[decoded.stream.stream_id] = {
             "runtime": runtime,
             "evaluations": evaluations,
@@ -342,6 +479,12 @@ def run_benchmark(
         "status": "completed",
         "scope": "evaluation_only_candidate_extraction_gate",
         "ground_truth_boundary": "Annotations were loaded only after model inference.",
+        "development_contract": {
+            "benchmark_spec_path": benchmark_spec.as_posix(),
+            "benchmark_spec_sha256": _sha256(benchmark_spec),
+            "reviewed_root": canonical_reviewed_root.as_posix(),
+            "stream_ids": [stream.stream_id for stream in development_inventory],
+        },
         "model": {
             "family": "mobile_sam",
             "model_name": "vit_t",
@@ -354,6 +497,7 @@ def run_benchmark(
             "torchvision_version": torchvision.__version__,
             "device": device,
             "dtype": "float32",
+            "local_source": _module_provenance("mobile_sam"),
         },
         "generator": {
             "points_per_side": points_per_side,
@@ -364,12 +508,25 @@ def run_benchmark(
             "crop_n_layers": 0,
         },
         "profiles": [asdict(profile) for profile in profiles],
+        "iou_thresholds": list(iou_thresholds),
         "streams": stream_payloads,
         "aggregate": {
-            profile.profile_id: aggregate_candidate_metrics(
-                tuple(metrics_by_profile[profile.profile_id])
-            )
+            profile.profile_id: {
+                f"{threshold:.2f}": aggregate_candidate_metrics(
+                    tuple(metrics_by_key[(profile.profile_id, f"{threshold:.2f}")])
+                )
+                for threshold in iou_thresholds
+            }
             for profile in profiles
+        },
+        "resource_summary": {
+            "frame_latency_seconds": _latency_summary(all_frame_latencies),
+            "peak_gpu_memory_allocated_bytes": None if not peak_allocated else max(peak_allocated),
+            "peak_gpu_memory_reserved_bytes": None if not peak_reserved else max(peak_reserved),
+            "process_rss": {
+                "available": rss_reporting_available,
+                "peak_bytes": None if not peak_rss else max(peak_rss),
+            },
         },
         "elapsed_seconds": time.perf_counter() - total_started,
     }
@@ -385,7 +542,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--expected-checkpoint-sha256", required=True)
     parser.add_argument("--points-per-side", type=int, default=8)
     parser.add_argument("--points-per-batch", type=int, default=64)
+    parser.add_argument("--iou-threshold", type=float, action="append")
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
+    parser.add_argument("--benchmark-spec", type=Path, default=DEFAULT_BENCHMARK_SPEC)
+    parser.add_argument("--reviewed-root", type=Path, default=DEFAULT_REVIEWED_ROOT)
     parser.add_argument("--output", type=Path, required=True)
     return parser
 
@@ -398,10 +558,13 @@ def main(argv: list[str] | None = None) -> int:
         checkpoint_path=args.checkpoint,
         expected_checkpoint_sha256=args.expected_checkpoint_sha256,
         profiles=DEFAULT_PROFILES,
+        iou_thresholds=tuple(args.iou_threshold or DEFAULT_IOU_THRESHOLDS),
         points_per_side=args.points_per_side,
         points_per_batch=args.points_per_batch,
         device=args.device,
         output_path=args.output,
+        benchmark_spec_path=args.benchmark_spec,
+        reviewed_root=args.reviewed_root,
     )
     print(
         json.dumps(
