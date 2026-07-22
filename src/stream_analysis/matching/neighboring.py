@@ -672,8 +672,8 @@ def _spatial_distance(left: CandidateRecord, right: CandidateRecord) -> float:
     return math.hypot(left_x - right_x, left_y - right_y) / math.sqrt(2.0)
 
 
-def _margin_pass(value: float | None, gate: float) -> bool:
-    return value is None or value >= gate
+def _margin_pass(value: float | None, threshold: float) -> bool:
+    return value is None or value >= threshold
 
 
 def _fallback_orientation(scorer: CanonicalScorer):

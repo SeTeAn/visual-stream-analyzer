@@ -1,17 +1,12 @@
 {
   "schema_version": "ocid-candidate-benchmark-spec-1.0",
   "benchmark_id": "ocid_candidate_benchmark_v1",
-  "status": "approved_gate_a_ocid_scope",
-  "purpose": "Candidate extraction and real-image pipeline evaluation on incrementally cluttered OCID scenes.",
+  "status": "ready",
+  "purpose": "Real-image pipeline evaluation on incrementally cluttered OCID scenes.",
   "source": {
     "dataset": "OCID",
     "source_url": "https://researchdata.tuwien.at/records/pcbjd-4wa12",
-    "source_fingerprint_sha256": "e463941973d162099bd9b3a338d7d1ffbc59ca1d3d7c5e44f3a6c2c41fe1fae9",
-    "structural_audit_path": ".local_outputs/gate_a/ocid_structural_audit_v1/structural_audit.json",
-    "structural_audit_sha256": "4bbc69521bda90c7b260b52610df7f8bc407761bb87076616631c9a6e8e841c2",
-    "component_decisions_path": "data/ocid/benchmark/ocid_candidate_component_decisions_v1.json",
-    "component_decisions_status": "frozen_complete",
-    "component_decisions_sha256": "8ad134666fcc9cf9100720c8276ae57d74081e06bfd8f20870457cbf211d5ae4"
+    "source_fingerprint_sha256": "e463941973d162099bd9b3a338d7d1ffbc59ca1d3d7c5e44f3a6c2c41fe1fae9"
   },
   "ground_truth_boundary": {
     "allowed_consumers": [
@@ -27,9 +22,7 @@
     "unit": "scene_group_id",
     "paired_camera_policy": "Top and bottom views of one physical scene remain in the same split.",
     "generalization_claim": "scene_disjoint_but_object_overlapping",
-    "model_selection_role": "development_only",
-    "heldout_annotation_policy": "Held-out ground truth may be prepared, previewed and frozen before experiments.",
-    "heldout_prediction_policy": "No held-out prediction, overlay or metric may be generated or inspected before explicit author unlock."
+    "model_selection_role": "development_only"
   },
   "roles": {
     "development": [
@@ -81,7 +74,7 @@
           "ARID10/table/bottom/fruits/seq10",
           "ARID10/table/top/fruits/seq10"
         ],
-        "reason": "Appearance-domain diversity with organic objects; not strict duplicate visual-type evidence."
+        "reason": "Appearance-domain diversity with organic objects; not a duplicate visual-type test."
       }
     ],
     "heldout": [
@@ -134,73 +127,9 @@
     "object_label_rule": "source_label_greater_than_detected_support_label",
     "support_label_rule": "unique_dominant_nonzero_label_in_first_mask",
     "bbox_derivation": "tight_axis_aligned_bbox_from_reviewed_instance_mask_components",
-    "component_review_policy": "largest_plus_reviewed_components_v1",
-    "component_connectivity": 4,
-    "secondary_area_ratio": 0.05,
-    "review_candidate_rule": "raw_bbox_differs_from_largest_component_bbox",
+    "mask_component_policy": "prepared_instance_component_union",
     "identity_proxy": "sequence_local_physical_instance_id",
     "visual_type_claim": "not_assessed",
-    "object_exclusion_policy": "none at frame or observation level; all low-visibility and fragmented observations are retained; only explicitly reviewed disconnected mask components may be excluded from the bbox union"
-  },
-  "review_contract": {
-    "frame_coverage": "all_230_frames",
-    "component_review_expected_observations": 261,
-    "component_review_protocol": {
-      "primary_reviews_per_observation": 2,
-      "primary_reviews_are_blind_to_automatic_proposal": true,
-      "secondary_component_decisions": [
-        "KEEP",
-        "DROP",
-        "UNRESOLVED",
-        "INTEGRITY_ALERT"
-      ],
-      "adjudication_rule": "Every disagreement, UNRESOLVED or INTEGRITY_ALERT requires independent adjudication before final annotation build.",
-      "author_attention_rule": "Any case unresolved after adjudication requires an author decision; all materially changed boxes are included in the author preview."
-    },
-    "overlay_contents": [
-      "reviewed_instance_component_union",
-      "reviewed_tight_bbox",
-      "raw_bbox_for_audit",
-      "source_label",
-      "sequence_local_physical_instance_id"
-    ],
-    "automatic_flags": [
-      "relative_visible_area_below_0_10",
-      "connected_component_count_above_1",
-      "border_touch",
-      "visible_to_absent",
-      "returned_visible",
-      "severe_interframe_visibility_drop"
-    ],
-    "author_review_status": "pending"
-  },
-  "event_support": {
-    "first_visible_or_added": "supported_as_observation",
-    "persisted_visible": "supported_as_observation",
-    "count_changed_visible": "supported_as_observation",
-    "visibility_reduced": "supported_as_mask_visibility_diagnostic",
-    "visibility_lost": "qualitative_outside_primary_split_only",
-    "physical_removed": "unsupported",
-    "returned_after_physical_removal": "unsupported",
-    "object_motion": "unsupported",
-    "interpretation": "OCID labels observable mask changes; it does not prove physical removal or return."
-  },
-  "heldout_lock": {
-    "predictions_unlocked": false,
-    "allowed_before_unlock": [
-      "structural_audit",
-      "annotation_generation",
-      "ground_truth_preview",
-      "annotation_correction",
-      "artifact_freeze"
-    ],
-    "forbidden_before_unlock": [
-      "model_prediction",
-      "prediction_overlay",
-      "metric_computation",
-      "model_selection",
-      "threshold_selection",
-      "postprocessing_selection"
-    ]
+    "object_exclusion_policy": "No frame-level or observation-level exclusions."
   }
 }

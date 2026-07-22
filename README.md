@@ -1,63 +1,53 @@
 # Visual Stream Analyzer
 
-Visual Stream Analyzer is a Python project for analyzing ordered image streams. It detects candidate visual regions, builds visual representations, matches objects between neighboring frames, groups recurring visual entities, and reports change events such as appearance, disappearance, persistence, count changes, and position changes.
+Visual Stream Analyzer processes an ordered sequence of images and describes how visible objects change over time. It detects object candidates, builds visual representations, matches candidates between neighboring frames, groups recurring visual entities, and writes structured change events.
 
-The project is organized as a command-line pipeline with separate validation, analysis, and evaluation stages. The main analysis pipeline does not read ground-truth annotations; annotations are used only by the evaluation command for saved run artifacts.
+The repository contains the project code, tests, compact example streams, configuration files, and utilities for real-image experiments. Model weights and full external datasets are not stored in Git.
 
-## What Is Included
+## Processing Pipeline
 
-- Source code for the stream analysis package: `src/stream_analysis`
-- Unit and integration tests: `tests`
-- Data streams with frames, manifests, and annotations: `data/streams`
-- A compact example run: `outputs/runs/demonstration_final_h04_dino_bbox`
-- A compact evaluation matrix: `outputs/evaluations/demonstration_final_matrix`
-- Base Python dependencies: `requirements.txt`
-- Optional DINOv2/PyTorch dependencies: `requirements-ml.txt`
-- Optional OCID Gate C1 benchmark dependencies: `requirements-gate-c1.txt`
+1. Validate the image-stream manifest and decode the frames.
+2. Detect candidate objects in every frame.
+3. Refine candidate masks when the real-image pipeline is used.
+4. Build visual representations for the detected candidates.
+5. Match candidates between neighboring frames.
+6. Group recurring visual entities across the stream.
+7. Create structured change events, reports, and image overlays.
 
-Large experiment archives and model weights are intentionally not included.
+The standard command-line interface keeps analysis and evaluation separate: `analyze` reads only the image stream, while `evaluate` reads annotations for an already saved run.
 
-## Visual Example
+## Implemented Paths
 
-The included example stream contains generated image sequences with recurring objects. The analysis output overlays detected recurring visual types and frame-to-frame change events.
+- A lightweight handcrafted-feature path for local testing without model weights.
+- A DINOv2 representation path with explicit local source and checkpoint paths.
+- A configured real-image pipeline that combines Grounding DINO, SAM2, and DINOv2.
 
-| Input frame | Analysis overlay |
-|---|---|
-| ![Input frame](assets/visual-example/input-frame.png) | ![Analysis overlay](assets/visual-example/analysis-overlay.png) |
-
-## Pipeline
-
-1. Load an ordered frame stream and validate its manifest.
-2. Extract candidate regions from each frame.
-3. Build visual representations using either handcrafted features or DINOv2-based features.
-4. Compare neighboring frames and select candidate matches.
-5. Group recurring visual entities across the stream.
-6. Detect temporal change events.
-7. Write JSON artifacts, overlay images, runtime status, and a text report.
-8. Evaluate saved artifacts against annotations when evaluation data is available.
-
-## Technologies
-
-- Python
-- NumPy
-- OpenCV
-- Pillow
-- SciPy
-- PyTorch and torchvision for the optional DINOv2 path
-- DINOv2-style visual representations with local model source and checkpoint paths
-- `unittest` test suite
+The real-image pipeline is executed by `tools.run_ocid_pipeline`. Its model versions, preprocessing, thresholds, matching, and grouping parameters are stored in `data/ocid/benchmark/ocid_pipeline_protocol_v1.json`.
 
 ## Repository Layout
 
 ```text
-src/stream_analysis/        # CLI, pipeline, matching, grouping, reporting, evaluation
-data/streams/               # image streams, manifests, annotations
-outputs/
-  runs/                     # curated example analysis run
-  evaluations/              # curated example evaluation summary
-tests/                      # unit and integration tests
-tools/                      # helper scripts
+src/stream_analysis/        Python package and command-line interface
+tools/                      dataset and real-image pipeline utilities
+tests/                      unit and integration tests
+data/streams/               compact image-stream examples
+data/ocid/                  OCID provenance and local-data instructions
+configs/examples/           example analysis configurations
+outputs/runs/               place for selected run examples
+outputs/evaluations/        place for selected evaluation artifacts
+assets/visual-example/      README illustration pair
 ```
+
+## Visual Examples
+
+The examples below use selected OCID frames. The first shows the configured full pipeline output; the second focuses on candidate-mask refinement.
+
+| Example | Input frame | Analysis result |
+|---|---|---|
+| Full pipeline | ![Full pipeline input](assets/visual-example/full-pipeline-input.png) | ![Full pipeline result](assets/visual-example/full-pipeline-result.png) |
+| Mask refinement | ![Mask refinement input](assets/visual-example/mask-refinement-input.png) | ![Mask refinement result](assets/visual-example/mask-refinement-result.png) |
+
+These are qualitative illustrations rather than aggregate performance measurements. Image provenance and adaptation details are recorded in `assets/visual-example/README.md`.
 
 ## Setup
 
@@ -66,178 +56,85 @@ Create a virtual environment and install the base dependencies:
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-Set `PYTHONPATH` before running the package from the repository root:
-
-```powershell
 $env:PYTHONPATH = "src"
 ```
 
-## Run A Handcrafted Example
-
-The handcrafted path does not require external model weights:
+Install the optional CUDA/PyTorch dependencies for DINOv2:
 
 ```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-ml.txt
+```
+
+Install the additional dependencies for the Grounding DINO + SAM2 + DINOv2 path:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-ocid.txt
+```
+
+Model weights must be supplied as local files. The project does not download them during analysis.
+
+## Run the Handcrafted Example
+
+The handcrafted path runs on CPU and does not require model weights:
+
+```powershell
+$env:PYTHONPATH = "src"
+
 .\.venv\Scripts\python.exe -B -m stream_analysis validate `
   data\streams\probe_01_stationery `
-  --config outputs\evaluations\demonstration_final_matrix\config_handcrafted_bbox_v1.json `
+  --config configs\examples\config_handcrafted_bbox_v1.json `
   --representation-family handcrafted `
   --variant handcrafted_bbox_v1
 
 .\.venv\Scripts\python.exe -B -m stream_analysis analyze `
   data\streams\probe_01_stationery `
-  --config outputs\evaluations\demonstration_final_matrix\config_handcrafted_bbox_v1.json `
+  --config configs\examples\config_handcrafted_bbox_v1.json `
   --representation-family handcrafted `
   --variant handcrafted_bbox_v1 `
   --device cpu `
   --diagnostic-level standard `
   --output-root .local_outputs `
-  --run-id smoke_handcrafted_bbox
+  --run-id handcrafted_example
 ```
 
-Evaluate the saved run:
+The run is written to `.local_outputs/runs/handcrafted_example`.
 
-```powershell
-.\.venv\Scripts\python.exe -B -m stream_analysis evaluate `
-  data\streams\probe_01_stationery `
-  --run-directory .local_outputs\runs\smoke_handcrafted_bbox `
-  --output-root .local_outputs `
-  --evaluation-id smoke_handcrafted_bbox_eval
-```
+## Run the Configured Real-Image Sample
 
-## Optional DINOv2 Path
-
-The DINOv2 path requires optional PyTorch dependencies and local DINOv2 assets. Model code and weights are not included in this repository.
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-ml.txt
-```
-
-When running DINOv2 analysis, pass explicit local paths:
-
-```powershell
---dinov2-source <path-to-dinov2-source> --dinov2-checkpoint <path-to-checkpoint>
-```
-
-## Learned Candidate Extraction
-
-The real-image path can replace the controlled-background extractor with the
-typed `torchvision_maskrcnn` candidate family in the analysis JSON config. Its
-parameters must pin the Torchvision version, checkpoint SHA-256 and checkpoint
-size; the model weights are local assets and are not downloaded by `analyze`.
-
-Pass the verified checkpoint explicitly together with the DINOv2 assets:
-
-```powershell
---candidate-checkpoint <path-to-maskrcnn-checkpoint> `
---dinov2-source <path-to-dinov2-source> `
---dinov2-checkpoint <path-to-dinov2-checkpoint>
-```
-
-The implemented working configuration uses Mask R-CNN only as a
-COCO closed-vocabulary provider. It must not be described as a general
-open-world extractor. Candidate-only OCID annotations are evaluation inputs and
-must remain outside the RGB stream passed to `analyze`.
-
-The isolated OCID Gate C1 comparison additionally uses local MobileSAM, SAM2
-and Grounding DINO assets. Install its Python-only additions after the CUDA
-dependencies:
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-ml.txt
-.\.venv\Scripts\python.exe -m pip install -r requirements-gate-c1.txt
-```
-
-The benchmark helpers require explicit local model paths and verified SHA-256
-digests. They do not register experimental providers in the production
-`analyze` command and do not download model weights at runtime.
-
-## Frozen OCID Gate D Protocol
-
-The final real-image evaluation is controlled by
-`data/ocid/benchmark/ocid_gate_d_protocol_v1.json`. It pins the benchmark
-split, local model assets, preprocessing, thresholds, matching and grouping
-configuration, metrics, and supported claim scope. The runner exposes no CLI
-overrides for those semantic values.
-
-Validate the protocol, benchmark metadata, model digests, and Git state
-without opening stream frames or evaluation annotations:
+After placing the expected local model files and prepared OCID data at the paths recorded in the protocol, validate the setup:
 
 ```powershell
 $env:PYTHONPATH = "src"
-.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d preflight `
-  --output .local_outputs\gate_d\preflight.json
+
+.\.venv\Scripts\python.exe -B -m tools.run_ocid_pipeline check `
+  --output .local_outputs\ocid_pipeline\check.json
 ```
 
-The development integration check runs the one stream fixed by the protocol.
-Inference persists and hashes every prediction artifact before the separate
-evaluation command is allowed to read its annotation:
+Run the configured sample stream:
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d smoke-development `
-  --output-root .local_outputs\gate_d\runs `
-  --run-id development-smoke
-
-.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d evaluate-development-smoke `
-  --run-directory .local_outputs\gate_d\runs\development-smoke
+.\.venv\Scripts\python.exe -B -m tools.run_ocid_pipeline analyze-sample `
+  --output-root .local_outputs\ocid_pipeline\runs `
+  --run-id ocid_sample
 ```
 
-Held-out inference additionally requires a single-use author-approval artifact
-bound to the exact protocol SHA-256, clean Git commit, branch, run ID, and
-frozen stream inventory. The inference command consumes that approval before
-reading held-out RGB; evaluation then verifies all persisted artifact hashes
-before opening held-out annotations. A failed attempt is retained and is not
-retried automatically.
+This path uses Grounding DINO for candidate boxes, SAM2 for masks, and DINOv2 for visual representations. Generated artifacts remain under `.local_outputs`, which is ignored by Git.
 
-After that approval has been created out of band, the two commands remain
-mechanically separate. The approval and held-out run directory stay outside
-the Git repository so their audit receipts cannot alter the frozen worktree:
+## Output Files
 
-```powershell
-.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d infer-heldout `
-  --output-root ..\.gate_d\runs `
-  --run-id gate-d-heldout-v1 `
-  --unlock ..\.gate_d\author-unlock.json
-
-.\.venv\Scripts\python.exe -B -m tools.run_ocid_gate_d evaluate-heldout `
-  --run-directory ..\.gate_d\runs\gate-d-heldout-v1 `
-  --unlock ..\.gate_d\author-unlock.json
-```
-
-The reviewed OCID streams and local model weights are intentionally not
-included in Git. Their expected paths and cryptographic digests are recorded
-in the protocol. The source label images used only for mask evaluation are
-separately pinned by `ocid_gate_d_source_label_inventory_v1.json`.
-
-## Example Results
-
-The curated evaluation matrix contains 20 completed analyze/evaluate entries across five held-out streams and four representation variants. The full numeric table is stored in:
-
-```text
-outputs/evaluations/demonstration_final_matrix/variant_macro_summary.csv
-```
-
-Selected values from that table:
-
-| Variant | Representation | Candidate F1 | Matching F1 | Grouping B-cubed F1 | Event pooled F1 |
-|---|---:|---:|---:|---:|---:|
-| `handcrafted_bbox_v1` | handcrafted | 1.000 | 0.886 | 0.862 | 0.822 |
-| `handcrafted_mask_v1` | handcrafted | 1.000 | 0.862 | 0.892 | 0.838 |
-| `bbox_rgb_letterbox_v1` | DINOv2 | 1.000 | 0.785 | 1.000 | 0.927 |
-| `mask_neutral_letterbox_v1` | DINOv2 | 1.000 | 0.794 | 0.989 | 0.920 |
-
-These results describe the included evaluation artifacts. They should not be read as production performance or as a general benchmark claim.
+An analysis run contains JSON manifests, a structured stream result, a text report, runtime status, and optional overlays and diagnostics. See `outputs/README.md` for the directory structure and artifact schemas.
 
 ## Tests
 
-Run the test suite from the repository root:
+Run the complete test suite from the repository root:
 
 ```powershell
 $env:PYTHONPATH = "src"
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests
 ```
 
-Some DINOv2 and Gate D integration tests require local model or OCID assets
-and are skipped when those assets are absent. The base handcrafted pipeline
-can be exercised without model weights.
+Tests that require local model weights or OCID files are skipped when those assets are absent.
+
+## Dataset Attribution
+
+Real-image utilities use the Object Clutter Indoor Dataset (OCID), distributed under CC BY 4.0. A compact attributed RGB example stream is included; the full dataset is not bundled. Source, DOI, license, and local layout are documented in `data/ocid/README.md`.

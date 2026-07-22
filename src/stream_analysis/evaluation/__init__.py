@@ -31,7 +31,6 @@ from .component_review import (
     finalize_component_review,
 )
 from .ranking import PairRankingRecord, evaluate_pair_ranking
-from .review_contract import CANONICAL_REVIEWER_ID_PATTERN, canonical_reviewer_id
 from .runner import (
     EVALUATOR_VERSION,
     EvaluationError,
@@ -50,7 +49,6 @@ __all__ = [
     "EVALUATION_REPORT_SCHEMA_ID",
     "EVALUATOR_VERSION",
     "BINARY_MASK_DIGEST_ENCODING",
-    "CANONICAL_REVIEWER_ID_PATTERN",
     "COMPONENT_REVIEW_POLICY_ID",
     "DEFAULT_SECONDARY_AREA_RATIO",
     "AnnotationFormatError",
@@ -73,7 +71,6 @@ __all__ = [
     "aggregate_candidate_metrics",
     "analyze_component_mask",
     "binary_mask_sha256",
-    "canonical_reviewer_id",
     "component_union_mask",
     "evaluate_candidate_predictions",
     "evaluate_physical_instance_continuity",

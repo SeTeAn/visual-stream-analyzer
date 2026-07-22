@@ -1,7 +1,7 @@
-"""Evaluate the pre-registered OCID Gate C1.1 Grounding DINO hardening grid.
+"""Evaluate configured Grounding DINO candidate-extraction variants on OCID.
 
-The tool derives the exact frozen development inventory, reuses the immutable
-Gate C1 ``object.`` raw predictions, runs only the pre-registered additional
+The tool derives the configured development inventory, reuses persisted
+OCID evaluation ``object.`` raw predictions, runs only the configured additional
 prompts, and opens annotations only after all RGB inference has completed.
 Held-out streams are rejected by the shared benchmark contract.
 """
@@ -22,29 +22,29 @@ from stream_analysis.evaluation import PredictedCandidate
 
 try:  # Support module and direct-script execution.
     from tools import evaluate_ocid_grounding_dino_extractor as grounding
-    from tools.ocid_gate_c1_common import (
+    from tools.ocid_evaluation_common import (
         DEFAULT_BENCHMARK_SPEC,
         DEFAULT_REVIEWED_ROOT,
         DevelopmentStream,
-        GateC1ContractError,
+        OcidEvaluationError,
         evaluate_profiles,
         load_development_inventory,
         write_canonical_json_atomic,
     )
 except ModuleNotFoundError:  # pragma: no cover - direct-script fallback.
     import evaluate_ocid_grounding_dino_extractor as grounding  # type: ignore[no-redef]
-    from ocid_gate_c1_common import (  # type: ignore[no-redef]
+    from ocid_evaluation_common import (  # type: ignore[no-redef]
         DEFAULT_BENCHMARK_SPEC,
         DEFAULT_REVIEWED_ROOT,
         DevelopmentStream,
-        GateC1ContractError,
+        OcidEvaluationError,
         evaluate_profiles,
         load_development_inventory,
         write_canonical_json_atomic,
     )
 
 
-SCHEMA_VERSION = "ocid-grounding-dino-hardening-gate-c1-1.v1"
+SCHEMA_VERSION = "ocid-grounding-dino-hardening-v1"
 SELECTED_CANDIDATE_SCHEMA = "ocid-grounding-dino-selected-candidates.v1"
 FROZEN_SCORE_THRESHOLD = 0.15
 FROZEN_NMS_IOU = 0.30
@@ -66,7 +66,7 @@ class PromptProfile:
             raise ValueError("prompt_id must contain letters, digits or underscores.")
         if not self.text or self.text != self.text.casefold() or not self.text.endswith("."):
             raise ValueError("prompt text must be lowercase and end with a period.")
-        if self.source not in {"gate_c1_raw_reuse", "new_inference"}:
+        if self.source not in {"ocid_evaluation_raw_reuse", "new_inference"}:
             raise ValueError("unsupported prompt source.")
 
 
@@ -87,7 +87,7 @@ class GeometryProfile:
 
 
 PROMPTS: tuple[PromptProfile, ...] = (
-    PromptProfile("p_object", "object.", True, "gate_c1_raw_reuse"),
+    PromptProfile("p_object", "object.", True, "ocid_evaluation_raw_reuse"),
     PromptProfile("p_item", "item.", True, "new_inference"),
     PromptProfile("p_foreground_object", "foreground object.", True, "new_inference"),
     PromptProfile(
@@ -125,9 +125,9 @@ def _json_object(path: Path, label: str) -> dict[str, Any]:
     try:
         payload = json.loads(path.resolve(strict=True).read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError) as error:
-        raise GateC1ContractError(f"cannot load {label}: {error}") from error
+        raise OcidEvaluationError(f"cannot load {label}: {error}") from error
     if not isinstance(payload, dict):
-        raise GateC1ContractError(f"{label} must be a JSON object")
+        raise OcidEvaluationError(f"{label} must be a JSON object")
     return payload
 
 
@@ -143,7 +143,7 @@ def _file_provenance(path: Path) -> dict[str, Any]:
 def _raw_prediction(payload: Mapping[str, Any]) -> grounding.RawPrediction:
     bbox = payload.get("bbox")
     if not isinstance(bbox, Mapping):
-        raise GateC1ContractError("raw prediction bbox must be an object")
+        raise OcidEvaluationError("raw prediction bbox must be an object")
     try:
         return grounding.RawPrediction(
             frame_id=str(payload["frame_id"]),
@@ -159,42 +159,42 @@ def _raw_prediction(payload: Mapping[str, Any]) -> grounding.RawPrediction:
             ),
         )
     except (KeyError, TypeError, ValueError) as error:
-        raise GateC1ContractError(f"malformed raw prediction: {error}") from error
+        raise OcidEvaluationError(f"malformed raw prediction: {error}") from error
 
 
-def load_gate_c1_baseline_raw(
+def load_ocid_evaluation_baseline_raw(
     report_path: Path,
     inventory: Sequence[DevelopmentStream],
 ) -> dict[str, tuple[grounding.RawPrediction, ...]]:
-    """Load and strictly validate the immutable Gate C1 ``object.`` report."""
+    """Load and strictly validate the immutable OCID evaluation ``object.`` report."""
 
-    report = _json_object(report_path, "Gate C1 Grounding DINO report")
+    report = _json_object(report_path, "OCID evaluation Grounding DINO report")
     if report.get("schema_version") != grounding.SCHEMA_VERSION:
-        raise GateC1ContractError("baseline report schema does not match Gate C1")
+        raise OcidEvaluationError("baseline report schema does not match OCID evaluation")
     if (
         report.get("status") != "completed"
-        or report.get("scope") != "development_only_candidate_extraction_gate_c1"
+        or report.get("scope") != "development_only_candidate_extraction_ocid_evaluation"
     ):
-        raise GateC1ContractError("baseline report must be the completed Gate C1 development report")
+        raise OcidEvaluationError("baseline report must be the completed OCID evaluation development report")
     if report.get("prompt") != "object.":
-        raise GateC1ContractError("baseline report must use the frozen object. prompt")
+        raise OcidEvaluationError("baseline report must use the configured object. prompt")
     streams = report.get("streams")
     expected = {item.stream_id for item in inventory}
     if not isinstance(streams, Mapping) or set(streams) != expected:
-        raise GateC1ContractError("baseline report must contain exactly the development streams")
+        raise OcidEvaluationError("baseline report must contain exactly the development streams")
     result: dict[str, tuple[grounding.RawPrediction, ...]] = {}
     for item in inventory:
         stream = streams[item.stream_id]
         if not isinstance(stream, Mapping):
-            raise GateC1ContractError(f"malformed baseline stream {item.stream_id}")
+            raise OcidEvaluationError(f"malformed baseline stream {item.stream_id}")
         raw = stream.get("raw_predictions")
         if not isinstance(raw, list):
-            raise GateC1ContractError(f"baseline stream {item.stream_id} lacks raw predictions")
+            raise OcidEvaluationError(f"baseline stream {item.stream_id} lacks raw predictions")
         parsed = tuple(_raw_prediction(row) for row in raw if isinstance(row, Mapping))
         if len(parsed) != len(raw):
-            raise GateC1ContractError(f"baseline stream {item.stream_id} has malformed raw rows")
+            raise OcidEvaluationError(f"baseline stream {item.stream_id} has malformed raw rows")
         if any(row.frame_index < 0 or row.prediction_index < 0 for row in parsed):
-            raise GateC1ContractError("baseline raw indices must be nonnegative")
+            raise OcidEvaluationError("baseline raw indices must be nonnegative")
         result[item.stream_id] = parsed
     return result
 
@@ -312,7 +312,7 @@ def candidates_for_profile(
     geometry: GeometryProfile,
     image_sizes: Mapping[str, ImageSize],
 ) -> tuple[tuple[PredictedCandidate, ...], tuple[dict[str, Any], ...]]:
-    """Apply frozen score/NMS and one registered geometry policy."""
+    """Apply configured score/NMS and one geometry policy."""
 
     selected = tuple(row for row in raw if row.score >= FROZEN_SCORE_THRESHOLD)
     selected = grounding._class_agnostic_nms(selected, FROZEN_NMS_IOU)
@@ -321,7 +321,7 @@ def candidates_for_profile(
     for row in selected:
         image_size = image_sizes.get(row.frame_id)
         if image_size is None:
-            raise GateC1ContractError(f"missing frame size for {row.frame_id}")
+            raise OcidEvaluationError(f"missing frame size for {row.frame_id}")
         rejected = geometry_rejects(row.bbox, image_size, geometry)
         source_key = f"{prompt.prompt_id}:{row.frame_id}:{row.prediction_index:03d}"
         candidate_id = (
@@ -374,7 +374,7 @@ def _candidate_record_index(
         candidate_id = record.get("candidate_id")
         if record.get("geometry_rejected") is False and isinstance(candidate_id, str):
             if candidate_id in result:
-                raise GateC1ContractError("candidate IDs must be unique within a stream")
+                raise OcidEvaluationError("candidate IDs must be unique within a stream")
             result[candidate_id] = record
     return result
 
@@ -386,10 +386,10 @@ def _profile_diagnostics(
     output: dict[str, Any] = {}
     profiles = development_result.get("profiles")
     if not isinstance(profiles, Mapping):
-        raise GateC1ContractError("development result lacks profiles")
+        raise OcidEvaluationError("development result lacks profiles")
     for profile_id, profile in profiles.items():
         if not isinstance(profile, Mapping):
-            raise GateC1ContractError(f"malformed profile {profile_id}")
+            raise OcidEvaluationError(f"malformed profile {profile_id}")
         surface_fp_ids: list[str] = []
         empty_frame_fp = 0
         per_stream: dict[str, Any] = {}
@@ -481,7 +481,7 @@ def _selection_values(
 def _split_profile_id(profile_id: str) -> tuple[str, str]:
     parts = profile_id.split("__", 1)
     if len(parts) != 2:
-        raise GateC1ContractError(f"malformed profile ID: {profile_id}")
+        raise OcidEvaluationError(f"malformed profile ID: {profile_id}")
     return parts[0], parts[1]
 
 
@@ -504,7 +504,7 @@ def select_profile(
     development_result: Mapping[str, Any],
     diagnostics: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Apply the pre-registered safety gates and deterministic ranking."""
+    """Apply the configured filters and deterministic ranking."""
 
     baseline_id = _profile_id("p_object", "g_none")
     baseline = _selection_values(development_result, diagnostics, baseline_id)
@@ -593,7 +593,7 @@ def select_profile(
         ),
     )[0]
     return {
-        "status": "selected_by_preregistered_rule",
+        "status": "selected_by_configured_rule",
         "selected_profile_id": selected["profile_id"],
         "baseline": baseline,
         "selected": selected,
@@ -674,11 +674,11 @@ def run_benchmark(
     """Run all new RGB prompts first, then open development annotations."""
 
     inventory = load_development_inventory(benchmark_spec_path, reviewed_root)
-    baseline_raw = load_gate_c1_baseline_raw(baseline_report_path, inventory)
+    baseline_raw = load_ocid_evaluation_baseline_raw(baseline_report_path, inventory)
     model_root = model_directory.resolve(strict=True)
     checkpoint = model_root / "model.safetensors"
     if not checkpoint.is_file() or _sha256(checkpoint) != expected_model_sha256.casefold():
-        raise GateC1ContractError("Grounding DINO model.safetensors SHA-256 mismatch")
+        raise OcidEvaluationError("Grounding DINO model.safetensors SHA-256 mismatch")
 
     decoded_by_stream: dict[str, Any] = {}
     sizes_by_stream: dict[str, dict[str, ImageSize]] = {}
@@ -689,9 +689,9 @@ def run_benchmark(
         sizes_by_stream[item.stream_id] = _frame_sizes(decoded)
         expected_frames[item.stream_id] = set(sizes_by_stream[item.stream_id])
         if len(expected_frames[item.stream_id]) != item.frame_count:
-            raise GateC1ContractError(f"decoded frame count mismatch for {item.stream_id}")
+            raise OcidEvaluationError(f"decoded frame count mismatch for {item.stream_id}")
         if {row.frame_id for row in baseline_raw[item.stream_id]} - expected_frames[item.stream_id]:
-            raise GateC1ContractError(f"baseline raw frame mismatch for {item.stream_id}")
+            raise OcidEvaluationError(f"baseline raw frame mismatch for {item.stream_id}")
 
     import torch
     import transformers
@@ -706,7 +706,7 @@ def run_benchmark(
     }
     runtime_by_prompt: dict[str, Any] = {
         "p_object": {
-            "source": "reused_gate_c1_raw_report",
+            "source": "reused_ocid_evaluation_raw_report",
             "report": _file_provenance(baseline_report_path),
         }
     }
@@ -770,7 +770,6 @@ def run_benchmark(
         "scope": "development_only",
         "heldout_access": "none",
         "ground_truth_boundary": "all_prompt_rgb_inference_completed_before_annotation_evaluation",
-        "preregistration": "ai-docs/research/ocid-gate-c1-1-extractor-hardening.md",
         "benchmark": _file_provenance(benchmark_spec_path),
         "reviewed_root": reviewed_root.resolve(strict=True).as_posix(),
         "model": {
@@ -854,7 +853,7 @@ def main(argv: list[str] | None = None) -> int:
             output_path=args.output,
             selected_candidates_output_path=args.selected_candidates_output,
         )
-    except (GateC1ContractError, OSError, RuntimeError, ValueError) as error:
+    except (OcidEvaluationError, OSError, RuntimeError, ValueError) as error:
         parser.error(str(error))
     return 0
 

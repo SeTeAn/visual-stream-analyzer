@@ -15,10 +15,10 @@ from stream_analysis.contracts import BBox, ImageSize
 from tools import evaluate_ocid_grounding_dino_extractor as subject
 
 
-class GroundingDinoExtractorGateTest(unittest.TestCase):
+class GroundingDinoExtractorTest(unittest.TestCase):
     def test_prompt_is_fixed_to_registered_generic_value(self) -> None:
         self.assertEqual(subject._validate_prompt("object."), "object.")
-        with self.assertRaisesRegex(ValueError, "pre-registered"):
+        with self.assertRaisesRegex(ValueError, "configured"):
             subject._validate_prompt("marker.")
 
     def test_clipped_integral_bbox_rejects_invalid_geometry(self) -> None:

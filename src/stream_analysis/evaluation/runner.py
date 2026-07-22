@@ -92,7 +92,7 @@ def evaluate_candidate_predictions(
     *,
     iou_threshold: float = PRIMARY_IOU_THRESHOLD,
 ) -> dict[str, Any]:
-    """Evaluate in-memory candidates for an isolated extractor gate.
+    """Evaluate in-memory candidates for an isolated extractor evaluation.
 
     Callers may evaluate the same predictions at several fixed IoU thresholds
     by calling this function once per threshold.  Candidate matching is

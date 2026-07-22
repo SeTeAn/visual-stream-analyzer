@@ -7,13 +7,11 @@ __pycache__/
 .local_outputs/
 tmp_outputs/
 
-# Keep only the curated example artifacts committed in this repository.
+# Keep only deliberately selected example artifacts committed in this repository.
 outputs/runs/*
-!outputs/runs/demonstration_final_h04_dino_bbox/
-!outputs/runs/demonstration_final_h04_dino_bbox/**
+!outputs/runs/README.md
 outputs/evaluations/*
-!outputs/evaluations/demonstration_final_matrix/
-!outputs/evaluations/demonstration_final_matrix/**
+!outputs/evaluations/README.md
 
 # Model weights are intentionally not stored in git.
 *.pt

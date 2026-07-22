@@ -69,7 +69,7 @@ class CandidateDiagnosticsTest(unittest.TestCase):
             "physical_instance_continuity_not_visual_type_ground_truth",
         )
 
-    def test_public_candidate_gate_returns_json_ready_metrics(self) -> None:
+    def test_public_candidate_evaluation_returns_json_ready_metrics(self) -> None:
         annotation = StreamAnnotation(
             path=Path("annotation.json"),
             digest_sha256="0" * 64,

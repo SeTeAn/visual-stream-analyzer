@@ -14,7 +14,7 @@ from PIL import Image
 from stream_analysis.contracts import BBox
 from stream_analysis.evaluation.component_review import analyze_component_mask
 from tools import evaluate_ocid_grounded_sam2_masks as subject
-from tools.ocid_gate_c1_common import DevelopmentStream, GateC1ContractError
+from tools.ocid_evaluation_common import DevelopmentStream, OcidEvaluationError
 
 
 def _inventory(root: Path) -> tuple[DevelopmentStream, ...]:
@@ -29,7 +29,7 @@ def _inventory(root: Path) -> tuple[DevelopmentStream, ...]:
     )
 
 
-class GroundedSam2MaskGateTest(unittest.TestCase):
+class GroundedSam2MaskTest(unittest.TestCase):
     def test_selected_manifest_is_exact_and_development_only(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -61,9 +61,9 @@ class GroundedSam2MaskGateTest(unittest.TestCase):
             self.assertEqual(parsed["stream_a"][0].bbox, BBox(1, 1, 3, 2))
             self.assertEqual(loaded["selected_profile_id"], "p_object__g_none")
 
-            payload["heldout_access"] = "unlocked"
+            payload["heldout_access"] = "accessed"
             path.write_text(json.dumps(payload), encoding="utf-8")
-            with self.assertRaisesRegex(GateC1ContractError, "development-only"):
+            with self.assertRaisesRegex(OcidEvaluationError, "development-only"):
                 subject.load_selected_candidates(path, _inventory(root))
 
     def test_pixel_metrics_and_bbox_mask_are_half_open(self) -> None:
@@ -120,7 +120,7 @@ class GroundedSam2MaskGateTest(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 subject._model_asset_provenance(root)
 
-    def test_reviewed_mask_uses_frozen_retained_components(self) -> None:
+    def test_prepared_mask_uses_configured_retained_components(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             label_path = root / "ARID" / "table" / "bottom" / "seq" / "label" / "source.png"
@@ -155,12 +155,12 @@ class GroundedSam2MaskGateTest(unittest.TestCase):
                 mock.patch.object(
                     subject,
                     "load_development_inventory",
-                    side_effect=GateC1ContractError("held-out remains locked"),
+                    side_effect=OcidEvaluationError("held-out remains locked"),
                 ),
                 mock.patch.object(subject, "load_selected_candidates") as selected,
                 mock.patch.object(subject, "run_rgb_inference") as inference,
             ):
-                with self.assertRaisesRegex(GateC1ContractError, "held-out"):
+                with self.assertRaisesRegex(OcidEvaluationError, "held-out"):
                     subject.run_benchmark(
                         selected_candidates_path=root / "selected.json",
                         model_directory=root / "model",

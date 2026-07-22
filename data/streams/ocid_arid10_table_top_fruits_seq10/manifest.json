@@ -1,0 +1,115 @@
+{
+  "frames": [
+    {
+      "frame_id": "frame_0001",
+      "image_path": "frames/frame_0001.png",
+      "index": 1,
+      "metadata": {
+        "sequence_position": 1
+      }
+    },
+    {
+      "frame_id": "frame_0002",
+      "image_path": "frames/frame_0002.png",
+      "index": 2,
+      "metadata": {
+        "sequence_position": 2
+      }
+    },
+    {
+      "frame_id": "frame_0003",
+      "image_path": "frames/frame_0003.png",
+      "index": 3,
+      "metadata": {
+        "sequence_position": 3
+      }
+    },
+    {
+      "frame_id": "frame_0004",
+      "image_path": "frames/frame_0004.png",
+      "index": 4,
+      "metadata": {
+        "sequence_position": 4
+      }
+    },
+    {
+      "frame_id": "frame_0005",
+      "image_path": "frames/frame_0005.png",
+      "index": 5,
+      "metadata": {
+        "sequence_position": 5
+      }
+    },
+    {
+      "frame_id": "frame_0006",
+      "image_path": "frames/frame_0006.png",
+      "index": 6,
+      "metadata": {
+        "sequence_position": 6
+      }
+    },
+    {
+      "frame_id": "frame_0007",
+      "image_path": "frames/frame_0007.png",
+      "index": 7,
+      "metadata": {
+        "sequence_position": 7
+      }
+    },
+    {
+      "frame_id": "frame_0008",
+      "image_path": "frames/frame_0008.png",
+      "index": 8,
+      "metadata": {
+        "sequence_position": 8
+      }
+    },
+    {
+      "frame_id": "frame_0009",
+      "image_path": "frames/frame_0009.png",
+      "index": 9,
+      "metadata": {
+        "sequence_position": 9
+      }
+    },
+    {
+      "frame_id": "frame_0010",
+      "image_path": "frames/frame_0010.png",
+      "index": 10,
+      "metadata": {
+        "sequence_position": 10
+      }
+    },
+    {
+      "frame_id": "frame_0011",
+      "image_path": "frames/frame_0011.png",
+      "index": 11,
+      "metadata": {
+        "sequence_position": 11
+      }
+    }
+  ],
+  "metadata": {
+    "frame_format": "png_rgb",
+    "frame_size": {
+      "height": 480,
+      "width": 640
+    },
+    "is_synthetic": false,
+    "purpose": "public_example",
+    "source_creators": [
+      "Jean-Baptiste Nicolas Weibel",
+      "Markus Suchi"
+    ],
+    "source_dataset": "OCID",
+    "source_doi": "10.48436/pcbjd-4wa12",
+    "source_license": "CC BY 4.0",
+    "source_sequence": "ARID10/table/top/fruits/seq10",
+    "source_url": "https://researchdata.tuwien.at/records/pcbjd-4wa12"
+  },
+  "notes": "Selected unmodified OCID RGB sequence included as an attributed public example.",
+  "ordering": "manifest",
+  "scene_description": "Real indoor scene with fruit and vegetable objects added incrementally on a fixed table.",
+  "schema_version": "stream-input-0.1",
+  "stream_id": "ocid_arid10_table_top_fruits_seq10"
+}

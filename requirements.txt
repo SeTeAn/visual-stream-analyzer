@@ -1,4 +1,4 @@
-Pillow
+Pillow==12.3.0
 numpy==2.4.4
 opencv-python-headless==4.13.0.92
 scipy==1.17.1

@@ -586,7 +586,7 @@ def _matching_representation(
             identifier=model_name,
             version=f"{model_name.replace('_', '-')}-pretrained-1.0",
         ),
-        runtime_metadata=RuntimeMetadata(runtime_id="oracle_matcher_gate"),
+        runtime_metadata=RuntimeMetadata(runtime_id="oracle_matcher_evaluation"),
         input_quality_metadata=InputQualityMetadata(
             candidate_confidence=candidate.candidate_confidence,
             quality_flags=candidate.quality_flags,
@@ -708,7 +708,7 @@ def evaluate_oracle_matcher(
             matching_config=matching_config,
         )
         if batch.errors:
-            raise ValueError("Production matcher produced errors in the oracle gate.")
+            raise ValueError("Production matcher produced errors in the oracle evaluation.")
         result = batch.result
         left_identity = {item.candidate_id: identity_by_candidate[item.candidate_id] for item in left}
         right_identity = {item.candidate_id: identity_by_candidate[item.candidate_id] for item in right}

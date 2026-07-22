@@ -12,7 +12,7 @@ from unittest import mock
 from stream_analysis.contracts import BBox, ImageSize
 from tools import evaluate_ocid_grounding_dino_extractor as grounding
 from tools import evaluate_ocid_grounding_dino_hardening as subject
-from tools.ocid_gate_c1_common import DevelopmentStream, GateC1ContractError
+from tools.ocid_evaluation_common import DevelopmentStream, OcidEvaluationError
 
 
 def _inventory(root: Path) -> tuple[DevelopmentStream, ...]:
@@ -60,7 +60,7 @@ def _selection_fixture(*, challenger_surface: int = 6, challenger_recall: float 
 
 
 class GroundingDinoHardeningTest(unittest.TestCase):
-    def test_grid_is_exactly_preregistered(self) -> None:
+    def test_grid_matches_configured_variants(self) -> None:
         self.assertEqual(
             [(item.prompt_id, item.text, item.selectable) for item in subject.PROMPTS],
             [
@@ -105,13 +105,13 @@ class GroundingDinoHardeningTest(unittest.TestCase):
             ["grounding-dino-hardening:p_object:g_surface_span_055_090:f:003"],
         )
 
-    def test_loads_only_exact_completed_gate_c1_baseline(self) -> None:
+    def test_loads_only_exact_completed_ocid_evaluation_baseline(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             report = {
                 "schema_version": grounding.SCHEMA_VERSION,
                 "status": "completed",
-                "scope": "development_only_candidate_extraction_gate_c1",
+                "scope": "development_only_candidate_extraction_ocid_evaluation",
                 "prompt": "object.",
                 "streams": {
                     "stream_a": {
@@ -130,17 +130,17 @@ class GroundingDinoHardeningTest(unittest.TestCase):
             }
             path = root / "report.json"
             path.write_text(json.dumps(report), encoding="utf-8")
-            loaded = subject.load_gate_c1_baseline_raw(path, _inventory(root))
+            loaded = subject.load_ocid_evaluation_baseline_raw(path, _inventory(root))
             self.assertEqual(loaded["stream_a"][0].bbox, BBox(0, 0, 2, 2))
             report["scope"] = "development_only"
             path.write_text(json.dumps(report), encoding="utf-8")
-            with self.assertRaisesRegex(GateC1ContractError, "completed Gate C1"):
-                subject.load_gate_c1_baseline_raw(path, _inventory(root))
+            with self.assertRaisesRegex(OcidEvaluationError, "completed OCID evaluation"):
+                subject.load_ocid_evaluation_baseline_raw(path, _inventory(root))
 
     def test_selection_uses_eligible_challenger_or_frozen_fallback(self) -> None:
         result, diagnostics = _selection_fixture(challenger_surface=6, challenger_recall=0.81)
         selected = subject.select_profile(result, diagnostics)
-        self.assertEqual(selected["status"], "selected_by_preregistered_rule")
+        self.assertEqual(selected["status"], "selected_by_configured_rule")
         self.assertEqual(selected["selected_profile_id"], "p_item__g_frame_080")
 
         result, diagnostics = _selection_fixture(challenger_surface=8, challenger_recall=0.81)
@@ -209,12 +209,12 @@ class GroundingDinoHardeningTest(unittest.TestCase):
                 mock.patch.object(
                     subject,
                     "load_development_inventory",
-                    side_effect=GateC1ContractError("held-out remains locked"),
+                    side_effect=OcidEvaluationError("held-out remains locked"),
                 ),
-                mock.patch.object(subject, "load_gate_c1_baseline_raw") as baseline,
+                mock.patch.object(subject, "load_ocid_evaluation_baseline_raw") as baseline,
                 mock.patch.object(subject, "_sha256") as digest,
             ):
-                with self.assertRaisesRegex(GateC1ContractError, "held-out"):
+                with self.assertRaisesRegex(OcidEvaluationError, "held-out"):
                     subject.run_benchmark(
                         model_directory=root,
                         expected_model_sha256="0" * 64,

@@ -4,7 +4,7 @@ All RGB inference and prediction-only artifacts are completed before this tool
 opens reviewed annotations or OCID label images.  The selected Grounding DINO
 bbox remains the candidate and explicit fallback; SAM2 is evaluated only as a
 mask enrichment layer.  The frozen held-out streams are rejected by the shared
-Gate C1 inventory contract.
+OCID evaluation inventory contract.
 """
 
 from __future__ import annotations
@@ -38,11 +38,11 @@ try:  # Support module and direct-script execution.
     from tools.evaluate_ocid_grounding_dino_hardening import (
         SELECTED_CANDIDATE_SCHEMA,
     )
-    from tools.ocid_gate_c1_common import (
+    from tools.ocid_evaluation_common import (
         DEFAULT_BENCHMARK_SPEC,
         DEFAULT_REVIEWED_ROOT,
         DevelopmentStream,
-        GateC1ContractError,
+        OcidEvaluationError,
         load_development_inventory,
         write_canonical_json_atomic,
     )
@@ -57,11 +57,11 @@ except ModuleNotFoundError:  # pragma: no cover - direct-script fallback.
     from evaluate_ocid_grounding_dino_hardening import (  # type: ignore[no-redef]
         SELECTED_CANDIDATE_SCHEMA,
     )
-    from ocid_gate_c1_common import (  # type: ignore[no-redef]
+    from ocid_evaluation_common import (  # type: ignore[no-redef]
         DEFAULT_BENCHMARK_SPEC,
         DEFAULT_REVIEWED_ROOT,
         DevelopmentStream,
-        GateC1ContractError,
+        OcidEvaluationError,
         load_development_inventory,
         write_canonical_json_atomic,
     )
@@ -73,7 +73,7 @@ except ModuleNotFoundError:  # pragma: no cover - direct-script fallback.
     )
 
 
-SCHEMA_VERSION = "ocid-grounded-sam2-mask-gate-c1-1.v1"
+SCHEMA_VERSION = "ocid-grounded-sam2-mask-v1"
 INFERENCE_SCHEMA_VERSION = "ocid-grounded-sam2-rgb-inference.v1"
 FROZEN_BBOX_IOU = 0.50
 FROZEN_CLEANUP = MaskCleanupConfig(
@@ -112,7 +112,7 @@ def _model_asset_provenance(model_root: Path) -> dict[str, dict[str, Any]]:
     for name in SAM2_CONFIG_FILES:
         path = (model_root / name).resolve(strict=True)
         if not path.is_file():
-            raise GateC1ContractError(f"SAM2 model asset must be a file: {name}")
+            raise OcidEvaluationError(f"SAM2 model asset must be a file: {name}")
         result[name] = {
             "path": path.as_posix(),
             "sha256": _sha256(path),
@@ -125,9 +125,9 @@ def _json_object(path: Path, label: str) -> dict[str, Any]:
     try:
         payload = json.loads(path.resolve(strict=True).read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError) as error:
-        raise GateC1ContractError(f"cannot load {label}: {error}") from error
+        raise OcidEvaluationError(f"cannot load {label}: {error}") from error
     if not isinstance(payload, dict):
-        raise GateC1ContractError(f"{label} must be a JSON object")
+        raise OcidEvaluationError(f"{label} must be a JSON object")
     return payload
 
 
@@ -140,9 +140,9 @@ def _bbox(payload: Mapping[str, Any]) -> BBox:
             height=float(payload["height"]),
         )
     except (KeyError, TypeError, ValueError) as error:
-        raise GateC1ContractError(f"malformed candidate bbox: {error}") from error
+        raise OcidEvaluationError(f"malformed candidate bbox: {error}") from error
     if value.width <= 0 or value.height <= 0:
-        raise GateC1ContractError("candidate bbox must have positive area")
+        raise OcidEvaluationError("candidate bbox must have positive area")
     return value
 
 
@@ -154,42 +154,42 @@ def load_selected_candidates(
 
     payload = _json_object(path, "selected candidate manifest")
     if payload.get("schema_version") != SELECTED_CANDIDATE_SCHEMA:
-        raise GateC1ContractError("unsupported selected candidate schema")
+        raise OcidEvaluationError("unsupported selected candidate schema")
     if (
         payload.get("scope") != "development_only_selected_candidates"
         or payload.get("heldout_access") != "none"
     ):
-        raise GateC1ContractError("selected candidates must be development-only")
+        raise OcidEvaluationError("selected candidates must be development-only")
     streams = payload.get("streams")
     expected = {item.stream_id for item in inventory}
     if not isinstance(streams, Mapping) or set(streams) != expected:
-        raise GateC1ContractError("selected candidates must contain exact development streams")
+        raise OcidEvaluationError("selected candidates must contain exact development streams")
 
     output: dict[str, tuple[CandidateRecord, ...]] = {}
     for item in inventory:
         stream = streams[item.stream_id]
         if not isinstance(stream, Mapping):
-            raise GateC1ContractError(f"malformed selected stream {item.stream_id}")
+            raise OcidEvaluationError(f"malformed selected stream {item.stream_id}")
         frame_sizes = stream.get("frame_sizes")
         rows = stream.get("candidates")
         if not isinstance(frame_sizes, Mapping) or len(frame_sizes) != item.frame_count:
-            raise GateC1ContractError(f"frame-size contract mismatch for {item.stream_id}")
+            raise OcidEvaluationError(f"frame-size contract mismatch for {item.stream_id}")
         if not isinstance(rows, list):
-            raise GateC1ContractError(f"candidate rows missing for {item.stream_id}")
+            raise OcidEvaluationError(f"candidate rows missing for {item.stream_id}")
         parsed: list[CandidateRecord] = []
         stream_ids: set[str] = set()
         for row in rows:
             if not isinstance(row, Mapping):
-                raise GateC1ContractError("candidate row must be an object")
+                raise OcidEvaluationError("candidate row must be an object")
             candidate_id = str(row.get("candidate_id", ""))
             frame_id = str(row.get("frame_id", ""))
             bbox_payload = row.get("bbox")
             if not candidate_id or candidate_id in stream_ids:
-                raise GateC1ContractError("candidate IDs must be non-empty and unique per stream")
+                raise OcidEvaluationError("candidate IDs must be non-empty and unique per stream")
             if frame_id not in frame_sizes or not isinstance(bbox_payload, Mapping):
-                raise GateC1ContractError("candidate references an unknown frame or bbox")
+                raise OcidEvaluationError("candidate references an unknown frame or bbox")
             if row.get("geometry_rejected") is not False:
-                raise GateC1ContractError("selected manifest contains a rejected candidate")
+                raise OcidEvaluationError("selected manifest contains a rejected candidate")
             stream_ids.add(candidate_id)
             parsed.append(
                 CandidateRecord(
@@ -411,7 +411,7 @@ def run_rgb_inference(
     model_root = model_directory.resolve(strict=True)
     checkpoint = model_root / "model.safetensors"
     if not checkpoint.is_file() or _sha256(checkpoint) != expected_model_sha256.casefold():
-        raise GateC1ContractError("SAM2 model.safetensors SHA-256 mismatch")
+        raise OcidEvaluationError("SAM2 model.safetensors SHA-256 mismatch")
     refiner = load_local_sam2_bbox_refiner(model_root, device=device)
     torch_module = refiner.torch_module
     import transformers
@@ -551,7 +551,7 @@ def _pixel_metrics(predicted: np.ndarray, expected: np.ndarray) -> dict[str, flo
     left = np.asarray(predicted, dtype=np.bool_)
     right = np.asarray(expected, dtype=np.bool_)
     if left.shape != right.shape:
-        raise GateC1ContractError("predicted and reviewed masks have different shapes")
+        raise OcidEvaluationError("predicted and reviewed masks have different shapes")
     intersection = int(np.count_nonzero(left & right))
     predicted_pixels = int(np.count_nonzero(left))
     expected_pixels = int(np.count_nonzero(right))
@@ -614,24 +614,24 @@ def _reviewed_mask(
     with Image.open(label_path) as image:
         labels = np.asarray(image).copy()
     if labels.ndim != 2 or not np.issubdtype(labels.dtype, np.integer):
-        raise GateC1ContractError(f"invalid OCID label image: {label_path}")
+        raise OcidEvaluationError(f"invalid OCID label image: {label_path}")
     raw = np.asarray(labels == source_label, dtype=np.bool_)
     analysis = analyze_component_mask(raw)
     case_id = f"{stream_id}__{frame_id}__label_{source_label:03d}"
     decision = decisions.get(case_id)
     if decision is None:
         if analysis.review_required:
-            raise GateC1ContractError(f"review-required mask lacks decision: {case_id}")
+            raise OcidEvaluationError(f"review-required mask lacks decision: {case_id}")
         retained = analysis.automatic_retained_component_ids
     else:
         retained_value = decision.get("final_retained_component_ids")
         if not isinstance(retained_value, list) or not all(
             isinstance(item, str) for item in retained_value
         ):
-            raise GateC1ContractError(f"malformed retained components for {case_id}")
+            raise OcidEvaluationError(f"malformed retained components for {case_id}")
         recorded_digest = decision.get("analysis", {}).get("source_mask_sha256")
         if recorded_digest != analysis.source_mask_sha256:
-            raise GateC1ContractError(f"source mask digest mismatch for {case_id}")
+            raise OcidEvaluationError(f"source mask digest mismatch for {case_id}")
         retained = tuple(retained_value)
     final = component_union_mask(analysis, retained)
     return final, {
@@ -827,11 +827,11 @@ def evaluate_masks(
     """Open reviewed masks only after the persisted RGB-inference boundary."""
 
     if inference_manifest.get("status") != "rgb_inference_completed_before_ground_truth":
-        raise GateC1ContractError("RGB inference boundary is not complete")
+        raise OcidEvaluationError("RGB inference boundary is not complete")
     benchmark_manifest_path = reviewed_root / "benchmark_manifest.json"
     benchmark_manifest = _json_object(benchmark_manifest_path, "reviewed benchmark manifest")
     if benchmark_manifest.get("heldout_lock", {}).get("predictions_unlocked") is not False:
-        raise GateC1ContractError("held-out benchmark lock must remain closed")
+        raise OcidEvaluationError("held-out benchmark lock must remain closed")
     stream_metadata = {
         str(row["stream_id"]): row for row in benchmark_manifest.get("streams", [])
     }
@@ -839,7 +839,7 @@ def evaluate_masks(
         benchmark_manifest["component_review"]["decisions_artifact"]
     )
     if _sha256(decisions_path) != benchmark_manifest["component_review"]["decisions_sha256"]:
-        raise GateC1ContractError("component-review decision digest mismatch")
+        raise OcidEvaluationError("component-review decision digest mismatch")
     decisions_payload = _json_object(decisions_path, "component review decisions")
     decisions = {
         str(row["case_id"]): row for row in decisions_payload.get("decisions", [])
@@ -854,7 +854,7 @@ def evaluate_masks(
         for row in inference_rows
     }
     if len(inference_by_id) != len(inference_rows):
-        raise GateC1ContractError("inference manifest candidate IDs are not unique")
+        raise OcidEvaluationError("inference manifest candidate IDs are not unique")
 
     evaluation_rows: list[dict[str, Any]] = []
     reviewed_masks: dict[str, np.ndarray] = {}
@@ -919,7 +919,7 @@ def evaluate_masks(
                 )
                 expected_bbox = mask_bbox_from_full_frame(expected_mask)
                 if expected_bbox is None or not _same_bbox(expected_bbox, expected_instance.bbox):
-                    raise GateC1ContractError(
+                    raise OcidEvaluationError(
                         f"reviewed mask bbox differs from frozen annotation: {assignment.instance_id}"
                     )
                 raw_path = artifact_root / str(inference["raw_mask"]["path"])
@@ -927,9 +927,9 @@ def evaluate_masks(
                 raw_mask = _load_mask(raw_path)
                 cleaned_mask = _load_mask(cleaned_path)
                 if binary_mask_sha256(raw_mask) != inference["raw_mask"]["binary_mask_sha256"]:
-                    raise GateC1ContractError("raw predicted-mask digest mismatch")
+                    raise OcidEvaluationError("raw predicted-mask digest mismatch")
                 if binary_mask_sha256(cleaned_mask) != inference["cleaned_mask"]["binary_mask_sha256"]:
-                    raise GateC1ContractError("cleaned predicted-mask digest mismatch")
+                    raise OcidEvaluationError("cleaned predicted-mask digest mismatch")
                 candidate = next(
                     row for row in selected[item.stream_id] if row.candidate_id == assignment.candidate_id
                 )
@@ -1125,20 +1125,20 @@ def run_benchmark(
     else:
         inference = _json_object(reuse_inference_manifest_path, "RGB inference manifest")
         if inference.get("schema_version") != INFERENCE_SCHEMA_VERSION:
-            raise GateC1ContractError("unsupported reusable inference manifest")
+            raise OcidEvaluationError("unsupported reusable inference manifest")
         selected_provenance = inference.get("selected_candidates")
         if (
             not isinstance(selected_provenance, Mapping)
             or selected_provenance.get("sha256") != _sha256(selected_candidates_path.resolve(strict=True))
             or inference.get("heldout_access") != "none"
         ):
-            raise GateC1ContractError("reusable inference manifest does not match selected candidates")
+            raise OcidEvaluationError("reusable inference manifest does not match selected candidates")
         model_provenance = inference.get("model")
         if (
             not isinstance(model_provenance, Mapping)
             or model_provenance.get("model_safetensors_sha256") != expected_model_sha256.casefold()
         ):
-            raise GateC1ContractError("reusable inference manifest model digest mismatch")
+            raise OcidEvaluationError("reusable inference manifest model digest mismatch")
     presentation_overlays = render_presentation_overlays(
         inventory=inventory,
         inference_manifest=inference,
@@ -1163,10 +1163,9 @@ def run_benchmark(
     report = {
         "schema_version": SCHEMA_VERSION,
         "status": "completed",
-        "scope": "development_only_mask_enrichment_gate_c1_1",
+        "scope": "development_only_mask_enrichment_ocid_evaluation_1",
         "heldout_access": "none",
         "ground_truth_boundary": "persisted_rgb_inference_manifest_before_reviewed_mask_evaluation",
-        "preregistration": "ai-docs/research/ocid-gate-c1-1-extractor-hardening.md",
         "selected_profile_id": selected_payload["selected_profile_id"],
         "inference_manifest": {
             "path": (destination / "inference_manifest.json").as_posix(),
@@ -1180,8 +1179,8 @@ def run_benchmark(
             "Mask quality is measured only on bbox-matched development true positives.",
             "False-positive candidates have no target mask and remain bbox detection errors.",
             "SAM2 predicted_iou is diagnostic and is not used as a rejection threshold.",
-            "DINOv2 predicted-mask embeddings are deferred to Gate C2.",
-            "Reviewed masks retain the frozen OCID primary component boundary; Gate B adjudicated disconnected components but did not redraw every object contour pixel by pixel.",
+            "DINOv2 predicted-mask embeddings are deferred to OCID representation evaluation.",
+            "Prepared OCID masks retain the selected instance-component boundary and do not redraw object contours pixel by pixel.",
         ],
     }
     write_canonical_json_atomic(output_path, report)
@@ -1219,7 +1218,7 @@ def main(argv: list[str] | None = None) -> int:
             output_path=args.output,
             reuse_inference_manifest_path=args.reuse_inference_manifest,
         )
-    except (GateC1ContractError, OSError, RuntimeError, ValueError) as error:
+    except (OcidEvaluationError, OSError, RuntimeError, ValueError) as error:
         parser.error(str(error))
     return 0
 

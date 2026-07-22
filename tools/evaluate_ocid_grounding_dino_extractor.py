@@ -31,20 +31,20 @@ from stream_analysis.evaluation import (
 )
 
 try:  # Support both ``python -m tools...`` and direct ``python tools/...`` use.
-    from tools.ocid_gate_c1_common import (
+    from tools.ocid_evaluation_common import (
         DEFAULT_BENCHMARK_SPEC,
         DEFAULT_REVIEWED_ROOT,
         validate_development_input_pairs,
     )
 except ModuleNotFoundError:  # pragma: no cover - exercised by direct CLI invocation.
-    from ocid_gate_c1_common import (  # type: ignore[no-redef]
+    from ocid_evaluation_common import (  # type: ignore[no-redef]
         DEFAULT_BENCHMARK_SPEC,
         DEFAULT_REVIEWED_ROOT,
         validate_development_input_pairs,
     )
 
 
-SCHEMA_VERSION = "ocid-grounding-dino-tiny-gate-c1.v1"
+SCHEMA_VERSION = "ocid-grounding-dino-v1"
 MODEL_FAMILY = "grounding_dino_tiny"
 HF_REVISION = "a2bb814dd30d776dcf7e30523b00659f4f141c71"
 REGISTERED_PROMPT = "object."
@@ -95,7 +95,7 @@ def _producer() -> ProducerProvenance:
         producer_stage="stream_input",
         producer_version="1.0",
         config_version="1.0",
-        config_digest="sha256:ocid-grounding-dino-extractor-gate-c1",
+        config_digest="sha256:ocid-grounding-dino-config-v1",
     )
 
 
@@ -111,7 +111,7 @@ def _load_stream(stream_directory: Path):
 def _validate_prompt(prompt: str) -> str:
     if prompt != REGISTERED_PROMPT:
         raise ValueError(
-            f"Gate C1 permits only the pre-registered generic prompt {REGISTERED_PROMPT!r}."
+            f"OCID evaluation uses only the configured generic prompt {REGISTERED_PROMPT!r}."
         )
     return prompt
 
@@ -122,12 +122,12 @@ def _benchmark_provenance(
     reviewed_root: Path,
     stream_ids: tuple[str, ...],
 ) -> dict[str, Any]:
-    """Record the frozen inputs after the exact development-pair guard passed."""
+    """Record configured inputs after the development-pair check passed."""
 
     resolved_spec = benchmark_spec_path.resolve(strict=True)
     resolved_root = reviewed_root.resolve(strict=True)
     return {
-        "contract": "exact_canonical_gate_c1_development_input_pairs",
+        "contract": "exact_canonical_ocid_evaluation_development_input_pairs",
         "benchmark_spec_path": resolved_spec.as_posix(),
         "benchmark_spec_sha256": _sha256(resolved_spec),
         "reviewed_root": resolved_root.as_posix(),
@@ -484,7 +484,7 @@ def run_benchmark(
     benchmark_spec_path: Path = DEFAULT_BENCHMARK_SPEC,
     reviewed_root: Path = DEFAULT_REVIEWED_ROOT,
 ) -> dict[str, Any]:
-    """Run fixed C1 profiles over development streams without model re-runs."""
+    """Run configured profiles over development streams without model re-runs."""
 
     _validate_prompt(prompt)
     inventory = validate_development_input_pairs(
@@ -493,7 +493,7 @@ def run_benchmark(
         benchmark_spec_path=benchmark_spec_path,
         reviewed_root=reviewed_root,
     )
-    # The validator derives these paths from the frozen contract.  Use that
+    # The validator derives these paths from the configured contract. Use that
     # canonical order rather than caller order for deterministic reports.
     stream_directories = tuple(item.stream_directory for item in inventory)
     annotation_paths = tuple(item.annotation_path for item in inventory)
@@ -555,7 +555,7 @@ def run_benchmark(
     payload = {
         "schema_version": SCHEMA_VERSION,
         "status": "completed",
-        "scope": "development_only_candidate_extraction_gate_c1",
+        "scope": "development_only_candidate_extraction_ocid_evaluation",
         "ground_truth_boundary": "Annotations were loaded only after RGB model inference per stream.",
         "benchmark": benchmark_provenance,
         "prompt": prompt,
