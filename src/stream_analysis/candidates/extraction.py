@@ -58,7 +58,7 @@ BackgroundStrategy = Literal["stream_model", "frame_border_median", "first_frame
 
 @dataclass(frozen=True, slots=True)
 class CandidateExtractionConfig:
-    """Versioned explicit configuration for F05 candidate extraction."""
+    """Versioned explicit configuration for candidate extraction."""
 
     config_version: str = "3.2"
     background_strategy: BackgroundStrategy = "frame_border_median"

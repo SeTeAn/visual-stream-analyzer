@@ -4,11 +4,13 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import numpy as np
 
 import tools.run_ocid_pipeline as ocid_pipeline
+from stream_analysis.contracts import BBox, ImageSize
 from tools.ocid_pipeline_contract import (
     DEFAULT_PROTOCOL,
     OcidPipelineError,
@@ -33,6 +35,144 @@ _LOCAL_OCID_PIPELINE_ASSETS_AVAILABLE = all(
         / "benchmark_manifest.json",
     )
 )
+
+
+class OcidPipelinePureUnitTest(unittest.TestCase):
+    def test_artifact_inventory_excludes_mutable_boundary_files_and_detects_tampering(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "attempt.json").write_text("{}", encoding="utf-8")
+            (root / "inference_manifest.json").write_text("{}", encoding="utf-8")
+            artifact = root / "stage" / "artifact.json"
+            artifact.parent.mkdir(parents=True)
+            artifact.write_text('{"value":1}', encoding="utf-8")
+            rows = ocid_pipeline._artifact_inventory(root)
+            self.assertEqual([row["path"] for row in rows], ["stage/artifact.json"])
+            ocid_pipeline._verify_artifact_inventory(root, rows)
+            with self.assertRaisesRegex(OcidPipelineError, "non-empty"):
+                ocid_pipeline._verify_artifact_inventory(root, [])
+            extra = root / "stage" / "unlisted.json"
+            extra.write_text("{}", encoding="utf-8")
+            with self.assertRaisesRegex(OcidPipelineError, "exact immutable file set"):
+                ocid_pipeline._verify_artifact_inventory(root, rows)
+            extra.unlink()
+            artifact.write_text('{"value":2}', encoding="utf-8")
+            with self.assertRaisesRegex(OcidPipelineError, "artifact changed"):
+                ocid_pipeline._verify_artifact_inventory(root, rows)
+
+    def test_binary_mask_and_embedding_artifacts_are_strict(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            mask = np.zeros((8, 9), dtype=np.bool_)
+            mask[2:6, 3:8] = True
+            path = root / "mask.png"
+            ocid_pipeline._save_binary_mask(path, mask)
+            np.testing.assert_array_equal(ocid_pipeline._load_binary_mask(path), mask)
+
+            embeddings = np.asarray([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
+            embedding_path = root / "embeddings.npz"
+            ocid_pipeline._save_embeddings(embedding_path, embeddings)
+            with np.load(embedding_path, allow_pickle=False) as archive:
+                self.assertEqual(set(archive.files), {"embeddings"})
+                np.testing.assert_array_equal(archive["embeddings"], embeddings)
+
+    def test_aggregate_resolution_filters_only_the_global_mask(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            masks = {
+                "global": np.ones((20, 20), dtype=np.bool_),
+                "a": np.pad(np.ones((4, 4), dtype=np.bool_), ((1, 15), (1, 15))),
+                "b": np.pad(np.ones((4, 4), dtype=np.bool_), ((1, 15), (8, 8))),
+                "c": np.pad(np.ones((4, 4), dtype=np.bool_), ((8, 8), (1, 15))),
+            }
+            rows = []
+            for candidate_id, mask in masks.items():
+                path = root / "masks" / f"{candidate_id}.png"
+                ocid_pipeline._save_binary_mask(path, mask)
+                rows.append(
+                    {
+                        "candidate_id": candidate_id,
+                        "frame_id": "frame_0001",
+                        "source_bbox": {"x": 0, "y": 0, "width": 20, "height": 20},
+                        "cleaned_mask": {"path": path.relative_to(root).as_posix()},
+                    }
+                )
+            kept, report = ocid_pipeline._resolve_stream_aggregate_masks(
+                run_directory=root,
+                stream_id="stream",
+                records=rows,
+            )
+            self.assertEqual(set(kept), {"a", "b", "c"})
+            self.assertEqual(report["removed_candidate_count"], 1)
+            self.assertEqual(report["frames"][0]["removed_candidate_ids"], ["global"])
+
+    def test_temporal_adapter_adds_supported_low_score_candidate(self) -> None:
+        frame_size = ImageSize(width=100, height=100)
+        decoded = SimpleNamespace(
+            frames=(
+                SimpleNamespace(frame_id="frame_0001", image_size=frame_size),
+                SimpleNamespace(frame_id="frame_0002", image_size=frame_size),
+            )
+        )
+        raw = (
+            SimpleNamespace(
+                frame_id="frame_0001",
+                frame_index=1,
+                prediction_index=0,
+                score=0.10,
+                phrase="object",
+                bbox=BBox(x=10, y=10, width=20, height=20),
+            ),
+            SimpleNamespace(
+                frame_id="frame_0002",
+                frame_index=2,
+                prediction_index=0,
+                score=0.20,
+                phrase="object",
+                bbox=BBox(x=10, y=10, width=20, height=20),
+            ),
+        )
+        baseline = (
+            {
+                "frame_id": "frame_0002",
+                "frame_index": 2,
+                "prediction_index": 0,
+                "candidate_id": "base",
+                "score": 0.20,
+                "phrase": "object",
+                "bbox": {"x": 10, "y": 10, "width": 20, "height": 20},
+                "geometry_rejected": False,
+            },
+        )
+        accepted, report = ocid_pipeline._temporal_detector_records(
+            raw=raw,
+            decoded=decoded,
+            prompt=SimpleNamespace(prompt_id="p_object"),
+            geometry=SimpleNamespace(min_area_ratio=None, min_span_ratio=None),
+            baseline_accepted=baseline,
+        )
+        self.assertEqual(len(accepted), 2)
+        self.assertEqual(report["base_candidate_count"], 1)
+        self.assertEqual(report["supplemental_candidate_count"], 1)
+        self.assertFalse(report["ground_truth_used_for_selection"])
+
+    def test_mask_assignment_counts_false_positives_and_misses(self) -> None:
+        matrix = np.asarray([[0.9, 0.1], [0.8, 0.2], [0.0, 0.0]])
+        assignments = ocid_pipeline._maximum_cardinality_mask_assignment(matrix, 0.5)
+        self.assertEqual(assignments, ((0, 0, 0.9),))
+        metrics = ocid_pipeline._detection_count_metrics(
+            {"tp": len(assignments), "fp": 2, "fn": 1}
+        )
+        self.assertEqual(metrics["precision"], 1 / 3)
+        self.assertEqual(metrics["recall"], 1 / 2)
+        self.assertEqual(metrics["f1"], 0.4)
+
+    def test_candidate_overlay_label_contains_only_frame_local_ordinal(self) -> None:
+        self.assertEqual(ocid_pipeline._candidate_overlay_label(0), "P00")
+        self.assertEqual(ocid_pipeline._candidate_overlay_label(29), "P29")
+        self.assertNotIn(".", ocid_pipeline._candidate_overlay_label(1))
+        with self.assertRaises(ValueError):
+            ocid_pipeline._candidate_overlay_label(-1)
 
 
 @unittest.skipUnless(_LOCAL_OCID_PIPELINE_ASSETS_AVAILABLE, "requires local OCID pipeline assets")
@@ -83,6 +223,21 @@ class OcidPipelineRunnerTest(unittest.TestCase):
                     access_path=access,
                 )
 
+    def test_development_rejects_access_argument_before_stream_access(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            access = Path(temporary) / "access.json"
+            access.write_text("{}", encoding="utf-8")
+            output = Path(temporary) / "runs"
+            with self.assertRaisesRegex(OcidPipelineError, "does not accept"):
+                ocid_pipeline.run_inference(
+                    protocol_path=DEFAULT_PROTOCOL,
+                    role="development",
+                    output_root=output,
+                    run_id="development-full",
+                    access_path=access,
+                )
+            self.assertFalse(output.exists())
+
     def test_sample_rejects_unsafe_run_id_before_creating_output(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary) / "runs"
@@ -107,36 +262,20 @@ class OcidPipelineRunnerTest(unittest.TestCase):
         self.assertEqual(decoded.stream.envelope.producer.producer_stage, "stream_input")
         self.assertEqual([frame.record.index for frame in decoded.frames], list(range(1, 12)))
 
-    def test_artifact_inventory_excludes_mutable_boundary_files_and_detects_tampering(self) -> None:
+    def test_evaluation_rejects_modified_inference_manifest_before_ground_truth(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            (root / "attempt.json").write_text("{}", encoding="utf-8")
-            (root / "inference_manifest.json").write_text("{}", encoding="utf-8")
-            artifact = root / "stage" / "artifact.json"
-            artifact.parent.mkdir(parents=True)
-            artifact.write_text('{"value":1}', encoding="utf-8")
-            rows = ocid_pipeline._artifact_inventory(root)
-            self.assertEqual([row["path"] for row in rows], ["stage/artifact.json"])
-            ocid_pipeline._verify_artifact_inventory(root, rows)
-            artifact.write_text('{"value":2}', encoding="utf-8")
-            with self.assertRaisesRegex(OcidPipelineError, "artifact changed"):
-                ocid_pipeline._verify_artifact_inventory(root, rows)
-
-    def test_binary_mask_and_embedding_artifacts_are_strict(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            mask = np.zeros((8, 9), dtype=np.bool_)
-            mask[2:6, 3:8] = True
-            path = root / "mask.png"
-            ocid_pipeline._save_binary_mask(path, mask)
-            np.testing.assert_array_equal(ocid_pipeline._load_binary_mask(path), mask)
-
-            embeddings = np.asarray([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
-            embedding_path = root / "embeddings.npz"
-            ocid_pipeline._save_embeddings(embedding_path, embeddings)
-            with np.load(embedding_path, allow_pickle=False) as archive:
-                self.assertEqual(set(archive.files), {"embeddings"})
-                np.testing.assert_array_equal(archive["embeddings"], embeddings)
+            self._write_minimal_inference(root)
+            inference_path = root / "inference_manifest.json"
+            inference = json.loads(inference_path.read_text(encoding="utf-8"))
+            inference["role"] = "development"
+            inference_path.write_text(json.dumps(inference), encoding="utf-8")
+            with patch.object(ocid_pipeline, "validate_evaluation_inputs") as evaluation_inputs:
+                with self.assertRaisesRegex(OcidPipelineError, "manifest changed"):
+                    self._run_minimal_development_evaluation(root)
+            evaluation_inputs.assert_not_called()
+            attempt = json.loads((root / "attempt.json").read_text(encoding="utf-8"))
+            self.assertFalse(attempt["ground_truth_opened"])
 
     def test_check_output_is_structured_and_exclusive(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -179,6 +318,7 @@ class OcidPipelineRunnerTest(unittest.TestCase):
             with (
                 patch.object(ocid_pipeline, "_verify_artifact_inventory"),
                 patch.object(ocid_pipeline, "_verified_stage_manifest", return_value={}),
+                patch.object(ocid_pipeline, "_verify_implementation_receipt"),
                 patch.object(ocid_pipeline, "_verify_analysis_inputs_unchanged"),
                 patch.object(ocid_pipeline, "_verify_stage_contracts"),
                 patch.object(ocid_pipeline, "_snapshots_from_persisted_masks", return_value={}),
@@ -199,6 +339,7 @@ class OcidPipelineRunnerTest(unittest.TestCase):
             with (
                 patch.object(ocid_pipeline, "_verify_artifact_inventory"),
                 patch.object(ocid_pipeline, "_verified_stage_manifest", return_value={}),
+                patch.object(ocid_pipeline, "_verify_implementation_receipt"),
                 patch.object(ocid_pipeline, "_verify_analysis_inputs_unchanged"),
                 patch.object(ocid_pipeline, "_verify_stage_contracts"),
                 patch.object(ocid_pipeline, "_snapshots_from_persisted_masks", return_value={}),
@@ -238,7 +379,9 @@ class OcidPipelineRunnerTest(unittest.TestCase):
             "status": "inference_completed_before_ground_truth",
             "ground_truth_opened": False,
         }
-        (root / "inference_manifest.json").write_text(json.dumps(inference), encoding="utf-8")
+        inference_path = root / "inference_manifest.json"
+        inference_path.write_text(json.dumps(inference), encoding="utf-8")
+        attempt["inference_manifest_sha256"] = ocid_pipeline.sha256_file(inference_path)
         (root / "attempt.json").write_text(json.dumps(attempt), encoding="utf-8")
 
     def _run_minimal_development_evaluation(self, root: Path) -> dict[str, object]:

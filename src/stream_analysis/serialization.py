@@ -354,7 +354,7 @@ def _compact_metadata(value: Any, path: str) -> dict[str, JsonValue]:
             compact[key] = list(nested)
             continue
         raise ValueError(
-            f"Primary payload must not contain unapproved metadata field {path}.{key}."
+            f"Primary payload must not contain unsupported metadata field {path}.{key}."
         )
     return compact
 

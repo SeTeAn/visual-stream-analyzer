@@ -152,7 +152,7 @@ def evaluate_profiles(
     """Evaluate supplied development predictions at every fixed IoU threshold.
 
     Ground truth is loaded only here, after profile/stream keys have passed the
-    development-only contract.  The result contains micro-pooled metrics and
+    configured evaluation contract. The result contains micro-pooled metrics and
     macro summaries over scene groups, preventing paired cameras from being
     presented as independent scenes.
     """

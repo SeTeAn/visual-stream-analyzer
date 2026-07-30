@@ -12,13 +12,13 @@ import argparse
 import hashlib
 import json
 import math
-import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from stream_analysis.contracts import BBox, ImageSize
 from stream_analysis.evaluation import PredictedCandidate
+from stream_analysis.runtime import grounding_dino as runtime_grounding
 
 try:  # Support module and direct-script execution.
     from tools import evaluate_ocid_grounding_dino_extractor as grounding
@@ -56,6 +56,8 @@ SELECTION_F1_TOLERANCE = 0.01
 
 @dataclass(frozen=True, slots=True)
 class PromptProfile:
+    """Prompt profile with explicit prediction-source metadata."""
+
     prompt_id: str
     text: str
     selectable: bool
@@ -70,20 +72,7 @@ class PromptProfile:
             raise ValueError("unsupported prompt source.")
 
 
-@dataclass(frozen=True, slots=True)
-class GeometryProfile:
-    geometry_id: str
-    min_area_ratio: float | None = None
-    min_span_ratio: float | None = None
-
-    def __post_init__(self) -> None:
-        if not self.geometry_id or not self.geometry_id.replace("_", "").isalnum():
-            raise ValueError("geometry_id must contain letters, digits or underscores.")
-        for value in (self.min_area_ratio, self.min_span_ratio):
-            if value is not None and not 0.0 < value <= 1.0:
-                raise ValueError("geometry ratios must be in (0, 1].")
-        if self.min_span_ratio is not None and self.min_area_ratio is None:
-            raise ValueError("a span threshold requires an area threshold.")
+GeometryProfile = runtime_grounding.GeometryProfile
 
 
 PROMPTS: tuple[PromptProfile, ...] = (
@@ -208,100 +197,28 @@ def _infer_stream_prompt(
     device: str,
     prompt: str,
 ) -> tuple[tuple[grounding.RawPrediction, ...], dict[str, Any]]:
-    """Run one registered prompt without opening evaluation annotations."""
-
-    from PIL import Image
-
-    raw: list[grounding.RawPrediction] = []
-    frames: list[dict[str, Any]] = []
-    if device == "cuda":
-        torch_module.cuda.reset_peak_memory_stats()
-    stream_started = time.perf_counter()
-    for frame_index, frame in enumerate(decoded.frames):
-        image = Image.fromarray(grounding._frame_array(frame), mode="RGB")
-        if device == "cuda":
-            torch_module.cuda.synchronize()
-        started = time.perf_counter()
-        inputs = grounding._move_to_device(
-            processor(images=image, text=prompt, return_tensors="pt"),
-            device,
-        )
-        model_started = time.perf_counter()
-        with torch_module.inference_mode():
-            outputs = model(**inputs)
-        if device == "cuda":
-            torch_module.cuda.synchronize()
-        model_seconds = time.perf_counter() - model_started
-        target_sizes = torch_module.tensor(
-            [[frame.image_size.height, frame.image_size.width]]
-        )
-        processed = grounding._post_process(processor, outputs, inputs, target_sizes)
-        if not isinstance(processed, (list, tuple)) or len(processed) != 1:
-            raise ValueError("Grounding DINO processor must return one frame result")
-        rows = grounding._normalise_processor_predictions(
-            processed[0],
-            frame_id=frame.frame_id,
-            frame_index=frame_index,
-            image_size=frame.image_size,
-        )
-        total_seconds = time.perf_counter() - started
-        raw.extend(rows)
-        frames.append(
-            {
-                "frame_id": frame.frame_id,
-                "raw_prediction_count": len(rows),
-                "model_forward_seconds": model_seconds,
-                "total_inference_seconds": total_seconds,
-            }
-        )
-        del image, inputs, outputs, processed
-    elapsed = time.perf_counter() - stream_started
-    latencies = [float(item["total_inference_seconds"]) for item in frames]
-    return tuple(raw), {
-        "frame_count": len(frames),
-        "elapsed_seconds": elapsed,
-        "mean_seconds_per_frame": None if not frames else elapsed / len(frames),
-        "latency_seconds": {
-            "p50": grounding._percentile(latencies, 50),
-            "p95": grounding._percentile(latencies, 95),
-        },
-        "process_rss_bytes": grounding._rss_bytes(),
-        "peak_gpu_memory_allocated_bytes": (
-            int(torch_module.cuda.max_memory_allocated()) if device == "cuda" else None
-        ),
-        "peak_gpu_memory_reserved_bytes": (
-            int(torch_module.cuda.max_memory_reserved()) if device == "cuda" else None
-        ),
-        "frames": frames,
-    }
+    return runtime_grounding.infer_stream(
+        decoded,
+        processor=processor,
+        model=model,
+        torch_module=torch_module,
+        device=device,
+        prompt=prompt,
+    )
 
 
 def _frame_sizes(decoded: Any) -> dict[str, ImageSize]:
     return {frame.frame_id: frame.image_size for frame in decoded.frames}
 
 
-def geometry_rejects(
-    bbox: BBox,
-    image_size: ImageSize,
-    geometry: GeometryProfile,
-) -> bool:
-    frame_area = image_size.width * image_size.height
-    if frame_area <= 0 or geometry.min_area_ratio is None:
-        return False
-    area_ratio = bbox.area / frame_area
-    if area_ratio < geometry.min_area_ratio:
-        return False
-    if geometry.min_span_ratio is None:
-        return True
-    return (
-        bbox.width / image_size.width >= geometry.min_span_ratio
-        or bbox.height / image_size.height >= geometry.min_span_ratio
-    )
+geometry_rejects = runtime_grounding.geometry_rejects
 
 
 def _surface_like(bbox: BBox, image_size: ImageSize) -> bool:
-    return geometry_rejects(bbox, image_size, GEOMETRIES[1]) or geometry_rejects(
-        bbox, image_size, GEOMETRIES[2]
+    return runtime_grounding.surface_like(
+        bbox,
+        image_size,
+        (GEOMETRIES[1], GEOMETRIES[2]),
     )
 
 
@@ -312,23 +229,32 @@ def candidates_for_profile(
     geometry: GeometryProfile,
     image_sizes: Mapping[str, ImageSize],
 ) -> tuple[tuple[PredictedCandidate, ...], tuple[dict[str, Any], ...]]:
-    """Apply configured score/NMS and one geometry policy."""
+    """Apply configured runtime filtering and convert results for evaluation."""
 
-    selected = tuple(row for row in raw if row.score >= FROZEN_SCORE_THRESHOLD)
-    selected = grounding._class_agnostic_nms(selected, FROZEN_NMS_IOU)
+    try:
+        profiled = runtime_grounding.select_predictions_for_profile(
+            raw,
+            filter_profile=runtime_grounding.FilterProfile(
+                FROZEN_SCORE_THRESHOLD,
+                FROZEN_NMS_IOU,
+            ),
+            geometry=geometry,
+            image_sizes=image_sizes,
+            surface_geometries=(GEOMETRIES[1], GEOMETRIES[2]),
+        )
+    except KeyError as error:
+        missing = error.args[0] if error.args else "missing frame size"
+        raise OcidEvaluationError(str(missing)) from error
+
     candidates: list[PredictedCandidate] = []
     records: list[dict[str, Any]] = []
-    for row in selected:
-        image_size = image_sizes.get(row.frame_id)
-        if image_size is None:
-            raise OcidEvaluationError(f"missing frame size for {row.frame_id}")
-        rejected = geometry_rejects(row.bbox, image_size, geometry)
+    for item in profiled:
+        row = item.prediction
         source_key = f"{prompt.prompt_id}:{row.frame_id}:{row.prediction_index:03d}"
         candidate_id = (
             f"grounding-dino-hardening:{prompt.prompt_id}:{geometry.geometry_id}:"
             f"{row.frame_id}:{row.prediction_index:03d}"
         )
-        area_ratio = row.bbox.area / (image_size.width * image_size.height)
         record = {
             "source_prediction_key": source_key,
             "candidate_id": candidate_id,
@@ -343,14 +269,14 @@ def candidates_for_profile(
                 "width": row.bbox.width,
                 "height": row.bbox.height,
             },
-            "bbox_area_ratio": area_ratio,
-            "bbox_width_ratio": row.bbox.width / image_size.width,
-            "bbox_height_ratio": row.bbox.height / image_size.height,
-            "surface_like": _surface_like(row.bbox, image_size),
-            "geometry_rejected": rejected,
+            "bbox_area_ratio": item.bbox_area_ratio,
+            "bbox_width_ratio": item.bbox_width_ratio,
+            "bbox_height_ratio": item.bbox_height_ratio,
+            "surface_like": item.surface_like,
+            "geometry_rejected": item.geometry_rejected,
         }
         records.append(record)
-        if rejected:
+        if item.geometry_rejected:
             continue
         candidates.append(
             PredictedCandidate(

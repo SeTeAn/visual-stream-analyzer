@@ -177,7 +177,7 @@ def analyze_component_mask(
     *,
     secondary_area_ratio: float = DEFAULT_SECONDARY_AREA_RATIO,
 ) -> ComponentAnalysis:
-    """Analyze one non-empty binary mask under the frozen review policy."""
+    """Analyze one non-empty binary mask under the configured review policy."""
 
     checked = _validate_mask(mask, require_nonempty=True)
     if isinstance(secondary_area_ratio, bool) or not isinstance(

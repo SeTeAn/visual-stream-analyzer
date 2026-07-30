@@ -1,28 +1,24 @@
-"""Benchmark a local Grounding DINO Tiny checkpoint on OCID candidates.
+"""Grounding DINO inference and evaluation utilities for OCID streams.
 
-This development-only helper is deliberately outside the normal analysis
-pipeline.  It runs inference from RGB streams only; the matching annotation is
-opened only after every frame in that stream has been processed.
+Reusable inference functions read RGB streams only. The command-line evaluator
+opens matching annotations only after every frame in a stream has been
+processed and its predictions have been persisted.
 """
 
 from __future__ import annotations
 
 import argparse
 import hashlib
-import inspect
 import json
-import math
 import os
 import tempfile
 import time
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-import numpy as np
-
 from stream_analysis import ManifestLoadRequest, ProducerProvenance, load_decoded_stream
 from stream_analysis.contracts import BBox, ImageSize
+from stream_analysis.runtime import grounding_dino as runtime_grounding
 from stream_analysis.evaluation import (
     PredictedCandidate,
     aggregate_candidate_metrics,
@@ -46,33 +42,14 @@ except ModuleNotFoundError:  # pragma: no cover - exercised by direct CLI invoca
 
 SCHEMA_VERSION = "ocid-grounding-dino-v1"
 MODEL_FAMILY = "grounding_dino_tiny"
-HF_REVISION = "a2bb814dd30d776dcf7e30523b00659f4f141c71"
+HF_REVISION = runtime_grounding.HF_REVISION
 REGISTERED_PROMPT = "object."
-RAW_POSTPROCESS_FLOOR = 0.01
+RAW_POSTPROCESS_FLOOR = runtime_grounding.RAW_POSTPROCESS_FLOOR
 SCORE_THRESHOLDS = (0.15, 0.20, 0.25, 0.30, 0.35)
 NMS_LEVELS: tuple[float | None, ...] = (None, 0.30, 0.50, 0.70)
 IOU_LEVELS = (0.50, 0.60, 0.70, 0.80, 0.90)
-@dataclass(frozen=True, slots=True)
-class RawPrediction:
-    """One processor post-processed prediction retained for all profiles."""
-
-    frame_id: str
-    frame_index: int
-    prediction_index: int
-    score: float
-    phrase: str
-    bbox: BBox
-
-
-@dataclass(frozen=True, slots=True)
-class FilterProfile:
-    score_threshold: float
-    class_agnostic_nms_iou: float | None
-
-    @property
-    def profile_id(self) -> str:
-        nms = "none" if self.class_agnostic_nms_iou is None else f"{self.class_agnostic_nms_iou:.2f}"
-        return f"score_{self.score_threshold:.2f}_nms_{nms}"
+RawPrediction = runtime_grounding.RawPrediction
+FilterProfile = runtime_grounding.FilterProfile
 
 
 DEFAULT_PROFILES = tuple(
@@ -136,45 +113,17 @@ def _benchmark_provenance(
     }
 
 
-def _integral_box(values: Any, image_size: ImageSize) -> BBox | None:
-    array = np.asarray(values, dtype=np.float64)
-    if array.shape != (4,) or not np.isfinite(array).all():
-        return None
-    left = max(0, min(image_size.width, int(math.floor(float(array[0])))))
-    top = max(0, min(image_size.height, int(math.floor(float(array[1])))))
-    right = max(0, min(image_size.width, int(math.ceil(float(array[2])))))
-    bottom = max(0, min(image_size.height, int(math.ceil(float(array[3])))))
-    if right <= left or bottom <= top:
-        return None
-    return BBox(left, top, right - left, bottom - top)
-
-
-def _bbox_iou(left: BBox, right: BBox) -> float:
-    intersection = left.intersection(right)
-    if intersection is None:
-        return 0.0
-    union = left.area + right.area - intersection.area
-    return 0.0 if union <= 0.0 else intersection.area / union
-
-
-def _class_agnostic_nms(
-    selected: Iterable[RawPrediction],
-    iou_threshold: float,
-) -> tuple[RawPrediction, ...]:
-    if not 0.0 <= iou_threshold <= 1.0:
-        raise ValueError("class_agnostic_nms_iou must be in [0, 1].")
-    by_frame: dict[str, list[RawPrediction]] = {}
-    for item in selected:
-        by_frame.setdefault(item.frame_id, []).append(item)
-    kept: list[RawPrediction] = []
-    for frame_id in sorted(by_frame):
-        accepted: list[RawPrediction] = []
-        ordered = sorted(by_frame[frame_id], key=lambda item: (-item.score, item.prediction_index))
-        for item in ordered:
-            if all(_bbox_iou(item.bbox, earlier.bbox) <= iou_threshold for earlier in accepted):
-                accepted.append(item)
-        kept.extend(sorted(accepted, key=lambda item: item.prediction_index))
-    return tuple(kept)
+_integral_box = runtime_grounding.integral_box
+_bbox_iou = runtime_grounding.bbox_iou
+_class_agnostic_nms = runtime_grounding.class_agnostic_nms
+_frame_array = runtime_grounding.frame_array
+_move_to_device = runtime_grounding.move_to_device
+_post_process = runtime_grounding.post_process
+_normalise_processor_predictions = runtime_grounding.normalise_processor_predictions
+_rss_bytes = runtime_grounding.rss_bytes
+_percentile = runtime_grounding.percentile
+_load_model_processor = runtime_grounding.load_model_processor
+_model_dtype = runtime_grounding.model_dtype
 
 
 def predictions_for_profile(
@@ -182,11 +131,7 @@ def predictions_for_profile(
     *,
     profile: FilterProfile,
 ) -> tuple[PredictedCandidate, ...]:
-    if not 0.0 <= profile.score_threshold <= 1.0:
-        raise ValueError("score_threshold must be in [0, 1].")
-    selected = tuple(item for item in raw if item.score >= profile.score_threshold)
-    if profile.class_agnostic_nms_iou is not None:
-        selected = _class_agnostic_nms(selected, profile.class_agnostic_nms_iou)
+    selected = runtime_grounding.filter_predictions(raw, profile=profile)
     return tuple(
         PredictedCandidate(
             candidate_id=f"grounding-dino:{item.frame_id}:{item.prediction_index:03d}",
@@ -201,127 +146,6 @@ def predictions_for_profile(
     )
 
 
-def _frame_array(frame: Any) -> np.ndarray:
-    return np.frombuffer(frame.rgb_bytes, dtype=np.uint8).reshape(
-        frame.image_size.height, frame.image_size.width, 3
-    ).copy()
-
-
-def _move_to_device(values: Any, device: str) -> Any:
-    if hasattr(values, "to"):
-        return values.to(device)
-    if isinstance(values, dict):
-        return {key: _move_to_device(value, device) for key, value in values.items()}
-    return values
-
-
-def _post_process(
-    processor: Any,
-    outputs: Any,
-    inputs: Any,
-    target_sizes: Any,
-) -> Any:
-    """Support the two documented Grounding DINO processor keyword variants."""
-
-    method = processor.post_process_grounded_object_detection
-    parameters = inspect.signature(method).parameters
-    common: dict[str, Any] = {"target_sizes": target_sizes}
-    if "input_ids" in parameters and hasattr(inputs, "input_ids"):
-        common["input_ids"] = inputs.input_ids
-    elif "input_ids" in parameters and isinstance(inputs, dict) and "input_ids" in inputs:
-        common["input_ids"] = inputs["input_ids"]
-    if "threshold" in parameters:
-        common["threshold"] = RAW_POSTPROCESS_FLOOR
-    else:
-        common["box_threshold"] = RAW_POSTPROCESS_FLOOR
-        if "text_threshold" in parameters:
-            common["text_threshold"] = RAW_POSTPROCESS_FLOOR
-    return method(outputs, **common)
-
-
-def _as_list(values: Any) -> list[Any]:
-    if hasattr(values, "detach"):
-        values = values.detach().to("cpu").tolist()
-    elif hasattr(values, "tolist"):
-        values = values.tolist()
-    return list(values)
-
-
-def _normalise_processor_predictions(
-    result: Any,
-    *,
-    frame_id: str,
-    frame_index: int,
-    image_size: ImageSize,
-) -> tuple[RawPrediction, ...]:
-    if not isinstance(result, dict):
-        raise TypeError("Grounding DINO processor result must be a dictionary.")
-    boxes = _as_list(result.get("boxes", ()))
-    scores = _as_list(result.get("scores", ()))
-    # Transformers 5.14 names Grounding DINO's decoded string phrases
-    # ``text_labels``.  ``labels`` remains a compatibility fallback for older
-    # processor outputs; it is audit metadata and never affects filtering.
-    labels = _as_list(result.get("text_labels", result.get("labels", ())))
-    if not (len(boxes) == len(scores) == len(labels)):
-        raise ValueError("Grounding DINO processor boxes, scores and labels have different lengths.")
-    sortable: list[tuple[float, str, BBox, int]] = []
-    for source_index, (box, score, label) in enumerate(zip(boxes, scores, labels, strict=True)):
-        bbox = _integral_box(box, image_size)
-        score_value = float(score)
-        if bbox is None or not math.isfinite(score_value):
-            continue
-        sortable.append((score_value, str(label), bbox, source_index))
-    sortable.sort(key=lambda item: (-item[0], item[2].x, item[2].y, item[2].width, item[2].height, item[1], item[3]))
-    return tuple(
-        RawPrediction(
-            frame_id=frame_id,
-            frame_index=frame_index,
-            prediction_index=index,
-            score=score,
-            phrase=label,
-            bbox=bbox,
-        )
-        for index, (score, label, bbox, _source_index) in enumerate(sortable)
-    )
-
-
-def _rss_bytes() -> int | None:
-    try:
-        import psutil
-
-        return int(psutil.Process().memory_info().rss)
-    except ImportError:
-        return None
-
-
-def _percentile(values: list[float], percentile: float) -> float | None:
-    if not values:
-        return None
-    return float(np.percentile(np.asarray(values, dtype=np.float64), percentile))
-
-
-def _load_model_processor(model_directory: Path, *, torch_module: Any, device: str) -> tuple[Any, Any]:
-    from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor
-
-    processor = AutoProcessor.from_pretrained(
-        str(model_directory), local_files_only=True, revision=HF_REVISION
-    )
-    model = AutoModelForZeroShotObjectDetection.from_pretrained(
-        str(model_directory), local_files_only=True, revision=HF_REVISION
-    )
-    model.to(device)
-    model.eval()
-    return processor, model
-
-
-def _model_dtype(model: Any) -> str:
-    try:
-        value = str(next(model.parameters()).dtype)
-    except (AttributeError, StopIteration):
-        return "unknown"
-    return value.removeprefix("torch.")
-
-
 def _infer_stream(
     decoded: Any,
     *,
@@ -331,66 +155,15 @@ def _infer_stream(
     device: str,
     prompt: str,
 ) -> tuple[tuple[RawPrediction, ...], dict[str, Any]]:
-    from PIL import Image
-
     _validate_prompt(prompt)
-    raw: list[RawPrediction] = []
-    frames: list[dict[str, Any]] = []
-    if device == "cuda":
-        torch_module.cuda.reset_peak_memory_stats()
-    stream_started = time.perf_counter()
-    for frame_index, frame in enumerate(decoded.frames):
-        image = Image.fromarray(_frame_array(frame), mode="RGB")
-        if device == "cuda":
-            torch_module.cuda.synchronize()
-        started = time.perf_counter()
-        inputs = _move_to_device(processor(images=image, text=prompt, return_tensors="pt"), device)
-        model_started = time.perf_counter()
-        with torch_module.inference_mode():
-            outputs = model(**inputs)
-        if device == "cuda":
-            torch_module.cuda.synchronize()
-        model_seconds = time.perf_counter() - model_started
-        target_sizes = torch_module.tensor([[frame.image_size.height, frame.image_size.width]])
-        processed = _post_process(processor, outputs, inputs, target_sizes)
-        if not isinstance(processed, (list, tuple)) or len(processed) != 1:
-            raise ValueError("Grounding DINO processor must return one result for one frame.")
-        rows = _normalise_processor_predictions(
-            processed[0],
-            frame_id=frame.frame_id,
-            frame_index=frame_index,
-            image_size=frame.image_size,
-        )
-        total_seconds = time.perf_counter() - started
-        raw.extend(rows)
-        frames.append(
-            {
-                "frame_id": frame.frame_id,
-                "raw_prediction_count": len(rows),
-                "model_forward_seconds": model_seconds,
-                "total_inference_seconds": total_seconds,
-            }
-        )
-        del image, inputs, outputs, processed
-    total_seconds = time.perf_counter() - stream_started
-    latencies = [float(row["total_inference_seconds"]) for row in frames]
-    return tuple(raw), {
-        "frame_count": len(frames),
-        "elapsed_seconds": total_seconds,
-        "mean_seconds_per_frame": None if not frames else total_seconds / len(frames),
-        "latency_seconds": {
-            "p50": _percentile(latencies, 50),
-            "p95": _percentile(latencies, 95),
-        },
-        "process_rss_bytes": _rss_bytes(),
-        "peak_gpu_memory_allocated_bytes": (
-            int(torch_module.cuda.max_memory_allocated()) if device == "cuda" else None
-        ),
-        "peak_gpu_memory_reserved_bytes": (
-            int(torch_module.cuda.max_memory_reserved()) if device == "cuda" else None
-        ),
-        "frames": frames,
-    }
+    return runtime_grounding.infer_stream(
+        decoded,
+        processor=processor,
+        model=model,
+        torch_module=torch_module,
+        device=device,
+        prompt=prompt,
+    )
 
 
 def _profile_metrics(annotation: Any, raw: tuple[RawPrediction, ...]) -> dict[str, Any]:

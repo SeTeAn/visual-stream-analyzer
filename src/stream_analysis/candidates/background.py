@@ -1,7 +1,7 @@
 """Background and mask primitives for controlled smooth RGB scenes.
 
-F04 deliberately stops at in-memory background/residual/mask operations.  It
-does not create candidate records, stable IDs, bounding boxes, diagnostics or
+This module stops at in-memory background, residual, and mask operations. It
+does not create candidate records, stable IDs, bounding boxes, diagnostics, or
 evaluation outputs.
 """
 

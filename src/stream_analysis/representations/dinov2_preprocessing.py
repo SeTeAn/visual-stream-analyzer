@@ -1,4 +1,4 @@
-"""Deterministic DINOv2 crop preprocessing for canonical F05 candidates."""
+"""Deterministic DINOv2 crop preprocessing for candidate regions."""
 
 from __future__ import annotations
 

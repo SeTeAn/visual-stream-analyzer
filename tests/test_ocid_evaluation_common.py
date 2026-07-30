@@ -26,6 +26,7 @@ SPEC = ROOT / "data" / "ocid" / "benchmark" / "ocid_candidate_benchmark_v1.json"
 REVIEWED = ROOT / "data" / "ocid" / "derived" / "ocid_candidate_benchmark_v1_reviewed"
 
 
+@unittest.skipUnless(REVIEWED.is_dir(), "requires the local reviewed OCID benchmark")
 class OcidEvaluationCommonTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:

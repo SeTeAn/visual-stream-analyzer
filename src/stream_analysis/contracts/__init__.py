@@ -1,4 +1,4 @@
-"""Public immutable contracts implemented by F01 and F02A."""
+"""Public immutable contracts for stream-analysis data."""
 
 from .common import (
     ErrorRecord,
@@ -10,6 +10,21 @@ from .common import (
     WarningRecord,
 )
 from .geometry import BBox, ImageSize, Point
+from .product import (
+    PRODUCT_RESULT_SCHEMA_VERSION,
+    PUBLIC_PIPELINE_MODELS,
+    ProductEvent,
+    ProductEventKind,
+    ProductFrame,
+    ProductMask,
+    ProductMatch,
+    ProductObjectRef,
+    ProductPipeline,
+    ProductResult,
+    ProductStatus,
+    ProductStream,
+    ProductVisualType,
+)
 from .pipeline import (
     ArtifactReference,
     AssignmentProvenance,
@@ -94,7 +109,20 @@ __all__ = [
     "PairEligibility",
     "PairwiseScoreRecord",
     "Point",
+    "PRODUCT_RESULT_SCHEMA_VERSION",
+    "PUBLIC_PIPELINE_MODELS",
     "ProducerProvenance",
+    "ProductFrame",
+    "ProductMask",
+    "ProductEvent",
+    "ProductEventKind",
+    "ProductMatch",
+    "ProductObjectRef",
+    "ProductPipeline",
+    "ProductResult",
+    "ProductStatus",
+    "ProductStream",
+    "ProductVisualType",
     "RecordEnvelope",
     "RecurringVisualType",
     "RepresentationFamily",

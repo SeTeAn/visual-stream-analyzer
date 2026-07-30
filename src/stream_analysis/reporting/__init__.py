@@ -1,4 +1,4 @@
-"""Stable F13 reporting and run-output API."""
+"""Stable reporting and run-output API."""
 
 from .artifacts import (
     CANDIDATE_MANIFEST_SCHEMA_ID,
@@ -13,6 +13,12 @@ from .artifacts import (
     write_run_artifacts,
 )
 from .overlays import render_primary_overlays
+from .product import (
+    ProductOutput,
+    ProductOutputCollisionError,
+    render_product_overlay,
+    write_product_output,
+)
 from .text import build_text_report
 
 __all__ = [
@@ -21,11 +27,15 @@ __all__ = [
     "RUN_MANIFEST_SCHEMA_ID",
     "RUNTIME_STATUS_SCHEMA_ID",
     "OutputCollisionError",
+    "ProductOutput",
+    "ProductOutputCollisionError",
     "RunArtifacts",
     "build_candidate_manifest_payload",
     "build_pair_scores_payload",
     "build_text_report",
     "render_primary_overlays",
+    "render_product_overlay",
+    "write_product_output",
     "write_failed_run_artifacts",
     "write_run_artifacts",
 ]

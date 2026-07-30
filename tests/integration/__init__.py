@@ -1,1 +1,1 @@
-"""F13-F14 integration tests."""
+"""Integration tests for the complete analysis lifecycle."""

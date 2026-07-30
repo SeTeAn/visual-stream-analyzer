@@ -57,7 +57,7 @@ class FrameDecodingTest(unittest.TestCase):
     def _request(self, root: Path) -> ManifestLoadRequest:
         return ManifestLoadRequest(stream_root=root, producer=_producer())
 
-    def test_raw_digest_rgb_bytes_and_f01_records_are_consistent(self) -> None:
+    def test_raw_digest_rgb_bytes_and_frame_records_are_consistent(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             raw = _save(root / "frames" / "frame_001.PNG")

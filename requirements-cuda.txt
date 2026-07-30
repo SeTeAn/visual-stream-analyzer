@@ -1,0 +1,9 @@
+# CUDA-enabled PyTorch dependencies for local model inference.
+# Install from the official PyTorch CUDA 12.8 wheel index:
+#
+#   .\.venv\Scripts\python.exe -m pip install -r requirements-cuda.txt
+#
+# Model weights are local assets and are not downloaded by the project.
+--index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128

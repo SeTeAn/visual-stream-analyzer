@@ -665,7 +665,7 @@ def _import_torch() -> Any:
     except ImportError as error:
         raise DinoV2ProviderError(
             "TORCH_MISSING",
-            "DINOv2 provider requires the approved local PyTorch environment.",
+            "DINOv2 provider requires a compatible local PyTorch environment.",
         ) from error
 
 

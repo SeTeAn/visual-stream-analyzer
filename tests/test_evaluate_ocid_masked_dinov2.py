@@ -212,7 +212,7 @@ class OcidMaskedDinoTest(unittest.TestCase):
             selected_path, selected, stream, decoded = self._synthetic_input_contract(root)
             sam = root / "sam.json"
             sam.write_text(json.dumps(self._sam_manifest(selected_path, heldout="accessed")), encoding="utf-8")
-            with self.assertRaisesRegex(ValueError, "development-only"):
+            with self.assertRaisesRegex(ValueError, "configured inference"):
                 self._load_contract(root=root, selected_path=selected_path, sam_path=sam,
                                     stream=stream, selected=selected, decoded=decoded)
             sam.write_text(json.dumps(self._sam_manifest(selected_path, candidate_id="other")), encoding="utf-8")

@@ -2,18 +2,18 @@
 
 The command has separate check, RGB-only inference, and ground-truth
 evaluation phases.  There are no CLI parameters for model or threshold
-selection; every semantic value comes from the configured protocol JSON.
+selection. The configured pipeline applies the same prediction-only object
+refinement to sample streams and complete dataset runs.
 """
 
 from __future__ import annotations
 
 import argparse
-import gc
 import hashlib
 import json
 import os
+import shutil
 import tempfile
-import time
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
@@ -21,20 +21,23 @@ from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from scipy.optimize import linear_sum_assignment
 
 from stream_analysis.candidates import (
     CandidateExtractionSnapshot,
     CandidateMaskRecord,
+    DEFAULT_MASK_CONTAINMENT,
+    DEFAULT_MINIMUM_COVERED_MASKS,
+    PositionedCandidateMask,
     candidate_mask_digest,
+    resolve_aggregate_masks,
 )
 from stream_analysis.contracts import (
     BBox,
     CandidateExtractionResult,
     CandidateRecord,
     FrameCandidateDiagnostics,
-    FramePair,
     GeometryFeatureMetadata,
-    ImageSize,
     MaskReference,
     ProducerProvenance,
     RecordEnvelope,
@@ -54,26 +57,35 @@ from stream_analysis.matching import (
     GroupingConfig,
     MatchingConfig,
     PairScoringConfig,
-    build_change_events,
-    group_recurring_visual_types,
-    match_neighboring_frames,
 )
 from stream_analysis.representations import (
     DINO_MASK_NEUTRAL_VARIANT,
-    DinoV2CosineScorer,
-    DinoV2RepresentationConfig,
-    LocalDinoV2Provider,
-    build_dinov2_representations,
 )
 from stream_analysis.serialization import to_json_compatible
+from stream_analysis.runtime.config import (
+    resolve_runtime_assets,
+    runtime_profile_from_sections,
+)
+from stream_analysis.runtime.engine import (
+    detector_profiles as runtime_detector_profiles,
+    execute_pipeline,
+    matching_configs as runtime_matching_configs,
+    temporal_detector_records as runtime_temporal_detector_records,
+)
+from stream_analysis.runtime.workspace import RuntimeWorkspace
 
-from tools import evaluate_ocid_grounding_dino_extractor as grounding
 from tools import evaluate_ocid_grounding_dino_hardening as hardening
 from tools.evaluate_ocid_masked_dinov2 import (
     CandidateInput,
     _assignment_identity,
 )
-from tools.evaluate_ocid_grounded_sam2_masks import evaluate_masks
+from tools.evaluate_ocid_grounded_sam2_masks import (
+    OVERLAY_PALETTE,
+    _reviewed_mask,
+    _same_bbox,
+    evaluate_masks,
+    mask_bbox_from_full_frame,
+)
 from tools.evaluate_ocid_oracle_dinov2 import (
     MatcherPolicy,
     OracleInstance,
@@ -101,12 +113,6 @@ from tools.ocid_pipeline_contract import (
     write_json_atomic,
     write_json_exclusive,
 )
-from tools.ocid_grounded_sam2_refinement import (
-    MaskCleanupConfig,
-    load_local_sam2_bbox_refiner,
-)
-
-
 INFERENCE_SCHEMA = "ocid-pipeline-inference-manifest-1.0"
 DETECTOR_SCHEMA = "ocid-pipeline-detector-artifacts-1.0"
 SAM2_SCHEMA = "ocid-pipeline-sam2-artifacts-1.0"
@@ -114,6 +120,8 @@ ANALYSIS_SCHEMA = "ocid-pipeline-analysis-artifacts-1.0"
 EVALUATION_SCHEMA = "ocid-pipeline-evaluation-1.0"
 ATTEMPT_SCHEMA = "ocid-pipeline-attempt-1.0"
 INPUT_RECEIPT_SCHEMA = "ocid-pipeline-analysis-input-receipt-1.0"
+IMPLEMENTATION_RECEIPT_SCHEMA = "ocid-pipeline-implementation-receipt-1.0"
+DISPLAY_BUNDLE_SCHEMA = "ocid-pipeline-candidate-overlay-bundle-1.0"
 _MUTABLE_FILENAMES = frozenset({"attempt.json", "inference_manifest.json"})
 
 
@@ -133,8 +141,8 @@ def run_inference(
     access_path: Path | None = None,
 ) -> dict[str, Any]:
     protocol = load_pipeline_protocol(protocol_path)
-    if role not in {"sample", "heldout"}:
-        raise OcidPipelineError("inference role must be sample or heldout")
+    if role not in {"sample", "development", "heldout"}:
+        raise OcidPipelineError("inference role must be sample, development, or heldout")
     run_id = validate_run_id(run_id)
     inventory = inventory_for_role(protocol, role)  # type: ignore[arg-type]
     access: Mapping[str, Any] | None = None
@@ -143,7 +151,7 @@ def run_inference(
             raise OcidPipelineError("held-out inference requires an evaluation access artifact")
         access = validate_evaluation_access(access_path, protocol, expected_run_id=run_id)
     elif access_path is not None:
-        raise OcidPipelineError("sample analysis does not accept evaluation access")
+        raise OcidPipelineError("non-heldout analysis does not accept evaluation access")
 
     output_directory = Path(output_root).resolve(strict=False)
     run_directory = (output_directory / run_id).resolve(strict=False)
@@ -205,19 +213,20 @@ def run_inference(
             **analysis_inputs,
         }
         write_json_exclusive(run_directory / "analysis_input_receipt.json", input_receipt)
+        implementation_receipt = _implementation_receipt(protocol)
+        write_json_exclusive(
+            run_directory / "implementation_receipt.json",
+            implementation_receipt,
+        )
         attempt["status"] = "rgb_inputs_verified"
         attempt["rgb_input_receipt_sha256"] = sha256_file(run_directory / "analysis_input_receipt.json")
         write_json_atomic(run_directory / "attempt.json", attempt)
 
-        detector_manifest = _run_detector_stage(protocol, inventory, role, run_directory)
-        sam2_manifest = _run_sam2_stage(protocol, inventory, role, run_directory, detector_manifest)
-        analysis_manifest = _run_analysis_stage(
+        detector_manifest, sam2_manifest, analysis_manifest = _run_runtime_pipeline(
             protocol,
             inventory,
             role,
             run_directory,
-            detector_manifest,
-            sam2_manifest,
         )
         artifacts = _artifact_inventory(run_directory)
         inference = {
@@ -239,13 +248,17 @@ def run_inference(
             },
             "stage_manifests": {
                 "analysis_inputs": _file_reference(run_directory, run_directory / "analysis_input_receipt.json"),
+                "implementation": _file_reference(run_directory, run_directory / "implementation_receipt.json"),
                 "detector": _file_reference(run_directory, run_directory / "detector_manifest.json"),
                 "sam2": _file_reference(run_directory, run_directory / "sam2_manifest.json"),
                 "analysis": _file_reference(run_directory, run_directory / "analysis_manifest.json"),
             },
             "coverage": {
-                "candidate_count": detector_manifest["candidate_count"],
+                "detector_candidate_count": detector_manifest["candidate_count"],
+                "candidate_count": sam2_manifest["resolved_candidate_count"],
                 "valid_mask_count": sam2_manifest["valid_mask_count"],
+                "resolved_mask_count": sam2_manifest["resolved_candidate_count"],
+                "removed_aggregate_count": sam2_manifest["removed_aggregate_count"],
                 "embedding_count": analysis_manifest["embedding_count"],
                 "mask_fallback_count": sam2_manifest["fallback_count"],
                 "embedding_failure_count": analysis_manifest["embedding_failure_count"],
@@ -312,6 +325,125 @@ def run_sample_evaluation(
     )
 
 
+def run_development_evaluation(
+    *,
+    protocol_path: Path,
+    run_directory: Path,
+) -> dict[str, Any]:
+    """Evaluate a completed full-dataset run from persisted inference artifacts."""
+
+    protocol = load_pipeline_protocol(protocol_path)
+    return _run_evaluation(
+        protocol=protocol,
+        run_directory=run_directory,
+        expected_role="development",
+        inventory=inventory_for_role(protocol, "development"),
+        output_filename="development_evaluation.json",
+        completion_status="completed_development_evaluation",
+        attempt_status="development_evaluation_completed",
+        access_path=None,
+    )
+
+
+def render_development_candidate_overlays(
+    *,
+    protocol_path: Path,
+    run_directory: Path,
+    output_root: Path,
+) -> dict[str, Any]:
+    """Render labels-only overlays from one completed development inference."""
+
+    protocol = load_pipeline_protocol(protocol_path)
+    run_root = Path(run_directory).resolve(strict=True)
+    destination = Path(output_root).resolve(strict=False)
+    try:
+        destination.relative_to(protocol.repository_root)
+    except ValueError as error:
+        raise OcidPipelineError("overlay output must stay inside the repository") from error
+    forbidden = {part.casefold().replace("-", "_") for part in destination.parts}
+    if any("heldout" in part.replace("_", "") for part in forbidden):
+        raise OcidPipelineError("overlay output points to a forbidden held-out location")
+    if destination.exists():
+        raise OcidPipelineError(f"overlay output already exists: {destination}")
+
+    inference_path = run_root / "inference_manifest.json"
+    attempt = _json_object(run_root / "attempt.json", "OCID pipeline attempt")
+    if attempt.get("inference_manifest_sha256") != sha256_file(inference_path):
+        raise OcidPipelineError("inference manifest changed after inference completion")
+    inference = _json_object(inference_path, "OCID pipeline inference manifest")
+    inventory = inventory_for_role(protocol, "development")
+    if (
+        inference.get("schema_version") != INFERENCE_SCHEMA
+        or inference.get("role") != "development"
+        or _mapping(inference, "protocol", "inference manifest").get("sha256")
+        != protocol.sha256
+        or _mapping(inference, "inventory", "inference manifest").get("stream_ids")
+        != [item.stream_id for item in inventory]
+    ):
+        raise OcidPipelineError("overlay source is not the complete development inference")
+    detector = _verified_stage_manifest(
+        run_root, inference, "detector", DETECTOR_SCHEMA
+    )
+    sam2 = _verified_stage_manifest(run_root, inference, "sam2", SAM2_SCHEMA)
+    analysis = _verified_stage_manifest(
+        run_root, inference, "analysis", ANALYSIS_SCHEMA
+    )
+    _verify_stage_contracts(
+        protocol,
+        "development",
+        inventory,
+        inference,
+        detector,
+        sam2,
+        analysis,
+    )
+    snapshots = _snapshots_from_persisted_masks(
+        protocol,
+        inventory,
+        run_root,
+        detector,
+        sam2,
+    )
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(
+        tempfile.mkdtemp(prefix=f".{destination.name}.", dir=destination.parent)
+    )
+    try:
+        streams: dict[str, Any] = {}
+        for item in inventory:
+            decoded = _load_stream(item, protocol.sha256)
+            streams[item.stream_id] = _render_candidate_overlays(
+                decoded,
+                snapshots[item.stream_id],
+                sam2["records_by_stream"][item.stream_id],
+                run_root,
+                output_root=staging,
+            )
+        bundle = {
+            "schema_version": DISPLAY_BUNDLE_SCHEMA,
+            "status": "completed_from_persisted_development_inference",
+            "source_run": run_root.relative_to(protocol.repository_root).as_posix(),
+            "source_inference_sha256": sha256_file(inference_path),
+            "renderer_sha256": sha256_file(Path(__file__).resolve(strict=True)),
+            "stream_count": len(inventory),
+            "frame_count": sum(item.frame_count for item in inventory),
+            "confidence_displayed": False,
+            "label_format": "Pnn_frame_local_ordinal_only",
+            "streams": streams,
+            "artifact_inventory": _artifact_inventory(staging),
+        }
+        write_json_exclusive(staging / "manifest.json", bundle)
+        if destination.exists():
+            raise OcidPipelineError("overlay output appeared during rendering")
+        os.rename(staging, destination)
+    except BaseException:
+        if staging.exists():
+            shutil.rmtree(staging)
+        raise
+    return bundle
+
+
 def _run_evaluation(
     *,
     protocol: OcidPipelineProtocol,
@@ -325,6 +457,10 @@ def _run_evaluation(
 ) -> dict[str, Any]:
     run_root = Path(run_directory).resolve(strict=True)
     inference_path = run_root / "inference_manifest.json"
+    attempt_path = run_root / "attempt.json"
+    attempt = _json_object(attempt_path, "OCID pipeline attempt")
+    if attempt.get("inference_manifest_sha256") != sha256_file(inference_path):
+        raise OcidPipelineError("inference manifest changed after inference completion")
     inference = _json_object(inference_path, "OCID pipeline inference manifest")
     if inference.get("schema_version") != INFERENCE_SCHEMA:
         raise OcidPipelineError("unsupported OCID pipeline inference manifest schema")
@@ -344,7 +480,7 @@ def _run_evaluation(
             expected_run_directory=run_root,
         )
     elif access_path is not None:
-        raise OcidPipelineError("sample evaluation does not accept an access file")
+        raise OcidPipelineError("non-heldout evaluation does not accept an access file")
     if _mapping(inference, "protocol", "inference manifest").get("sha256") != protocol.sha256:
         raise OcidPipelineError("inference manifest protocol digest mismatch")
     state = git_state(protocol.repository_root)
@@ -370,6 +506,13 @@ def _run_evaluation(
         "analysis_inputs",
         INPUT_RECEIPT_SCHEMA,
     )
+    implementation_receipt = _verified_stage_manifest(
+        run_root,
+        inference,
+        "implementation",
+        IMPLEMENTATION_RECEIPT_SCHEMA,
+    )
+    _verify_implementation_receipt(protocol, implementation_receipt)
     _verify_analysis_inputs_unchanged(
         protocol,
         inventory,
@@ -403,8 +546,6 @@ def _run_evaluation(
         snapshots,
         analysis_manifest,
     )
-    attempt_path = run_root / "attempt.json"
-    attempt = _json_object(attempt_path, "OCID pipeline attempt")
     if (
         attempt.get("schema_version") != ATTEMPT_SCHEMA
         or attempt.get("run_id") != run_id
@@ -474,9 +615,9 @@ def _run_evaluation(
                 "OCID supplies physical-instance proxies, not real-image visual-type ground truth.",
                 "Grouping and event artifacts are qualitative model outputs and are not visual-type accuracy metrics.",
                 "Physical removal, return after removal, and object motion are not supported by this benchmark.",
-                "Mask diagnostics are conditional on bbox-matched detections and do not replace candidate metrics.",
+                "Conditional mask diagnostics include only bbox-matched detections; use the adjacent end-to-end mask assignment for full detection-inclusive quality.",
                 "Continuity metrics are conditional on candidates assigned to physical-instance proxies.",
-                "No model, prompt, threshold, or post-processing choice was changed for this evaluation.",
+                "Evaluation reads persisted predictions and does not modify model, threshold, or post-processing configuration.",
             ],
             "completed_at_utc": _utc_now(),
         }
@@ -498,213 +639,171 @@ def _run_evaluation(
     return report
 
 
-def _run_detector_stage(
+def _run_runtime_pipeline(
     protocol: OcidPipelineProtocol,
     inventory: Sequence[OcidStream],
     role: str,
     run_directory: Path,
-) -> dict[str, Any]:
-    import torch
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Execute the shared runtime and persist the detailed analysis artifacts."""
 
-    if not torch.cuda.is_available():
-        raise OcidPipelineError("OCID pipeline protocol requires CUDA, but CUDA is unavailable")
-    os.environ["HF_HUB_OFFLINE"] = "1"
-    os.environ["TRANSFORMERS_OFFLINE"] = "1"
-    torch.backends.cudnn.benchmark = False
-    models = _mapping(protocol.payload, "models", "protocol")
-    model_spec = _mapping(models, "candidate_extractor", "models")
-    model_directory = _repo_path(protocol, _text(model_spec, "directory", "candidate extractor"), directory=True)
-    processor, model = grounding._load_model_processor(model_directory, torch_module=torch, device="cuda")
-    prompt, geometry = _detector_profiles(protocol)
-    streams: dict[str, Any] = {}
-    total_candidates = 0
+    profile = runtime_profile_from_sections(
+        profile_id="visual_stream_analyzer_v1",
+        models=_mapping(protocol.payload, "models", "protocol"),
+        pipeline=_mapping(protocol.payload, "pipeline", "protocol"),
+        paths_include_models_prefix=True,
+    )
+    assets = resolve_runtime_assets(
+        profile,
+        protocol.repository_root / "models",
+        verify=False,
+    )
+    decoded_streams = tuple(_load_stream(item, protocol.sha256) for item in inventory)
+    outcome = execute_pipeline(
+        decoded_streams,
+        profile=profile,
+        assets=assets,
+        workspace=RuntimeWorkspace(run_directory),
+        record_namespace="ocid-pipeline",
+        candidate_source="grounding_dino_sam2_ocid_pipeline_v1",
+    )
+    inventory_by_stream = {item.stream_id: item for item in inventory}
+
+    detector_streams: dict[str, Any] = {}
     total_raw = 0
+    total_candidates = 0
     total_rejected = 0
-    started = time.perf_counter()
-    try:
-        for item in inventory:
-            decoded = _load_stream(item, protocol.sha256)
-            raw, runtime = grounding._infer_stream(
-                decoded,
-                processor=processor,
-                model=model,
-                torch_module=torch,
-                device="cuda",
-                prompt=prompt.text,
-            )
-            _candidates, records = hardening.candidates_for_profile(
-                raw,
-                prompt=prompt,
-                geometry=geometry,
-                image_sizes={frame.frame_id: frame.image_size for frame in decoded.frames},
-            )
-            accepted = [dict(record) for record in records if record["geometry_rejected"] is False]
-            stream_payload = {
-                "schema_version": "ocid-pipeline-detector-stream-1.0",
-                "stream_id": item.stream_id,
-                "scene_group_id": item.scene_group_id,
-                "frame_count": len(decoded.frames),
-                "raw_predictions": [hardening._raw_payload(row) for row in raw],
-                "postprocess_records": [dict(record) for record in records],
-                "accepted_candidates": accepted,
-                "runtime": runtime,
-            }
-            path = run_directory / "detector" / f"{item.stream_id}.json"
-            write_json_exclusive(path, stream_payload)
-            streams[item.stream_id] = _file_reference(run_directory, path)
-            total_raw += len(raw)
-            total_candidates += len(accepted)
-            total_rejected += len(records) - len(accepted)
-    finally:
-        del model, processor
-        gc.collect()
-        torch.cuda.empty_cache()
-    manifest = {
+    total_supplemental = 0
+    for stream in outcome.streams:
+        detector = stream.detector
+        stream_id = detector.decoded.stream.stream_id
+        item = inventory_by_stream[stream_id]
+        payload = {
+            "schema_version": "ocid-pipeline-detector-stream-1.0",
+            "stream_id": stream_id,
+            "scene_group_id": item.scene_group_id,
+            "frame_count": len(detector.decoded.frames),
+            "raw_predictions": [hardening._raw_payload(row) for row in detector.raw_predictions],
+            "postprocess_records": [dict(row) for row in detector.postprocess_records],
+            "accepted_candidates": [dict(row) for row in detector.accepted_candidates],
+            "temporal_support": {
+                **dict(detector.temporal_support),
+                "ground_truth_used_for_selection": False,
+            },
+            "runtime": dict(detector.runtime),
+        }
+        path = run_directory / "detector" / f"{stream_id}.json"
+        write_json_exclusive(path, payload)
+        detector_streams[stream_id] = _file_reference(run_directory, path)
+        total_raw += len(detector.raw_predictions)
+        total_candidates += len(detector.accepted_candidates)
+        total_rejected += sum(
+            1 for row in detector.postprocess_records if row["geometry_rejected"] is True
+        )
+        total_supplemental += int(detector.temporal_support["supplemental_candidate_count"])
+    detector_model = _mapping(
+        _mapping(protocol.payload, "models", "protocol"),
+        "candidate_extractor",
+        "models",
+    )
+    detector_manifest = {
         "schema_version": DETECTOR_SCHEMA,
         "status": "detector_inference_completed_before_ground_truth",
         "role": role,
         "protocol_sha256": protocol.sha256,
         "configuration": protocol.payload["pipeline"]["candidate_extraction"],
         "model": {
-            "family": model_spec["family"],
-            "hf_revision": model_spec["hf_revision"],
-            "model_safetensors_sha256": model_spec["assets"]["model.safetensors"]["sha256"],
+            "family": detector_model["family"],
+            "hf_revision": detector_model["hf_revision"],
+            "model_safetensors_sha256": detector_model["assets"]["model.safetensors"]["sha256"],
             "device": "cuda",
             "dtype": "float32",
             "local_files_only": True,
         },
-        "streams": streams,
-        "stream_count": len(streams),
+        "streams": detector_streams,
+        "stream_count": len(detector_streams),
         "frame_count": sum(item.frame_count for item in inventory),
         "raw_prediction_count": total_raw,
         "candidate_count": total_candidates,
+        "base_candidate_count": total_candidates - total_supplemental,
+        "supplemental_candidate_count": total_supplemental,
         "geometry_rejected_count": total_rejected,
-        "elapsed_seconds": time.perf_counter() - started,
+        "elapsed_seconds": outcome.detector_elapsed_seconds,
         "ground_truth_opened": False,
     }
-    write_json_exclusive(run_directory / "detector_manifest.json", manifest)
-    return manifest
+    write_json_exclusive(run_directory / "detector_manifest.json", detector_manifest)
 
-
-def _run_sam2_stage(
-    protocol: OcidPipelineProtocol,
-    inventory: Sequence[OcidStream],
-    role: str,
-    run_directory: Path,
-    detector_manifest: Mapping[str, Any],
-) -> dict[str, Any]:
-    models = _mapping(protocol.payload, "models", "protocol")
-    model_spec = _mapping(models, "mask_refiner", "models")
-    model_directory = _repo_path(protocol, _text(model_spec, "directory", "mask refiner"), directory=True)
-    cleanup_payload = _mapping(
-        _mapping(_mapping(protocol.payload, "pipeline", "protocol"), "mask_refinement", "pipeline"),
-        "cleanup",
-        "mask refinement",
-    )
-    cleanup = MaskCleanupConfig(
-        min_component_pixels=int(cleanup_payload["min_component_pixels"]),
-        min_component_area_ratio=float(cleanup_payload["min_component_area_ratio"]),
-        connectivity=int(cleanup_payload["connectivity"]),  # type: ignore[arg-type]
-    )
-    refiner = load_local_sam2_bbox_refiner(model_directory, device="cuda")
     records_by_stream: dict[str, list[dict[str, Any]]] = {}
+    resolved_by_stream: dict[str, list[str]] = {}
+    resolution_by_stream: dict[str, Any] = {}
     valid_count = 0
-    fallback_count = 0
-    started = time.perf_counter()
-    try:
-        for item in inventory:
-            decoded = _load_stream(item, protocol.sha256)
-            detector = _load_referenced_json(run_directory, detector_manifest, item.stream_id)
-            rows = detector.get("accepted_candidates")
-            if not isinstance(rows, list):
-                raise OcidPipelineError(f"detector candidates missing for {item.stream_id}")
-            by_frame: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
-            for row in rows:
-                if not isinstance(row, Mapping):
-                    raise OcidPipelineError("malformed persisted detector candidate")
-                by_frame[_text(row, "frame_id", "detector candidate")].append(row)
-            stream_records: list[dict[str, Any]] = []
-            for frame in decoded.frames:
-                candidates = sorted(
-                    by_frame.get(frame.frame_id, ()),
-                    key=lambda row: str(row["candidate_id"]),
-                )
-                if not candidates:
-                    continue
-                boxes = tuple(_bbox(_mapping(row, "bbox", "detector candidate")) for row in candidates)
-                results = refiner.refine(_frame_array(frame), boxes, cleanup=cleanup)
-                if len(results) != len(candidates):
-                    raise OcidPipelineError("SAM2 result count differs from candidate count")
-                for index, (candidate, result) in enumerate(zip(candidates, results, strict=True)):
-                    if result.status != "valid" or result.raw_mask is None or result.cleaned_mask is None:
-                        fallback_count += 1
-                        raise OcidPipelineError(
-                            f"SAM2 mask fallback is forbidden: {candidate['candidate_id']} "
-                            f"({result.fallback_reason})"
-                        )
-                    safe_name = _safe_candidate_artifact_name(str(candidate["candidate_id"]), index)
-                    raw_path = run_directory / "masks" / item.stream_id / frame.frame_id / f"{safe_name}.raw.png"
-                    cleaned_path = (
-                        run_directory / "masks" / item.stream_id / frame.frame_id / f"{safe_name}.cleaned.png"
-                    )
-                    _save_binary_mask(raw_path, result.raw_mask)
-                    _save_binary_mask(cleaned_path, result.cleaned_mask)
-                    quality = result.quality
-                    assert quality is not None
-                    stream_records.append(
-                        {
-                            "stream_id": item.stream_id,
-                            "candidate_id": candidate["candidate_id"],
-                            "frame_id": candidate["frame_id"],
-                            "frame_index": candidate["frame_index"],
-                            "score": candidate["score"],
-                            "phrase": candidate["phrase"],
-                            "source_bbox": candidate["bbox"],
-                            "status": "valid",
-                            "fallback_reason": None,
-                            "mask_bbox": _bbox_payload(result.mask_bbox),
-                            "raw_mask": {
-                                "path": raw_path.relative_to(run_directory).as_posix(),
-                                "file_sha256": sha256_file(raw_path),
-                                "binary_mask_sha256": binary_mask_sha256(result.raw_mask),
-                            },
-                            "cleaned_mask": {
-                                "path": cleaned_path.relative_to(run_directory).as_posix(),
-                                "file_sha256": sha256_file(cleaned_path),
-                                "binary_mask_sha256": binary_mask_sha256(result.cleaned_mask),
-                            },
-                            "quality": {
-                                "selected_mask_index": quality.selected_mask_index,
-                                "predicted_iou": quality.predicted_iou,
-                                "object_score_logit": quality.object_score_logit,
-                                "raw_foreground_pixels": quality.raw_foreground_pixels,
-                                "cleaned_foreground_pixels": quality.cleaned_foreground_pixels,
-                                "removed_component_count": quality.removed_component_count,
-                                "removed_foreground_pixels": quality.removed_foreground_pixels,
-                            },
-                            "details": dict(result.details),
-                        }
-                    )
-                    valid_count += 1
-            records_by_stream[item.stream_id] = sorted(
-                stream_records,
-                key=lambda row: (int(row["frame_index"]), str(row["candidate_id"])),
+    resolved_count = 0
+    removed_count = 0
+    for stream in outcome.streams:
+        mask_outcome = stream.masks
+        stream_id = mask_outcome.decoded.stream.stream_id
+        rows: list[dict[str, Any]] = []
+        for record in mask_outcome.records:
+            result = record.result
+            assert (
+                result.raw_mask is not None
+                and result.cleaned_mask is not None
+                and result.mask_bbox is not None
+                and result.quality is not None
             )
-    finally:
-        del refiner
-        gc.collect()
-        try:
-            import torch
-
-            torch.cuda.empty_cache()
-        except (ImportError, RuntimeError):
-            pass
-    candidate_count = int(detector_manifest["candidate_count"])
-    if valid_count != candidate_count or fallback_count:
-        raise OcidPipelineError(
-            f"OCID pipeline requires one valid mask per candidate: {valid_count}/{candidate_count}"
-        )
-    manifest = {
+            raw_path = record.artifacts.raw_path
+            cleaned_path = record.artifacts.cleaned_path
+            quality = result.quality
+            rows.append(
+                {
+                    "stream_id": stream_id,
+                    "candidate_id": record.candidate_id,
+                    "frame_id": record.frame_id,
+                    "frame_index": record.frame_index,
+                    "score": record.score,
+                    "phrase": record.phrase,
+                    "source_bbox": _bbox_payload(record.source_bbox),
+                    "status": "valid",
+                    "fallback_reason": None,
+                    "mask_bbox": _bbox_payload(result.mask_bbox),
+                    "raw_mask": {
+                        "path": raw_path.relative_to(run_directory).as_posix(),
+                        "file_sha256": sha256_file(raw_path),
+                        "binary_mask_sha256": binary_mask_sha256(result.raw_mask),
+                    },
+                    "cleaned_mask": {
+                        "path": cleaned_path.relative_to(run_directory).as_posix(),
+                        "file_sha256": sha256_file(cleaned_path),
+                        "binary_mask_sha256": binary_mask_sha256(result.cleaned_mask),
+                    },
+                    "quality": {
+                        "selected_mask_index": quality.selected_mask_index,
+                        "predicted_iou": quality.predicted_iou,
+                        "object_score_logit": quality.object_score_logit,
+                        "raw_foreground_pixels": quality.raw_foreground_pixels,
+                        "cleaned_foreground_pixels": quality.cleaned_foreground_pixels,
+                        "removed_component_count": quality.removed_component_count,
+                        "removed_foreground_pixels": quality.removed_foreground_pixels,
+                    },
+                    "details": dict(result.details),
+                }
+            )
+        rows.sort(key=lambda row: (int(row["frame_index"]), str(row["candidate_id"])))
+        records_by_stream[stream_id] = rows
+        resolved_by_stream[stream_id] = list(mask_outcome.resolved_candidate_ids)
+        resolution_by_stream[stream_id] = {
+            **dict(mask_outcome.aggregate_resolution),
+            "ground_truth_used_for_selection": False,
+        }
+        valid_count += len(rows)
+        resolved_count += len(mask_outcome.resolved_candidate_ids)
+        removed_count += int(mask_outcome.aggregate_resolution["removed_candidate_count"])
+    sam2_model = _mapping(
+        _mapping(protocol.payload, "models", "protocol"),
+        "mask_refiner",
+        "models",
+    )
+    sam2_manifest = {
         "schema_version": SAM2_SCHEMA,
         "status": "rgb_inference_completed_before_ground_truth",
         "scope": role,
@@ -712,197 +811,102 @@ def _run_sam2_stage(
         "protocol_sha256": protocol.sha256,
         "configuration": protocol.payload["pipeline"]["mask_refinement"],
         "model": {
-            "family": model_spec["family"],
-            "model_safetensors_sha256": model_spec["assets"]["model.safetensors"]["sha256"],
+            "family": sam2_model["family"],
+            "model_safetensors_sha256": sam2_model["assets"]["model.safetensors"]["sha256"],
             "device": "cuda",
             "dtype": "float32",
             "local_files_only": True,
         },
         "records_by_stream": records_by_stream,
-        "candidate_count": candidate_count,
+        "resolved_candidate_ids_by_stream": resolved_by_stream,
+        "aggregate_resolution_by_stream": resolution_by_stream,
+        "candidate_count": total_candidates,
         "valid_mask_count": valid_count,
-        "fallback_count": fallback_count,
-        "elapsed_seconds": time.perf_counter() - started,
+        "resolved_candidate_count": resolved_count,
+        "removed_aggregate_count": removed_count,
+        "fallback_count": 0,
+        "elapsed_seconds": outcome.mask_elapsed_seconds,
         "ground_truth_opened": False,
     }
-    write_json_exclusive(run_directory / "sam2_manifest.json", manifest)
-    return manifest
+    write_json_exclusive(run_directory / "sam2_manifest.json", sam2_manifest)
 
-
-def _run_analysis_stage(
-    protocol: OcidPipelineProtocol,
-    inventory: Sequence[OcidStream],
-    role: str,
-    run_directory: Path,
-    detector_manifest: Mapping[str, Any],
-    sam2_manifest: Mapping[str, Any],
-) -> dict[str, Any]:
-    models = _mapping(protocol.payload, "models", "protocol")
-    model_spec = _mapping(models, "representation", "models")
-    checkpoint = _repo_path(
-        protocol,
-        _text(_mapping(model_spec, "checkpoint", "representation"), "path", "DINOv2 checkpoint"),
-        directory=False,
-    )
-    source = _repo_path(protocol, _text(model_spec, "source_directory", "representation"), directory=True)
-    pipeline = _mapping(protocol.payload, "pipeline", "protocol")
-    representation_payload = _mapping(pipeline, "representation", "pipeline")
-    provider = LocalDinoV2Provider(
-        source_dir=source,
-        checkpoint_path=checkpoint,
-        expected_checkpoint_sha256=_mapping(model_spec, "checkpoint", "representation")["sha256"],
-        expected_checkpoint_size_bytes=int(_mapping(model_spec, "checkpoint", "representation")["size_bytes"]),
-        expected_source_tree_fingerprint=model_spec["source_tree_fingerprint_sha256"],
-        model_name=model_spec["model_name"],
-        embedding_dimension=int(model_spec["embedding_dimension"]),
-        device_policy="cuda",
-        batch_size=int(representation_payload["batch_size"]),
-    )
-    representation_config = DinoV2RepresentationConfig(
-        expected_checkpoint_sha256=_mapping(model_spec, "checkpoint", "representation")["sha256"],
-        expected_checkpoint_size_bytes=int(_mapping(model_spec, "checkpoint", "representation")["size_bytes"]),
-        expected_source_tree_fingerprint=model_spec["source_tree_fingerprint_sha256"],
-        model_name=model_spec["model_name"],
-        embedding_dimension=int(model_spec["embedding_dimension"]),
-        variant=DINO_MASK_NEUTRAL_VARIANT,
-        input_size=int(representation_payload["input_size"]),
-        context_padding_ratio=float(representation_payload["context_padding_ratio"]),
-        device_policy="cuda",
-        batch_size=int(representation_payload["batch_size"]),
-    )
-    scoring, matching, grouping_config, events_config = _matching_configs(protocol)
-    scorer = DinoV2CosineScorer()
-    streams: dict[str, Any] = {}
+    analysis_streams: dict[str, Any] = {}
     total_embeddings = 0
-    embedding_failures = 0
-    started = time.perf_counter()
-    try:
-        snapshots = _snapshots_from_persisted_masks(
-            protocol,
-            inventory,
+    representation_model = _mapping(
+        _mapping(protocol.payload, "models", "protocol"),
+        "representation",
+        "models",
+    )
+    for stream in outcome.streams:
+        analysis = stream.analysis
+        decoded = analysis.decoded
+        stream_id = decoded.stream.stream_id
+        candidate_ids = [
+            candidate.candidate_id for candidate in analysis.snapshot.result.candidates
+        ]
+        embedding_path = analysis.embedding_artifact.path
+        embedding_reference = _file_reference(run_directory, embedding_path)
+        first_record = analysis.representation_batch.records[0] if candidate_ids else None
+        representation = {
+            "variant": DINO_MASK_NEUTRAL_VARIANT,
+            "semantic_config_digest": analysis.representation_batch.semantic_config_digest,
+            "requested_device": analysis.representation_batch.requested_device,
+            "resolved_device": analysis.representation_batch.resolved_device,
+            "provider": (
+                _portable_runtime_metadata(first_record.provider_metadata.details)
+                if first_record is not None
+                else {}
+            ),
+            "model": (
+                _portable_runtime_metadata(first_record.model_metadata.details)
+                if first_record is not None and first_record.model_metadata is not None
+                else {}
+            ),
+            "warning_count": len(analysis.representation_batch.warnings),
+            "error_count": len(analysis.representation_batch.errors),
+        }
+        stream_payload = {
+            "schema_version": "ocid-pipeline-stream-analysis-1.0",
+            "stream_id": stream_id,
+            "candidate_ids": candidate_ids,
+            "embedding_artifact": embedding_reference,
+            "embedding_shape": list(analysis.embeddings.shape),
+            "representation": representation,
+            "matching_results": to_json_compatible(analysis.matching_results),
+            "grouping": to_json_compatible(analysis.grouping),
+            "frame_comparisons": to_json_compatible(analysis.event_batch.comparisons),
+            "change_events": to_json_compatible(analysis.event_batch.events),
+            "event_warning_count": len(analysis.event_batch.warnings),
+            "event_error_count": len(analysis.event_batch.errors),
+        }
+        path = run_directory / "analysis" / stream_id / "analysis.json"
+        write_json_exclusive(path, stream_payload)
+        overlays = _render_mask_type_overlays(
+            decoded,
+            analysis.snapshot,
+            analysis.grouping,
+            records_by_stream[stream_id],
             run_directory,
-            detector_manifest,
-            sam2_manifest,
         )
-        for item in inventory:
-            decoded = _load_stream(item, protocol.sha256)
-            snapshot = snapshots[item.stream_id]
-            batch = build_dinov2_representations(decoded, snapshot, provider, representation_config)
-            embedding_failures += len(batch.errors)
-            if batch.errors or len(batch.records) != len(snapshot.result.candidates):
-                raise OcidPipelineError(
-                    f"DINOv2 representation coverage failed for {item.stream_id}: "
-                    f"records={len(batch.records)}, candidates={len(snapshot.result.candidates)}, "
-                    f"errors={len(batch.errors)}"
-                )
-            representation_by_id = {record.candidate_id: record for record in batch.records}
-            candidate_ids = [candidate.candidate_id for candidate in snapshot.result.candidates]
-            embeddings = np.stack(
-                [
-                    np.asarray(representation_by_id[candidate_id].payload.embedding, dtype=np.float32)
-                    for candidate_id in candidate_ids
-                ],
-                axis=0,
-            ) if candidate_ids else np.empty((0, int(model_spec["embedding_dimension"])), dtype=np.float32)
-            npz_path = run_directory / "analysis" / item.stream_id / "embeddings.npz"
-            _save_embeddings(npz_path, embeddings)
-            matching_results = []
-            candidates = snapshot.result.candidates
-            for left, right in zip(decoded.frames, decoded.frames[1:]):
-                frame_pair = FramePair(
-                    from_frame_id=left.frame_id,
-                    from_frame_index=left.record.index,
-                    from_frame_size=left.image_size,
-                    to_frame_id=right.frame_id,
-                    to_frame_index=right.record.index,
-                    to_frame_size=right.image_size,
-                )
-                batch_match = match_neighboring_frames(
-                    stream_id=item.stream_id,
-                    frame_pair=frame_pair,
-                    from_candidates=tuple(
-                        candidate for candidate in candidates if candidate.frame_id == left.frame_id
-                    ),
-                    to_candidates=tuple(candidate for candidate in candidates if candidate.frame_id == right.frame_id),
-                    representations=batch.records,
-                    representation_variant_id=representation_config.variant,
-                    scorer=scorer,
-                    scoring_config=scoring,
-                    matching_config=matching,
-                )
-                if batch_match.errors:
-                    raise OcidPipelineError(f"neighbor matching failed for {item.stream_id}")
-                matching_results.append(batch_match.result)
-            matching_tuple = tuple(matching_results)
-            grouping = group_recurring_visual_types(
-                stream_id=item.stream_id,
-                candidates=candidates,
-                representations=batch.records,
-                matching_results=matching_tuple,
-                representation_variant_id=representation_config.variant,
-                scorer=scorer,
-                config=grouping_config,
-            )
-            event_batch = build_change_events(
-                stream_id=item.stream_id,
-                candidates=candidates,
-                grouping=grouping,
-                matching_results=matching_tuple,
-                config=events_config,
-            )
-            stream_payload = {
-                "schema_version": "ocid-pipeline-stream-analysis-1.0",
-                "stream_id": item.stream_id,
-                "candidate_ids": candidate_ids,
-                "embedding_artifact": _file_reference(run_directory, npz_path),
-                "embedding_shape": list(embeddings.shape),
-                "representation": {
-                    "variant": representation_config.variant,
-                    "semantic_config_digest": batch.semantic_config_digest,
-                    "requested_device": batch.requested_device,
-                    "resolved_device": batch.resolved_device,
-                    "provider": dict(provider.provider_metadata()),
-                    "model": dict(provider.model_metadata()),
-                    "warning_count": len(batch.warnings),
-                    "error_count": len(batch.errors),
-                },
-                "matching_results": to_json_compatible(matching_tuple),
-                "grouping": to_json_compatible(grouping),
-                "frame_comparisons": to_json_compatible(event_batch.comparisons),
-                "change_events": to_json_compatible(event_batch.events),
-                "event_warning_count": len(event_batch.warnings),
-                "event_error_count": len(event_batch.errors),
-            }
-            path = run_directory / "analysis" / item.stream_id / "analysis.json"
-            write_json_exclusive(path, stream_payload)
-            overlays = _render_mask_type_overlays(
-                decoded,
-                snapshot,
-                grouping,
-                sam2_manifest["records_by_stream"][item.stream_id],
-                run_directory,
-            )
-            streams[item.stream_id] = {
-                "analysis": _file_reference(run_directory, path),
-                "embedding_artifact": _file_reference(run_directory, npz_path),
-                "overlay_manifest": overlays,
-                "candidate_count": len(candidate_ids),
-                "embedding_count": len(candidate_ids),
-                "matching_comparison_count": len(matching_tuple),
-                "group_count": len(grouping.recurring_types),
-                "event_count": len(event_batch.events),
-            }
-            total_embeddings += len(candidate_ids)
-    finally:
-        del provider
-        gc.collect()
-        try:
-            import torch
-
-            torch.cuda.empty_cache()
-        except (ImportError, RuntimeError):
-            pass
-    manifest = {
+        candidate_overlays = _render_candidate_overlays(
+            decoded,
+            analysis.snapshot,
+            records_by_stream[stream_id],
+            run_directory,
+        )
+        analysis_streams[stream_id] = {
+            "analysis": _file_reference(run_directory, path),
+            "embedding_artifact": embedding_reference,
+            "overlay_manifest": overlays,
+            "candidate_overlay_manifest": candidate_overlays,
+            "candidate_count": len(candidate_ids),
+            "embedding_count": len(candidate_ids),
+            "matching_comparison_count": len(analysis.matching_results),
+            "group_count": len(analysis.grouping.recurring_types),
+            "event_count": len(analysis.event_batch.events),
+        }
+        total_embeddings += len(candidate_ids)
+    analysis_manifest = {
         "schema_version": ANALYSIS_SCHEMA,
         "status": "annotation_free_analysis_completed_before_ground_truth",
         "role": role,
@@ -915,22 +919,134 @@ def _run_analysis_stage(
             "events": protocol.payload["pipeline"]["events"],
         },
         "model": {
-            "model_name": model_spec["model_name"],
-            "checkpoint_sha256": model_spec["checkpoint"]["sha256"],
-            "source_tree_fingerprint_sha256": model_spec["source_tree_fingerprint_sha256"],
-            "embedding_dimension": model_spec["embedding_dimension"],
+            "model_name": representation_model["model_name"],
+            "checkpoint_sha256": representation_model["checkpoint"]["sha256"],
+            "source_tree_fingerprint_sha256": representation_model[
+                "source_tree_fingerprint_sha256"
+            ],
+            "embedding_dimension": representation_model["embedding_dimension"],
         },
-        "streams": streams,
-        "candidate_count": int(detector_manifest["candidate_count"]),
+        "streams": analysis_streams,
+        "input_candidate_count": total_candidates,
+        "candidate_count": resolved_count,
         "embedding_count": total_embeddings,
-        "embedding_failure_count": embedding_failures,
-        "elapsed_seconds": time.perf_counter() - started,
+        "embedding_failure_count": 0,
+        "elapsed_seconds": outcome.analysis_elapsed_seconds,
         "ground_truth_opened": False,
     }
-    if total_embeddings != int(detector_manifest["candidate_count"]):
-        raise OcidPipelineError("OCID pipeline embedding coverage differs from detector coverage")
-    write_json_exclusive(run_directory / "analysis_manifest.json", manifest)
-    return manifest
+    if total_embeddings != resolved_count:
+        raise OcidPipelineError("runtime embedding coverage differs from resolved coverage")
+    write_json_exclusive(run_directory / "analysis_manifest.json", analysis_manifest)
+    return detector_manifest, sam2_manifest, analysis_manifest
+
+
+def _portable_runtime_metadata(details: Mapping[str, Any]) -> dict[str, Any]:
+    """Remove machine-local paths and hardware names from persisted metadata."""
+
+    private_keys = {"checkpoint_path", "gpu_name", "source_dir"}
+    return {str(key): value for key, value in details.items() if key not in private_keys}
+
+
+def _temporal_detector_records(
+    *,
+    raw: Sequence[Any],
+    decoded: Any,
+    prompt: hardening.PromptProfile,
+    geometry: hardening.GeometryProfile,
+    baseline_accepted: Sequence[Mapping[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Adapt shared temporal-support results to the detailed artifact schema."""
+
+    accepted, audit = runtime_temporal_detector_records(
+        raw=raw,
+        decoded=decoded,
+        prompt=prompt,
+        geometry=geometry,
+        baseline_accepted=baseline_accepted,
+    )
+    return [dict(row) for row in accepted], {
+        **dict(audit),
+        "ground_truth_used_for_selection": False,
+    }
+
+
+def _resolve_stream_aggregate_masks(
+    *,
+    run_directory: Path,
+    stream_id: str,
+    records: Sequence[Mapping[str, Any]],
+) -> tuple[tuple[str, ...], dict[str, Any]]:
+    """Resolve global aggregate masks per frame and persist full evidence."""
+
+    by_frame: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
+    for row in records:
+        by_frame[_text(row, "frame_id", "SAM2 record")].append(row)
+    kept_ids: list[str] = []
+    frame_rows: list[dict[str, Any]] = []
+    for frame_id in sorted(by_frame):
+        rows = sorted(by_frame[frame_id], key=lambda row: str(row["candidate_id"]))
+        positioned: list[PositionedCandidateMask] = []
+        for row in rows:
+            candidate_id = _text(row, "candidate_id", "SAM2 record")
+            cleaned = _mapping(row, "cleaned_mask", "SAM2 record")
+            full_mask = _load_binary_mask(
+                _run_artifact_path(
+                    run_directory,
+                    _text(cleaned, "path", "cleaned mask"),
+                )
+            )
+            positioned.append(
+                PositionedCandidateMask(
+                    candidate_id=candidate_id,
+                    frame_id=frame_id,
+                    mask=np.ascontiguousarray(full_mask, dtype=np.bool_),
+                )
+            )
+        resolution = resolve_aggregate_masks(positioned)
+        frame_kept = resolution.kept_candidate_ids
+        kept_ids.extend(frame_kept)
+        frame_rows.append(
+            {
+                "frame_id": frame_id,
+                "input_candidate_count": len(rows),
+                "kept_candidate_ids": list(frame_kept),
+                "removed_candidate_ids": list(resolution.removed_candidate_ids),
+                "decisions": [
+                    {
+                        "candidate_id": decision.candidate_id,
+                        "reason": decision.reason.value,
+                        "mask_area_pixels": decision.mask_area_pixels,
+                        "covered_masks": [
+                            {
+                                "candidate_id": evidence.candidate_id,
+                                "intersection_pixels": evidence.intersection_pixels,
+                                "candidate_mask_area_pixels": (
+                                    evidence.candidate_mask_area_pixels
+                                ),
+                                "containment": evidence.containment,
+                            }
+                            for evidence in decision.covered_masks
+                        ],
+                    }
+                    for decision in resolution.decisions
+                ],
+            }
+        )
+    all_ids = {str(row["candidate_id"]) for row in records}
+    if len(kept_ids) != len(set(kept_ids)) or not set(kept_ids) <= all_ids:
+        raise OcidPipelineError("aggregate resolution produced an invalid candidate set")
+    removed_count = len(all_ids) - len(kept_ids)
+    return tuple(kept_ids), {
+        "enabled": True,
+        "policy_id": "aggregate_mask_containment_v1",
+        "mask_containment_at_least": DEFAULT_MASK_CONTAINMENT,
+        "minimum_covered_masks": DEFAULT_MINIMUM_COVERED_MASKS,
+        "ground_truth_used_for_selection": False,
+        "input_candidate_count": len(records),
+        "resolved_candidate_count": len(kept_ids),
+        "removed_candidate_count": removed_count,
+        "frames": frame_rows,
+    }
 
 
 def _snapshots_from_persisted_masks(
@@ -943,13 +1059,25 @@ def _snapshots_from_persisted_masks(
     records_by_stream = sam2_manifest.get("records_by_stream")
     if not isinstance(records_by_stream, Mapping):
         raise OcidPipelineError("SAM2 manifest lacks records_by_stream")
+    resolved_by_stream = sam2_manifest.get("resolved_candidate_ids_by_stream")
+    if not isinstance(resolved_by_stream, Mapping):
+        raise OcidPipelineError("SAM2 manifest lacks resolved candidate membership")
+    resolution_by_stream = sam2_manifest.get("aggregate_resolution_by_stream")
+    if not isinstance(resolution_by_stream, Mapping):
+        raise OcidPipelineError("SAM2 manifest lacks aggregate resolution evidence")
     result: dict[str, CandidateExtractionSnapshot] = {}
     for item in inventory:
         decoded = _load_stream(item, protocol.sha256)
         detector = _load_referenced_json(run_directory, detector_manifest, item.stream_id)
         accepted = detector.get("accepted_candidates")
         mask_rows = records_by_stream.get(item.stream_id)
-        if not isinstance(accepted, list) or not isinstance(mask_rows, list):
+        resolved_ids = resolved_by_stream.get(item.stream_id)
+        if (
+            not isinstance(accepted, list)
+            or not isinstance(mask_rows, list)
+            or not isinstance(resolved_ids, list)
+            or not all(isinstance(value, str) for value in resolved_ids)
+        ):
             raise OcidPipelineError(f"persisted candidates or masks missing for {item.stream_id}")
         masks_by_id = {
             str(row["candidate_id"]): row
@@ -958,6 +1086,27 @@ def _snapshots_from_persisted_masks(
         }
         if len(masks_by_id) != len(mask_rows):
             raise OcidPipelineError(f"duplicate or malformed mask rows for {item.stream_id}")
+        accepted_by_id = {
+            str(row["candidate_id"]): row
+            for row in accepted
+            if isinstance(row, Mapping) and isinstance(row.get("candidate_id"), str)
+        }
+        if (
+            len(accepted_by_id) != len(accepted)
+            or len(resolved_ids) != len(set(resolved_ids))
+            or not set(resolved_ids) <= set(accepted_by_id)
+            or set(accepted_by_id) != set(masks_by_id)
+        ):
+            raise OcidPipelineError(
+                f"resolved candidate membership is inconsistent for {item.stream_id}"
+            )
+        _verify_aggregate_resolution_membership(
+            stream_id=item.stream_id,
+            accepted_ids=set(accepted_by_id),
+            resolved_ids=tuple(resolved_ids),
+            payload=resolution_by_stream.get(item.stream_id),
+        )
+        accepted = [accepted_by_id[candidate_id] for candidate_id in resolved_ids]
         frame_lookup = {frame.frame_id: frame for frame in decoded.frames}
         producer = _producer("ocid_pipeline_candidate_extraction", protocol.sha256)
         candidates: list[CandidateRecord] = []
@@ -1067,6 +1216,52 @@ def _snapshots_from_persisted_masks(
     return result
 
 
+def _verify_aggregate_resolution_membership(
+    *,
+    stream_id: str,
+    accepted_ids: set[str],
+    resolved_ids: Sequence[str],
+    payload: Any,
+) -> None:
+    if not isinstance(payload, Mapping):
+        raise OcidPipelineError(f"aggregate resolution is missing for {stream_id}")
+    frames = payload.get("frames")
+    if not isinstance(frames, list):
+        raise OcidPipelineError(f"aggregate resolution frames are malformed for {stream_id}")
+    input_ids: list[str] = []
+    kept_ids: list[str] = []
+    removed_ids: list[str] = []
+    for frame in frames:
+        if not isinstance(frame, Mapping):
+            raise OcidPipelineError("aggregate resolution frame must be an object")
+        frame_kept = frame.get("kept_candidate_ids")
+        frame_removed = frame.get("removed_candidate_ids")
+        if (
+            not isinstance(frame_kept, list)
+            or not isinstance(frame_removed, list)
+            or not all(isinstance(value, str) for value in (*frame_kept, *frame_removed))
+            or set(frame_kept) & set(frame_removed)
+            or int(frame.get("input_candidate_count", -1))
+            != len(frame_kept) + len(frame_removed)
+        ):
+            raise OcidPipelineError("aggregate resolution frame partition is invalid")
+        input_ids.extend((*frame_kept, *frame_removed))
+        kept_ids.extend(frame_kept)
+        removed_ids.extend(frame_removed)
+    if (
+        len(input_ids) != len(set(input_ids))
+        or set(input_ids) != accepted_ids
+        or set(kept_ids) != set(resolved_ids)
+        or len(kept_ids) != len(resolved_ids)
+        or int(payload.get("input_candidate_count", -1)) != len(accepted_ids)
+        or int(payload.get("resolved_candidate_count", -1)) != len(resolved_ids)
+        or int(payload.get("removed_candidate_count", -1)) != len(removed_ids)
+    ):
+        raise OcidPipelineError(
+            f"aggregate resolution does not exactly partition candidates for {stream_id}"
+        )
+
+
 def _verify_stage_contracts(
     protocol: OcidPipelineProtocol,
     expected_role: str,
@@ -1105,23 +1300,83 @@ def _verify_stage_contracts(
         raise OcidPipelineError("stage stream inventory differs from the configured inference inventory")
     coverage = _mapping(inference, "coverage", "inference manifest")
     candidate_count = coverage.get("candidate_count")
+    detector_candidate_count = coverage.get("detector_candidate_count")
+    removed_aggregate_count = coverage.get("removed_aggregate_count")
     if (
         isinstance(candidate_count, bool)
         or not isinstance(candidate_count, int)
         or candidate_count < 0
-        or detector.get("candidate_count") != candidate_count
-        or sam2.get("candidate_count") != candidate_count
-        or sam2.get("valid_mask_count") != candidate_count
+        or isinstance(detector_candidate_count, bool)
+        or not isinstance(detector_candidate_count, int)
+        or detector_candidate_count < candidate_count
+        or isinstance(removed_aggregate_count, bool)
+        or not isinstance(removed_aggregate_count, int)
+        or removed_aggregate_count != detector_candidate_count - candidate_count
+        or detector.get("candidate_count") != detector_candidate_count
+        or sam2.get("candidate_count") != detector_candidate_count
+        or sam2.get("valid_mask_count") != detector_candidate_count
+        or sam2.get("resolved_candidate_count") != candidate_count
+        or sam2.get("removed_aggregate_count") != removed_aggregate_count
         or sam2.get("fallback_count") != 0
         or analysis.get("candidate_count") != candidate_count
+        or analysis.get("input_candidate_count") != detector_candidate_count
         or analysis.get("embedding_count") != candidate_count
         or analysis.get("embedding_failure_count") != 0
-        or coverage.get("valid_mask_count") != candidate_count
+        or coverage.get("valid_mask_count") != detector_candidate_count
+        or coverage.get("resolved_mask_count") != candidate_count
         or coverage.get("embedding_count") != candidate_count
         or coverage.get("mask_fallback_count") != 0
         or coverage.get("embedding_failure_count") != 0
     ):
         raise OcidPipelineError("stage coverage differs from the strict OCID pipeline contract")
+
+
+def _implementation_receipt(protocol: OcidPipelineProtocol) -> dict[str, Any]:
+    """Record executable Python sources for later integrity validation."""
+
+    package_root = protocol.repository_root / "src" / "stream_analysis"
+    tool_names = (
+        "run_ocid_pipeline.py",
+        "ocid_pipeline_contract.py",
+        "evaluate_ocid_grounding_dino_extractor.py",
+        "evaluate_ocid_grounding_dino_hardening.py",
+        "evaluate_ocid_grounded_sam2_masks.py",
+        "ocid_grounded_sam2_refinement.py",
+        "evaluate_ocid_masked_dinov2.py",
+        "evaluate_ocid_oracle_dinov2.py",
+    )
+    paths = list(package_root.rglob("*.py")) + [
+        protocol.repository_root / "tools" / name for name in tool_names
+    ]
+    state = git_state(protocol.repository_root)
+    files = []
+    for path in sorted(set(paths), key=lambda row: row.relative_to(protocol.repository_root).as_posix()):
+        full = path.resolve(strict=True)
+        files.append(
+            {
+                "path": full.relative_to(protocol.repository_root).as_posix(),
+                "size_bytes": full.stat().st_size,
+                "sha256": sha256_file(full),
+            }
+        )
+    return {
+        "schema_version": IMPLEMENTATION_RECEIPT_SCHEMA,
+        "git_commit": state.commit,
+        "git_branch": state.branch,
+        "git_worktree_clean": state.worktree_clean,
+        "file_count": len(files),
+        "files": files,
+        "ground_truth_opened": False,
+    }
+
+
+def _verify_implementation_receipt(
+    protocol: OcidPipelineProtocol,
+    persisted: Mapping[str, Any],
+) -> None:
+    current = _implementation_receipt(protocol)
+    if dict(persisted) != current:
+        raise OcidPipelineError("executable implementation changed after inference")
 
 
 def _verify_analysis_inputs_unchanged(
@@ -1260,20 +1515,327 @@ def _evaluate_mask_diagnostics(
         item.stream_id: snapshots[item.stream_id].result.candidates
         for item in inventory
     }
+    records = sam2_manifest.get("records_by_stream")
+    if not isinstance(records, Mapping):
+        raise OcidPipelineError("SAM2 manifest lacks records for mask evaluation")
+    final_records: dict[str, list[Mapping[str, Any]]] = {}
+    for item in inventory:
+        rows = records.get(item.stream_id)
+        if not isinstance(rows, list):
+            raise OcidPipelineError(f"SAM2 records missing for {item.stream_id}")
+        final_ids = {candidate.candidate_id for candidate in selected[item.stream_id]}
+        filtered = [
+            row
+            for row in rows
+            if isinstance(row, Mapping) and row.get("candidate_id") in final_ids
+        ]
+        if len(filtered) != len(final_ids):
+            raise OcidPipelineError(f"final SAM2 membership differs for {item.stream_id}")
+        final_records[item.stream_id] = filtered
+    evaluation_manifest = dict(sam2_manifest)
+    final_count = sum(len(rows) for rows in final_records.values())
+    evaluation_manifest["records_by_stream"] = final_records
+    evaluation_manifest["candidate_count"] = final_count
+    evaluation_manifest["valid_mask_count"] = final_count
     ocid_root = protocol.repository_root / "data" / "ocid" / "raw" / "OCID-dataset"
     summary, rows, _reviewed_masks = evaluate_masks(
         inventory=inventory,  # type: ignore[arg-type]
         selected=selected,  # type: ignore[arg-type]
-        inference_manifest=sam2_manifest,
+        inference_manifest=evaluation_manifest,
         reviewed_root=protocol.reviewed_root,
         ocid_root=ocid_root,
         artifact_root=run_directory,
     )
     return {
-        "summary": summary,
-        "matched_observation_count": len(rows),
-        "rows": rows,
-        "conditional_on_bbox_match": True,
+        "conditional_bbox_matched": {
+            "summary": summary,
+            "matched_observation_count": len(rows),
+            "rows": rows,
+            "conditional_on_bbox_match": True,
+        },
+        "end_to_end_assignment": _evaluate_end_to_end_masks(
+            protocol=protocol,
+            inventory=inventory,
+            run_directory=run_directory,
+            snapshots=snapshots,
+            records_by_stream=final_records,
+            ocid_root=ocid_root,
+        ),
+    }
+
+
+def _evaluate_end_to_end_masks(
+    *,
+    protocol: OcidPipelineProtocol,
+    inventory: Sequence[OcidStream],
+    run_directory: Path,
+    snapshots: Mapping[str, CandidateExtractionSnapshot],
+    records_by_stream: Mapping[str, Sequence[Mapping[str, Any]]],
+    ocid_root: Path,
+) -> dict[str, Any]:
+    """Score every final prediction and every reference by full mask IoU."""
+
+    benchmark_path = protocol.reviewed_root / "benchmark_manifest.json"
+    benchmark = _json_object(benchmark_path, "reviewed benchmark manifest")
+    if _mapping(benchmark, "heldout_lock", "reviewed benchmark").get(
+        "predictions_unlocked"
+    ) is not False:
+        raise OcidPipelineError("held-out benchmark lock must remain closed")
+    stream_metadata = {
+        str(row["stream_id"]): row
+        for row in benchmark.get("streams", [])
+        if isinstance(row, Mapping) and isinstance(row.get("stream_id"), str)
+    }
+    component_review = _mapping(benchmark, "component_review", "reviewed benchmark")
+    decisions_path = protocol.reviewed_root / _text(
+        component_review,
+        "decisions_artifact",
+        "component review",
+    )
+    if sha256_file(decisions_path) != component_review.get("decisions_sha256"):
+        raise OcidPipelineError("component-review decision digest mismatch")
+    decisions_payload = _json_object(decisions_path, "component review decisions")
+    decisions = {
+        str(row["case_id"]): row
+        for row in decisions_payload.get("decisions", [])
+        if isinstance(row, Mapping) and isinstance(row.get("case_id"), str)
+    }
+    thresholds = (0.50, 0.75)
+    totals = {
+        threshold: {"tp": 0, "fp": 0, "fn": 0, "matched_ious": [], "frames": []}
+        for threshold in thresholds
+    }
+    per_stream: dict[float, dict[str, Any]] = {
+        threshold: {} for threshold in thresholds
+    }
+    expected_frame_count = sum(item.frame_count for item in inventory)
+    for item in inventory:
+        annotation = load_annotation(
+            item.annotation_path,
+            manifest_path=item.stream_directory / "manifest.json",
+        )
+        raw_instances = {
+            str(row["instance_id"]): row
+            for row in annotation.raw["expected_element_instances"]
+        }
+        manifest = _json_object(item.stream_directory / "manifest.json", "analysis manifest")
+        source_filenames = {
+            str(row["frame_id"]): str(row["metadata"]["ocid_source_filename"])
+            for row in manifest["frames"]
+        }
+        metadata = stream_metadata.get(item.stream_id)
+        if not isinstance(metadata, Mapping):
+            raise OcidPipelineError(f"reviewed stream metadata missing: {item.stream_id}")
+        source_sequence = _text(metadata, "source_sequence", "reviewed stream")
+        candidates_by_frame: dict[str, list[CandidateRecord]] = defaultdict(list)
+        for candidate in snapshots[item.stream_id].result.candidates:
+            candidates_by_frame[candidate.frame_id].append(candidate)
+        mask_rows = {
+            str(row["candidate_id"]): row for row in records_by_stream[item.stream_id]
+        }
+        stream_counts = {
+            threshold: {"tp": 0, "fp": 0, "fn": 0, "frame_count": 0}
+            for threshold in thresholds
+        }
+        for frame_id in annotation.frame_ids:
+            predictions = tuple(
+                sorted(
+                    candidates_by_frame.get(frame_id, ()),
+                    key=lambda row: row.candidate_id.encode("utf-8"),
+                )
+            )
+            references = tuple(
+                sorted(
+                    annotation.instances_by_frame.get(frame_id, ()),
+                    key=lambda row: row.instance_id.encode("utf-8"),
+                )
+            )
+            predicted_masks = tuple(
+                _load_binary_mask(
+                    _run_artifact_path(
+                        run_directory,
+                        _text(
+                            _mapping(mask_rows[candidate.candidate_id], "cleaned_mask", "mask row"),
+                            "path",
+                            "cleaned mask",
+                        ),
+                    )
+                )
+                for candidate in predictions
+            )
+            expected_masks: list[np.ndarray] = []
+            for reference in references:
+                expected, _provenance = _reviewed_mask(
+                    stream_id=item.stream_id,
+                    frame_id=frame_id,
+                    instance_payload=raw_instances[reference.instance_id],
+                    source_sequence=source_sequence,
+                    source_filename=source_filenames[frame_id],
+                    ocid_root=ocid_root,
+                    decisions=decisions,
+                )
+                expected_bbox = mask_bbox_from_full_frame(expected)
+                if expected_bbox is None or not _same_bbox(expected_bbox, reference.bbox):
+                    raise OcidPipelineError(
+                        f"reviewed mask bbox differs from annotation: {reference.instance_id}"
+                    )
+                expected_masks.append(expected)
+            matrix = _mask_iou_matrix(predicted_masks, tuple(expected_masks))
+            for threshold in thresholds:
+                assignments = _maximum_cardinality_mask_assignment(matrix, threshold)
+                matched_predictions = {row[0] for row in assignments}
+                matched_references = {row[1] for row in assignments}
+                tp = len(assignments)
+                fp = len(predictions) - tp
+                fn = len(references) - tp
+                totals[threshold]["tp"] += tp
+                totals[threshold]["fp"] += fp
+                totals[threshold]["fn"] += fn
+                totals[threshold]["matched_ious"].extend(row[2] for row in assignments)
+                stream_counts[threshold]["tp"] += tp
+                stream_counts[threshold]["fp"] += fp
+                stream_counts[threshold]["fn"] += fn
+                stream_counts[threshold]["frame_count"] += 1
+                totals[threshold]["frames"].append(
+                    {
+                        "stream_id": item.stream_id,
+                        "scene_group_id": item.scene_group_id,
+                        "frame_id": frame_id,
+                        "prediction_count": len(predictions),
+                        "reference_count": len(references),
+                        "tp": tp,
+                        "fp": fp,
+                        "fn": fn,
+                        "assignments": [
+                            {
+                                "candidate_id": predictions[left].candidate_id,
+                                "instance_id": references[right].instance_id,
+                                "mask_iou": iou,
+                            }
+                            for left, right, iou in assignments
+                        ],
+                        "false_positive_candidate_ids": [
+                            row.candidate_id
+                            for index, row in enumerate(predictions)
+                            if index not in matched_predictions
+                        ],
+                        "missed_instance_ids": [
+                            row.instance_id
+                            for index, row in enumerate(references)
+                            if index not in matched_references
+                        ],
+                    }
+                )
+        for threshold in thresholds:
+            per_stream[threshold][item.stream_id] = _detection_count_metrics(
+                stream_counts[threshold]
+            ) | {"frame_count": stream_counts[threshold]["frame_count"]}
+    output: dict[str, Any] = {}
+    for threshold in thresholds:
+        if len(totals[threshold]["frames"]) != expected_frame_count:
+            raise OcidPipelineError("end-to-end mask evaluation missed inventory frames")
+        output[f"{threshold:.2f}"] = {
+            "mask_iou_at_least": threshold,
+            "assignment_policy": "maximum_cardinality_then_maximum_summed_mask_iou",
+            "frame_count": expected_frame_count,
+            "micro": _detection_count_metrics(totals[threshold])
+            | {
+                "matched_mask_iou": _numeric_distribution(
+                    totals[threshold]["matched_ious"]
+                )
+            },
+            "per_stream": per_stream[threshold],
+            "per_frame": totals[threshold]["frames"],
+        }
+    return {
+        "status": "computed",
+        "reference_semantics": "ocid_derived_component_reviewed",
+        "prediction_universe": "all_final_candidates_including_false_positives",
+        "reference_universe": "all_reference_instances_in_evaluated_frames",
+        "metrics_by_mask_iou": output,
+    }
+
+
+def _mask_iou_matrix(
+    predicted_masks: Sequence[np.ndarray],
+    expected_masks: Sequence[np.ndarray],
+) -> np.ndarray:
+    matrix = np.zeros((len(predicted_masks), len(expected_masks)), dtype=np.float64)
+    if not predicted_masks or not expected_masks:
+        return matrix
+    shapes = {np.asarray(mask).shape for mask in (*predicted_masks, *expected_masks)}
+    if len(shapes) != 1:
+        raise OcidPipelineError("prediction and reference mask shapes differ")
+    left = np.stack(predicted_masks).reshape(len(predicted_masks), -1)
+    right = np.stack(expected_masks).reshape(len(expected_masks), -1)
+    intersections = left.astype(np.float32) @ right.astype(np.float32).T
+    left_areas = np.count_nonzero(left, axis=1)[:, None]
+    right_areas = np.count_nonzero(right, axis=1)[None, :]
+    unions = left_areas + right_areas - intersections
+    np.divide(intersections, unions, out=matrix, where=unions > 0)
+    return matrix
+
+
+def _maximum_cardinality_mask_assignment(
+    matrix: np.ndarray,
+    threshold: float,
+) -> tuple[tuple[int, int, float], ...]:
+    values = np.asarray(matrix, dtype=np.float64)
+    if values.ndim != 2 or (values.size and not np.all(np.isfinite(values))):
+        raise OcidPipelineError("mask IoU matrix is malformed")
+    prediction_count, reference_count = values.shape
+    if prediction_count == 0 or reference_count == 0:
+        return ()
+    valid = values >= threshold
+    bonus = float(min(prediction_count, reference_count) + 1)
+    rewards = np.zeros(
+        (prediction_count + reference_count, prediction_count + reference_count),
+        dtype=np.float64,
+    )
+    rewards[:prediction_count, :reference_count] = np.where(
+        valid,
+        bonus + values,
+        0.0,
+    )
+    rows, columns = linear_sum_assignment(-rewards)
+    return tuple(
+        sorted(
+            (
+                (row, column, float(values[row, column]))
+                for row, column in zip(rows.tolist(), columns.tolist())
+                if row < prediction_count
+                and column < reference_count
+                and valid[row, column]
+            ),
+            key=lambda row: (row[0], row[1]),
+        )
+    )
+
+
+def _detection_count_metrics(values: Mapping[str, Any]) -> dict[str, Any]:
+    tp = int(values["tp"])
+    fp = int(values["fp"])
+    fn = int(values["fn"])
+    return {
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "precision": None if tp + fp == 0 else tp / (tp + fp),
+        "recall": None if tp + fn == 0 else tp / (tp + fn),
+        "f1": None if 2 * tp + fp + fn == 0 else 2 * tp / (2 * tp + fp + fn),
+    }
+
+
+def _numeric_distribution(values: Sequence[float]) -> dict[str, Any]:
+    array = np.asarray(tuple(values), dtype=np.float64)
+    if not len(array):
+        return {"count": 0, "min": None, "median": None, "mean": None, "max": None}
+    return {
+        "count": len(array),
+        "min": float(np.min(array)),
+        "median": float(np.median(array)),
+        "mean": float(np.mean(array)),
+        "max": float(np.max(array)),
     }
 
 
@@ -1478,84 +2040,33 @@ def _candidate_evaluation_payload(value: Mapping[str, Any]) -> dict[str, Any]:
 def _matching_configs(
     protocol: OcidPipelineProtocol,
 ) -> tuple[PairScoringConfig, MatchingConfig, GroupingConfig, EventConfig]:
-    pipeline = _mapping(protocol.payload, "pipeline", "protocol")
-    score = _mapping(pipeline, "scoring", "pipeline")
-    match = _mapping(pipeline, "matching", "pipeline")
-    group = _mapping(pipeline, "grouping", "pipeline")
-    event = _mapping(pipeline, "events", "pipeline")
-    scoring = PairScoringConfig(
-        scorer_id=score["scorer_id"],
-        scorer_version=score["scorer_version"],
-        visual_gate=float(score["visual_gate"]),
-        spatial_gate=score["spatial_gate"],
+    profile = runtime_profile_from_sections(
+        profile_id="visual_stream_analyzer_v1",
+        models=_mapping(protocol.payload, "models", "protocol"),
+        pipeline=_mapping(protocol.payload, "pipeline", "protocol"),
+        paths_include_models_prefix=True,
     )
-    matching = MatchingConfig(
-        unmatched_pair_cost=float(match["unmatched_pair_cost"]),
-        local_margin_gate=float(match["local_margin_gate"]),
-        global_margin_gate=float(match["global_margin_gate"]),
-        severe_quality_flags=tuple(match["severe_quality_flags"]),
-        assignment_policy_id=match["assignment_policy_id"],
-        assignment_policy_version=match["assignment_policy_version"],
-    )
-    grouping = GroupingConfig(
-        medoid_gate=float(group["medoid_gate"]),
-        support_quantile=float(group["support_quantile"]),
-        quantile_gate=float(group["quantile_gate"]),
-        support_pair_gate=float(group["support_pair_gate"]),
-        support_ratio_gate=float(group["support_ratio_gate"]),
-        visual_gate=float(group["visual_gate"]),
-        medoid_weight=float(group["medoid_weight"]),
-        quantile_weight=float(group["quantile_weight"]),
-        support_ratio_weight=float(group["support_ratio_weight"]),
-        second_best_margin=float(group["second_best_margin"]),
-        representation_variant_id=DINO_MASK_NEUTRAL_VARIANT,
-        scorer_id=score["scorer_id"],
-        scorer_version=score["scorer_version"],
-        expose_unmerged_alternatives=bool(group["expose_unmerged_alternatives"]),
-        use_uncertain_temporal_seeds=bool(group["use_uncertain_temporal_seeds"]),
-        uncertain_seed_visual_gate=float(group["uncertain_seed_visual_gate"]),
-        uncertain_seed_spatial_gate=float(group["uncertain_seed_spatial_gate"]),
-        coframe_aspect_log_gate=float(group["coframe_aspect_log_gate"]),
-        coframe_area_log_gate=float(group["coframe_area_log_gate"]),
-        coframe_fill_ratio_gate=float(group["coframe_fill_ratio_gate"]),
-        coframe_hole_count_gate=int(group["coframe_hole_count_gate"]),
-        coframe_visual_gate=float(group["coframe_visual_gate"]),
-        coframe_margin_bypass=bool(group["coframe_margin_bypass"]),
-        severe_quality_flags=tuple(group["severe_quality_flags"]),
-        grouping_policy_id=group["grouping_policy_id"],
-        grouping_policy_version=group["grouping_policy_version"],
-    )
-    events = EventConfig(
-        position_threshold_norm=float(event["position_threshold_norm"]),
-        severe_quality_flags=tuple(event["severe_quality_flags"]),
-        event_policy_id=event["event_policy_id"],
-        event_policy_version=event["event_policy_version"],
-    )
-    return scoring, matching, grouping, events
+    return runtime_matching_configs(profile.pipeline)
 
 
 def _detector_profiles(
     protocol: OcidPipelineProtocol,
 ) -> tuple[hardening.PromptProfile, hardening.GeometryProfile]:
-    payload = _mapping(
-        _mapping(protocol.payload, "pipeline", "protocol"),
-        "candidate_extraction",
-        "pipeline",
+    profile = runtime_profile_from_sections(
+        profile_id="visual_stream_analyzer_v1",
+        models=_mapping(protocol.payload, "models", "protocol"),
+        pipeline=_mapping(protocol.payload, "pipeline", "protocol"),
+        paths_include_models_prefix=True,
     )
-    if (
-        float(payload["raw_score_floor"]) != grounding.RAW_POSTPROCESS_FLOOR
-        or float(payload["score_threshold"]) != hardening.FROZEN_SCORE_THRESHOLD
-        or float(payload["class_agnostic_nms_iou"]) != hardening.FROZEN_NMS_IOU
-    ):
-        raise OcidPipelineError("protocol detector gates differ from selected implementation constants")
-    geometry = _mapping(payload, "geometry_filter", "candidate extraction")
+    prompt, geometry = runtime_detector_profiles(profile)
     return (
-        hardening.PromptProfile("p_object", str(payload["prompt"]), True, "ocid_evaluation_raw_reuse"),
-        hardening.GeometryProfile(
-            str(geometry["policy_id"]),
-            min_area_ratio=float(geometry["reject_when_area_ratio_at_least"]),
-            min_span_ratio=float(geometry["and_either_span_ratio_at_least"]),
+        hardening.PromptProfile(
+            prompt.prompt_id,
+            prompt.text,
+            prompt.selectable,
+            "ocid_evaluation_raw_reuse",
         ),
+        geometry,
     )
 
 
@@ -1576,6 +2087,108 @@ def _producer(stage: str, protocol_sha256: str) -> ProducerProvenance:
         config_version="1.0.0",
         config_digest=f"sha256:{protocol_sha256}",
     )
+
+
+def _render_candidate_overlays(
+    decoded: Any,
+    snapshot: CandidateExtractionSnapshot,
+    mask_rows: Sequence[Mapping[str, Any]],
+    run_directory: Path,
+    *,
+    output_root: Path | None = None,
+) -> dict[str, Any]:
+    """Render one audit-friendly overlay for every frame, including empty ones."""
+
+    destination_root = (
+        run_directory / "candidate_overlays"
+        if output_root is None
+        else Path(output_root)
+    )
+    reference_root = run_directory if output_root is None else destination_root
+    mask_by_id = {str(row["candidate_id"]): row for row in mask_rows}
+    candidates_by_frame: dict[str, list[CandidateRecord]] = defaultdict(list)
+    for candidate in snapshot.result.candidates:
+        candidates_by_frame[candidate.frame_id].append(candidate)
+    frames: list[dict[str, Any]] = []
+    font = ImageFont.load_default()
+    for frame in decoded.frames:
+        canvas = _frame_array(frame).astype(np.float32)
+        candidates = sorted(
+            candidates_by_frame.get(frame.frame_id, ()),
+            key=lambda row: row.candidate_id.encode("utf-8"),
+        )
+        labels: list[tuple[CandidateRecord, str, tuple[int, int, int]]] = []
+        prediction_rows: list[dict[str, Any]] = []
+        for index, candidate in enumerate(candidates):
+            row = mask_by_id.get(candidate.candidate_id)
+            if row is None:
+                raise OcidPipelineError(
+                    f"overlay candidate lacks mask: {candidate.candidate_id}"
+                )
+            cleaned = _mapping(row, "cleaned_mask", "mask row")
+            mask = _load_binary_mask(
+                _run_artifact_path(run_directory, _text(cleaned, "path", "cleaned mask"))
+            )
+            color = OVERLAY_PALETTE[index % len(OVERLAY_PALETTE)]
+            color_array = np.asarray(color, dtype=np.float32)
+            canvas[mask] = canvas[mask] * 0.55 + color_array * 0.45
+            canvas[_mask_boundary(mask)] = color_array
+            label = _candidate_overlay_label(index)
+            labels.append((candidate, label, color))
+            prediction_rows.append(
+                {
+                    "label": f"P{index:02d}",
+                    "candidate_id": candidate.candidate_id,
+                    "score": candidate.candidate_confidence,
+                    "color_rgb": list(color),
+                    "bbox": _bbox_payload(candidate.bbox),
+                }
+            )
+        image = Image.fromarray(np.clip(canvas, 0, 255).astype(np.uint8), mode="RGB")
+        draw = ImageDraw.Draw(image)
+        for candidate, label, color in labels:
+            bbox = candidate.bbox
+            draw.rectangle(
+                (bbox.left, bbox.top, bbox.right - 1, bbox.bottom - 1),
+                outline=color,
+                width=2,
+            )
+            draw.text((bbox.left + 2, max(0, bbox.top - 12)), label, fill=color, font=font)
+        path = (
+            destination_root
+            / decoded.stream.stream_id
+            / f"{frame.frame_id}.png"
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        image.save(path, format="PNG", optimize=True)
+        frames.append(
+            {
+                "frame_id": frame.frame_id,
+                "prediction_count": len(candidates),
+                "predictions": prediction_rows,
+                "artifact": _file_reference(reference_root, path),
+            }
+        )
+    manifest_path = (
+        destination_root / decoded.stream.stream_id / "manifest.json"
+    )
+    manifest = {
+        "schema_version": "ocid-pipeline-candidate-overlays-1.0",
+        "stream_id": decoded.stream.stream_id,
+        "rendering": "cleaned_mask_alpha_contour_bbox_and_frame_local_ordinal_label",
+        "confidence_displayed": False,
+        "palette_size": len(OVERLAY_PALETTE),
+        "ground_truth_opened": False,
+        "frames": frames,
+    }
+    write_json_exclusive(manifest_path, manifest)
+    return _file_reference(reference_root, manifest_path)
+
+
+def _candidate_overlay_label(index: int) -> str:
+    if isinstance(index, bool) or not isinstance(index, int) or index < 0:
+        raise ValueError("candidate overlay index must be a nonnegative integer")
+    return f"P{index:02d}"
 
 
 def _render_mask_type_overlays(
@@ -1640,6 +2253,22 @@ def _artifact_inventory(run_directory: Path) -> list[dict[str, Any]]:
 def _verify_artifact_inventory(run_directory: Path, rows: Any) -> None:
     if not isinstance(rows, list) or not rows:
         raise OcidPipelineError("inference artifact inventory must be a non-empty list")
+    if not all(isinstance(row, Mapping) for row in rows):
+        raise OcidPipelineError("malformed inference artifact entry")
+    expected_path_rows = [row.get("path") for row in rows]
+    if not all(isinstance(path, str) and path for path in expected_path_rows):
+        raise OcidPipelineError("malformed inference artifact path")
+    current_rows = _artifact_inventory(run_directory)
+    expected_paths = set(expected_path_rows)
+    current_paths = {row["path"] for row in current_rows}
+    if (
+        len(expected_paths) != len(rows)
+        or expected_paths != current_paths
+    ):
+        raise OcidPipelineError(
+            "inference artifact inventory differs from the exact immutable file set"
+        )
+    current_by_path = {str(row["path"]): row for row in current_rows}
     seen: set[str] = set()
     for row in rows:
         if not isinstance(row, Mapping):
@@ -1648,8 +2277,11 @@ def _verify_artifact_inventory(run_directory: Path, rows: Any) -> None:
         if relative in seen:
             raise OcidPipelineError("duplicate inference artifact path")
         seen.add(relative)
-        path = _run_artifact_path(run_directory, relative)
-        if path.stat().st_size != row.get("size_bytes") or sha256_file(path) != row.get("sha256"):
+        current = current_by_path[relative]
+        if (
+            current.get("size_bytes") != row.get("size_bytes")
+            or current.get("sha256") != row.get("sha256")
+        ):
             raise OcidPipelineError(f"inference artifact changed: {relative}")
 
 
@@ -1703,22 +2335,6 @@ def _run_artifact_path(root: Path, value: str) -> Path:
         raise OcidPipelineError("run artifact escapes the run directory") from error
     if not path.is_file():
         raise OcidPipelineError(f"run artifact is not a file: {path}")
-    return path
-
-
-def _repo_path(protocol: OcidPipelineProtocol, value: str, *, directory: bool) -> Path:
-    relative = PurePosixPath(value.replace("\\", "/"))
-    if relative.is_absolute() or ".." in relative.parts or not relative.parts:
-        raise OcidPipelineError("protocol repository path must be relative")
-    path = (protocol.repository_root / Path(*relative.parts)).resolve(strict=True)
-    try:
-        path.relative_to(protocol.repository_root)
-    except ValueError as error:
-        raise OcidPipelineError("protocol repository path escapes the repository") from error
-    if directory and not path.is_dir():
-        raise OcidPipelineError(f"protocol directory is missing: {path}")
-    if not directory and not path.is_file():
-        raise OcidPipelineError(f"protocol file is missing: {path}")
     return path
 
 
@@ -1818,11 +2434,6 @@ def _type_color(type_id: str) -> tuple[int, int, int]:
     return tuple(64 + value % 160 for value in digest[:3])  # type: ignore[return-value]
 
 
-def _safe_candidate_artifact_name(candidate_id: str, source_index: int) -> str:
-    digest = hashlib.sha256(candidate_id.encode("utf-8")).hexdigest()[:20]
-    return f"candidate_{source_index:03d}_{digest}"
-
-
 def _macro_metric(metrics: Mapping[str, Any], name: str) -> float | None:
     if name == "false_per_frame":
         frame_count = int(metrics.get("frame_count", 0))
@@ -1876,6 +2487,13 @@ def _parser() -> argparse.ArgumentParser:
     smoke.add_argument("--output-root", type=Path, required=True)
     smoke.add_argument("--run-id", required=True)
 
+    development = subparsers.add_parser(
+        "analyze-development",
+        help="run the current pipeline on the complete configured dataset split",
+    )
+    development.add_argument("--output-root", type=Path, required=True)
+    development.add_argument("--run-id", required=True)
+
     inference = subparsers.add_parser("analyze-evaluation", help="run the exact evaluation-accessed held-out inference once")
     inference.add_argument("--output-root", type=Path, required=True)
     inference.add_argument("--run-id", required=True)
@@ -1886,6 +2504,19 @@ def _parser() -> argparse.ArgumentParser:
         help="evaluate a completed sample run",
     )
     smoke_evaluation.add_argument("--run-directory", type=Path, required=True)
+
+    development_evaluation = subparsers.add_parser(
+        "evaluate-development",
+        help="evaluate a completed full development run",
+    )
+    development_evaluation.add_argument("--run-directory", type=Path, required=True)
+
+    display = subparsers.add_parser(
+        "render-development-overlays",
+        help="render frame-local ordinal labels without confidence values",
+    )
+    display.add_argument("--run-directory", type=Path, required=True)
+    display.add_argument("--output-root", type=Path, required=True)
 
     evaluation = subparsers.add_parser("evaluate-results", help="open GT only after validating persisted inference")
     evaluation.add_argument("--run-directory", type=Path, required=True)
@@ -1906,6 +2537,13 @@ def main(argv: list[str] | None = None) -> int:
                 output_root=args.output_root,
                 run_id=args.run_id,
             )
+        elif args.command == "analyze-development":
+            result = run_inference(
+                protocol_path=args.protocol,
+                role="development",
+                output_root=args.output_root,
+                run_id=args.run_id,
+            )
         elif args.command == "analyze-evaluation":
             result = run_inference(
                 protocol_path=args.protocol,
@@ -1918,6 +2556,17 @@ def main(argv: list[str] | None = None) -> int:
             result = run_sample_evaluation(
                 protocol_path=args.protocol,
                 run_directory=args.run_directory,
+            )
+        elif args.command == "evaluate-development":
+            result = run_development_evaluation(
+                protocol_path=args.protocol,
+                run_directory=args.run_directory,
+            )
+        elif args.command == "render-development-overlays":
+            result = render_development_candidate_overlays(
+                protocol_path=args.protocol,
+                run_directory=args.run_directory,
+                output_root=args.output_root,
             )
         else:
             result = run_evaluation(

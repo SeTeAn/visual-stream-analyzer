@@ -30,7 +30,7 @@ def _producer() -> ProducerProvenance:
         producer_stage="stream_input",
         producer_version="1.0",
         config_version="stream_input_v1",
-        config_digest="sha256:f03-integration",
+        config_digest="sha256:input-integration",
     )
 
 

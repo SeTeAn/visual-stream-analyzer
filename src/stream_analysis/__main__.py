@@ -1,5 +1,5 @@
-"""Execute the stream analysis CLI."""
+"""Execute the current Visual Stream Analyzer CLI."""
 
-from .cli import main
+from .product_cli import main
 
 raise SystemExit(main())

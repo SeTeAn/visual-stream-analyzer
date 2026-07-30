@@ -1,4 +1,4 @@
-"""F08 DINOv2 configuration, batch assembly and representation records."""
+"""DINOv2 configuration, batch assembly, and representation records."""
 
 from __future__ import annotations
 
@@ -90,7 +90,9 @@ class DinoV2RepresentationConfig:
         if isinstance(self.input_size, bool) or not isinstance(self.input_size, int) or self.input_size <= 0:
             raise ValueError("input_size must be a positive integer.")
         if self.input_size != DINO_INPUT_SIZE:
-            raise ValueError(f"input_size must remain {DINO_INPUT_SIZE} for F08 v1.")
+            raise ValueError(
+                f"input_size must remain {DINO_INPUT_SIZE} for the DINOv2 v1 contract."
+            )
         if isinstance(self.context_padding_ratio, bool) or not isinstance(
             self.context_padding_ratio, (int, float)
         ):
@@ -271,7 +273,7 @@ def build_dinov2_representations(
     provider: DinoV2BatchProviderProtocol,
     config: DinoV2RepresentationConfig | None = None,
 ) -> DinoV2RepresentationBatch:
-    """Build one ordered DINOv2 record per canonical F05 candidate."""
+    """Build one ordered DINOv2 record per extracted candidate."""
 
     if not isinstance(decoded_stream, DecodedStream):
         raise TypeError("decoded_stream must be DecodedStream.")

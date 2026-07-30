@@ -39,7 +39,7 @@ def load_tests(
     tests: unittest.TestSuite,
     pattern: str | None,
 ) -> unittest.TestSuite:
-    """Include the pre-F02B non-package contract suite in root discovery."""
+    """Include the standalone contract suite in root discovery."""
 
     contract_suite = unittest.TestLoader().discover(
         str(Path(__file__).parent / "contracts"),

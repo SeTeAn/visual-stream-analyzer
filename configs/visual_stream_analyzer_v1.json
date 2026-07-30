@@ -1,0 +1,146 @@
+{
+  "schema_version": "visual-stream-analyzer-profile-1.0",
+  "profile_id": "visual_stream_analyzer_v1",
+  "models": {
+    "candidate_extractor": {
+      "family": "grounding_dino_tiny",
+      "hf_revision": "a2bb814dd30d776dcf7e30523b00659f4f141c71",
+      "directory": "extractors/grounding-dino-tiny-hf-a2bb814",
+      "assets": {
+        "model.safetensors": {
+          "size_bytes": 689359096,
+          "sha256": "1a2412ef99bd74bcd3c2a246fa1e48581f8889a1300c9051974741314fc042f3"
+        },
+        "config.json": {
+          "size_bytes": 1644,
+          "sha256": "eec82c5ab66e16df12a9a212e68ac011779927c2536cf9078658e35d85f0c67a"
+        },
+        "preprocessor_config.json": {
+          "size_bytes": 457,
+          "sha256": "8454179ba95e2ad22947835aad7b45862a601fc0055ab88bf1ee70892d3aea60"
+        }
+      }
+    },
+    "mask_refiner": {
+      "family": "sam2.1_hiera_tiny_bbox_prompted",
+      "directory": "extractors/sam2.1-hiera-tiny-hf-de431c4",
+      "assets": {
+        "model.safetensors": {
+          "size_bytes": 155908064,
+          "sha256": "48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7"
+        },
+        "config.json": {
+          "size_bytes": 5695,
+          "sha256": "860aff9751b139d83a4ad7df1e5535416fded533e0ead02625edbefcb9953cce"
+        },
+        "preprocessor_config.json": {
+          "size_bytes": 683,
+          "sha256": "6ebf229ee259368ce4a8d4f2fe893a72b053023710853e257253939e601f583d"
+        },
+        "processor_config.json": {
+          "size_bytes": 95,
+          "sha256": "f8a68e865cfad115c1c2763f3d93eca7b1c622da06da2a9273eb437fb2389b6d"
+        }
+      }
+    },
+    "representation": {
+      "family": "dinov2",
+      "model_name": "dinov2_vitb14",
+      "source_directory": "dinov2/runtime-source-7764ea0",
+      "source_tree_fingerprint_sha256": "67338e0c3eafe5cdc4501814ddd9ea2c64a397fd346ee953c0f48379fbd6e72f",
+      "checkpoint": {
+        "path": "dinov2/checkpoints/dinov2_vitb14_pretrain.pth",
+        "size_bytes": 346378731,
+        "sha256": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73"
+      },
+      "embedding_dimension": 768,
+      "output_token": "cls"
+    }
+  },
+  "pipeline": {
+    "candidate_extraction": {
+      "prompt": "object.",
+      "raw_score_floor": 0.01,
+      "score_threshold": 0.15,
+      "class_agnostic_nms_iou": 0.3,
+      "geometry_filter": {
+        "policy_id": "g_surface_span_055_090",
+        "reject_when_area_ratio_at_least": 0.55,
+        "and_either_span_ratio_at_least": 0.9
+      }
+    },
+    "mask_refinement": {
+      "prompt": "candidate_bbox",
+      "cleanup": {
+        "connectivity": 8,
+        "min_component_pixels": 16,
+        "min_component_area_ratio": 0.005,
+        "remove_only_when_below_both_thresholds": true,
+        "fill_holes": false
+      },
+      "quality_score_rejection": false,
+      "fallback_policy": "fail_run_if_any_candidate_has_no_valid_mask"
+    },
+    "representation": {
+      "variant": "mask_neutral_letterbox_v1",
+      "input_size": 224,
+      "context_padding_ratio": 0.0,
+      "batch_size": 4,
+      "l2_normalized": true
+    },
+    "scoring": {
+      "scorer_id": "dinov2_cosine_canonical_v1",
+      "scorer_version": "1.0.0",
+      "visual_gate": 0.8,
+      "spatial_gate": null
+    },
+    "matching": {
+      "assignment_policy_id": "augmented_global_linear_assignment_v1",
+      "assignment_policy_version": "1.1.0",
+      "unmatched_pair_cost": 0.7,
+      "local_margin_gate": 0.01,
+      "global_margin_gate": 0.01,
+      "severe_quality_flags": [
+        "POSSIBLE_MERGING",
+        "POSSIBLE_SPLITTING"
+      ]
+    },
+    "grouping": {
+      "grouping_policy_id": "temporal_medoid_agglomerative_v1",
+      "grouping_policy_version": "1.3.0",
+      "medoid_gate": 0.8,
+      "support_quantile": 0.25,
+      "quantile_gate": 0.8,
+      "support_pair_gate": 0.8,
+      "support_ratio_gate": 0.75,
+      "visual_gate": 0.8,
+      "medoid_weight": 0.4,
+      "quantile_weight": 0.4,
+      "support_ratio_weight": 0.2,
+      "second_best_margin": 0.01,
+      "use_uncertain_temporal_seeds": true,
+      "uncertain_seed_visual_gate": 0.95,
+      "uncertain_seed_spatial_gate": 0.08,
+      "coframe_aspect_log_gate": 0.35,
+      "coframe_area_log_gate": 0.45,
+      "coframe_fill_ratio_gate": 0.3,
+      "coframe_hole_count_gate": 2,
+      "coframe_visual_gate": 0.963,
+      "coframe_margin_bypass": true,
+      "expose_unmerged_alternatives": false,
+      "severe_quality_flags": [
+        "POSSIBLE_MERGING",
+        "POSSIBLE_SPLITTING"
+      ]
+    },
+    "events": {
+      "event_policy_id": "primary_membership_change_events_v1",
+      "event_policy_version": "1.0.0",
+      "position_threshold_norm": 0.1,
+      "severe_quality_flags": [
+        "POSSIBLE_MERGING",
+        "POSSIBLE_SPLITTING"
+      ]
+    }
+  }
+}

@@ -1,4 +1,4 @@
-"""Strict JSON adapter for the typed F13-F14 integration configuration."""
+"""Strict JSON adapter for the typed integration configuration."""
 
 from __future__ import annotations
 

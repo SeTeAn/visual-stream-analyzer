@@ -1,4 +1,4 @@
-"""Public F03 stream-input API."""
+"""Public stream-input API."""
 
 from .frames import (
     FRAME_RECORD_SCHEMA_VERSION,

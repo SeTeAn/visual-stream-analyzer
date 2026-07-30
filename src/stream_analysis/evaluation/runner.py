@@ -1414,7 +1414,7 @@ def _limitations(representation_eval: dict[str, Any], grouping_eval: dict[str, A
     elif representation_eval.get("status") != "supported":
         rows.append("Representation metrics are unavailable for this evaluation.")
     rows.extend(grouping_eval.get("limitations") or [])
-    rows.append("Probe/development metrics are not final held-out claims unless data_role=final_held_out and freeze rules were followed.")
+    rows.append("Metric scope follows the data role recorded in the evaluation manifest.")
     return rows
 
 

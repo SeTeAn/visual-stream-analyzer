@@ -1,4 +1,4 @@
-"""F14 orchestration for the primary, annotation-free analyze lifecycle."""
+"""Orchestration for the primary annotation-free analysis lifecycle."""
 
 from __future__ import annotations
 
@@ -84,7 +84,7 @@ def _validate_portable_run_segment(run_id: str) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AnalyzePipelineConfig:
-    """Typed aggregate over the already-versioned F03-F12 configurations."""
+    """Typed aggregate over the versioned analysis configurations."""
 
     candidate_extraction: CandidateExtractionConfiguration
     representation: RepresentationConfig
@@ -300,7 +300,7 @@ def _artifact_references(run_id: str, *, include_pair_scores: bool = False) -> t
 
 
 def _compact_event(event: ChangeEvent) -> ChangeEvent:
-    """Project stage-local diagnostics onto the approved compact primary schema."""
+    """Project stage-local diagnostics onto the defined compact primary schema."""
 
     source = event.evidence.details
     details: dict[str, object] = {"predicate": event.kind.value}
@@ -360,7 +360,7 @@ def _build_model_provenance(config: AnalyzePipelineConfig) -> tuple[ModelProvena
 
 
 def _run_analysis(request: AnalyzeRequest, started: datetime, started_clock: float) -> AnalyzeOutcome:
-    """Execute F03-F12 once and persist the mandatory primary run artifacts."""
+    """Execute the configured stages and persist the primary run artifacts."""
 
     analysis_config = request.config.analysis_config
     run_digest = semantic_config_digest(analysis_config)

@@ -1,4 +1,4 @@
-"""Versioned handcrafted representations for canonical F05 candidates.
+"""Versioned handcrafted representations for extracted candidates.
 
 The module is deliberately representation-only: it does not read annotations,
 create candidates, assign visual types, use position in visual features, or
@@ -374,7 +374,7 @@ def srgb_uint8_to_normalized_cielab(rgb: np.ndarray) -> np.ndarray:
     """Convert sRGB uint8 pixels to normalized D65 CIELAB in float64.
 
     The final axis must have length three.  The returned array is independent
-    from the input and follows the exact reference conversion in the F07 design.
+    from the input and follows the representation's reference color conversion.
     """
 
     if not isinstance(rgb, np.ndarray):

@@ -29,7 +29,7 @@ ACCESS_STATUS = "evaluation_access_granted"
 ACCESS_DECISION = "approved_for_controlled_evaluation_run"
 ACCESS_CONSUMPTION_SCHEMA = "ocid-pipeline-evaluation-access-consumption-1.0"
 CHECK_REPORT_SCHEMA = "ocid-pipeline-check-receipt-1.0"
-RunRole = Literal["sample", "heldout"]
+RunRole = Literal["sample", "development", "heldout"]
 
 
 class OcidPipelineError(ValueError):
@@ -156,6 +156,8 @@ def inventory_for_role(
 ) -> tuple[OcidStream, ...]:
     if role == "heldout":
         return protocol.heldout
+    if role == "development":
+        return protocol.development
     if role == "sample":
         execution = _mapping(protocol.payload, "execution", "OCID pipeline protocol")
         stream_id = _text(execution, "sample_stream_id", "execution")

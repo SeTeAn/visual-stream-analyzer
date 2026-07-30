@@ -65,6 +65,12 @@ class OcidPipelineContractTest(unittest.TestCase):
         self.assertEqual(inventory[0].stream_id, "ocid_arid10_table_bottom_box_seq05")
         self.assertEqual(inventory[0].frame_count, 11)
 
+    def test_development_inventory_is_the_complete_fixed_split(self) -> None:
+        inventory = inventory_for_role(self.protocol, "development")
+        self.assertEqual(inventory, self.protocol.development)
+        self.assertEqual(len(inventory), 10)
+        self.assertEqual(sum(item.frame_count for item in inventory), 148)
+
     def test_build_check_report_does_not_claim_stream_or_ground_truth_access(self) -> None:
         receipt = build_check_report(self.protocol)
         self.assertFalse(receipt["benchmark"]["heldout_rgb_opened"])

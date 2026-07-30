@@ -1,1 +1,1 @@
-"""F13 reporting tests."""
+"""Reporting tests."""

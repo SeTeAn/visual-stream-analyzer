@@ -17,7 +17,7 @@ import os
 import tempfile
 import time
 from dataclasses import dataclass
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Mapping, Sequence
 
 import numpy as np
@@ -88,6 +88,36 @@ SAM2_CONFIG_FILES = (
     "sam2.1_hiera_t.yaml",
 )
 
+# A fixed high-contrast palette keeps a candidate's color tied to its original
+# frame-local index.  Twenty-four entries avoid the ambiguous four-color reuse
+# that made dense prediction overlays difficult to audit.
+OVERLAY_PALETTE: tuple[tuple[int, int, int], ...] = (
+    (0, 220, 255),
+    (255, 120, 30),
+    (120, 255, 80),
+    (220, 80, 255),
+    (255, 210, 0),
+    (60, 140, 255),
+    (255, 70, 120),
+    (100, 240, 200),
+    (185, 105, 255),
+    (255, 175, 105),
+    (55, 205, 120),
+    (255, 105, 210),
+    (175, 225, 50),
+    (75, 180, 235),
+    (245, 75, 75),
+    (125, 235, 245),
+    (215, 155, 255),
+    (245, 200, 120),
+    (80, 170, 80),
+    (250, 135, 170),
+    (145, 145, 255),
+    (210, 180, 55),
+    (40, 190, 180),
+    (240, 105, 105),
+)
+
 
 @dataclass(frozen=True, slots=True)
 class CandidateRecord:
@@ -150,7 +180,7 @@ def load_selected_candidates(
     path: Path,
     inventory: Sequence[DevelopmentStream],
 ) -> tuple[dict[str, tuple[CandidateRecord, ...]], dict[str, Any]]:
-    """Validate the selected development-only candidate manifest exactly."""
+    """Validate the selected candidate manifest and its configured inventory."""
 
     payload = _json_object(path, "selected candidate manifest")
     if payload.get("schema_version") != SELECTED_CANDIDATE_SCHEMA:
@@ -159,7 +189,7 @@ def load_selected_candidates(
         payload.get("scope") != "development_only_selected_candidates"
         or payload.get("heldout_access") != "none"
     ):
-        raise OcidEvaluationError("selected candidates must be development-only")
+        raise OcidEvaluationError("selected candidates do not match the configured inventory")
     streams = payload.get("streams")
     expected = {item.stream_id for item in inventory}
     if not isinstance(streams, Mapping) or set(streams) != expected:
@@ -295,29 +325,118 @@ def _mask_boundary(mask: np.ndarray) -> np.ndarray:
     return value & ~interior
 
 
+def _overlay_indices(indices: Sequence[int], *, candidate_count: int, label: str) -> frozenset[int]:
+    normalized: set[int] = set()
+    for index in indices:
+        if isinstance(index, bool) or not isinstance(index, int):
+            raise ValueError(f"{label} must contain integer candidate indices")
+        if not 0 <= index < candidate_count:
+            raise ValueError(f"{label} contains out-of-range candidate index {index}")
+        normalized.add(index)
+    return frozenset(normalized)
+
+
+def _prediction_label(index: int) -> str:
+    if isinstance(index, bool) or not isinstance(index, int) or index < 0:
+        raise ValueError("prediction index must be a non-negative integer")
+    return f"P{index:02d}"
+
+
+def render_prediction_overlay(
+    rgb: np.ndarray,
+    candidates: Sequence[CandidateRecord],
+    results: Sequence[GroundedMaskResult],
+    *,
+    hidden_indices: Sequence[int] = (),
+) -> Image.Image:
+    """Render one auditable prediction overlay without changing mask data.
+
+    Colors are assigned from the original frame-local candidate index, even
+    when other candidates are hidden.  Larger masks are composited first so
+    that smaller masks remain visible instead of being painted over by a union
+    mask.  ``hidden_indices`` is visualization-only and does not alter the
+    candidates, results, persisted masks, or evaluation.
+    """
+
+    pairs = tuple(zip(candidates, results, strict=True))
+    hidden = _overlay_indices(
+        hidden_indices,
+        candidate_count=len(pairs),
+        label="hidden_indices",
+    )
+    canvas = np.asarray(rgb, dtype=np.float32).copy()
+    mask_rows = [
+        (index, result, int(np.count_nonzero(result.cleaned_mask)))
+        for index, (_, result) in enumerate(pairs)
+        if index not in hidden and result.cleaned_mask is not None
+    ]
+    for index, result, _ in sorted(mask_rows, key=lambda row: (-row[2], row[0])):
+        color = np.asarray(
+            OVERLAY_PALETTE[index % len(OVERLAY_PALETTE)],
+            dtype=np.float32,
+        )
+        mask = np.asarray(result.cleaned_mask, dtype=np.bool_)
+        canvas[mask] = canvas[mask] * 0.62 + color * 0.38
+        canvas[_mask_boundary(mask)] = color
+    image = Image.fromarray(np.clip(canvas, 0, 255).astype(np.uint8), mode="RGB")
+    draw = ImageDraw.Draw(image)
+    for index, (candidate, result) in enumerate(pairs):
+        if index in hidden:
+            continue
+        color = (
+            OVERLAY_PALETTE[index % len(OVERLAY_PALETTE)]
+            if result.status == "valid"
+            else (255, 40, 40)
+        )
+        box = candidate.bbox
+        draw.rectangle((box.left, box.top, box.right - 1, box.bottom - 1), outline=color, width=2)
+        draw.text(
+            (box.left + 2, max(0, box.top - 12)),
+            _prediction_label(index),
+            fill=color,
+        )
+    return image
+
+
+def render_individual_prediction_overlays(
+    rgb: np.ndarray,
+    candidates: Sequence[CandidateRecord],
+    results: Sequence[GroundedMaskResult],
+    *,
+    candidate_indices: Sequence[int] | None = None,
+) -> dict[int, Image.Image]:
+    """Render one isolated overlay per requested frame-local candidate index."""
+
+    pairs = tuple(zip(candidates, results, strict=True))
+    selected = (
+        frozenset(range(len(pairs)))
+        if candidate_indices is None
+        else _overlay_indices(
+            candidate_indices,
+            candidate_count=len(pairs),
+            label="candidate_indices",
+        )
+    )
+    all_indices = frozenset(range(len(pairs)))
+    return {
+        index: render_prediction_overlay(
+            rgb,
+            candidates,
+            results,
+            hidden_indices=tuple(sorted(all_indices - {index})),
+        )
+        for index in sorted(selected)
+    }
+
+
 def _prediction_overlay(
     rgb: np.ndarray,
     candidates: Sequence[CandidateRecord],
     results: Sequence[GroundedMaskResult],
 ) -> Image.Image:
-    canvas = np.asarray(rgb, dtype=np.float32).copy()
-    palette = ((0, 220, 255), (255, 120, 30), (120, 255, 80), (220, 80, 255))
-    for index, result in enumerate(results):
-        if result.cleaned_mask is None:
-            continue
-        color = np.asarray(palette[index % len(palette)], dtype=np.float32)
-        mask = result.cleaned_mask
-        canvas[mask] = canvas[mask] * 0.62 + color * 0.38
-        canvas[_mask_boundary(mask)] = color
-    image = Image.fromarray(np.clip(canvas, 0, 255).astype(np.uint8), mode="RGB")
-    draw = ImageDraw.Draw(image)
-    for index, (candidate, result) in enumerate(zip(candidates, results, strict=True)):
-        color = palette[index % len(palette)] if result.status == "valid" else (255, 40, 40)
-        box = candidate.bbox
-        draw.rectangle((box.left, box.top, box.right - 1, box.bottom - 1), outline=color, width=2)
-        quality = "fallback" if result.quality is None else f"q={result.quality.predicted_iou:.2f}"
-        draw.text((box.left + 2, max(0, box.top - 12)), f"{index:02d} {quality}", fill=color)
-    return image
+    """Compatibility wrapper for callers of ``_prediction_overlay``."""
+
+    return render_prediction_overlay(rgb, candidates, results)
 
 
 def render_presentation_overlays(
@@ -595,6 +714,87 @@ def _same_bbox(left: BBox, right: BBox) -> bool:
     )
 
 
+def _has_forbidden_ocid_path_token(parts: Sequence[str]) -> bool:
+    for part in parts:
+        token = part.casefold()
+        if "heldout" in token or "held-out" in token or "held_out" in token:
+            return True
+    return False
+
+
+def _ocid_relative_parts(value: str, *, label: str) -> tuple[str, ...]:
+    if not isinstance(value, str) or not value.strip():
+        raise OcidEvaluationError(f"{label} must be a non-empty relative path")
+    posix_value = PurePosixPath(value.replace("\\", "/"))
+    windows_value = PureWindowsPath(value)
+    if (
+        posix_value.is_absolute()
+        or windows_value.is_absolute()
+        or bool(windows_value.drive)
+        or bool(windows_value.root)
+    ):
+        raise OcidEvaluationError(f"{label} must not be absolute")
+    parts = tuple(posix_value.parts)
+    if not parts or any(part.rstrip(" .") in {"", ".", ".."} for part in parts):
+        raise OcidEvaluationError(f"{label} must not contain traversal components")
+    if _has_forbidden_ocid_path_token(parts):
+        raise OcidEvaluationError(f"{label} contains a forbidden held-out path token")
+    return parts
+
+
+def _resolve_strict_path(path: Path) -> Path:
+    """Small seam for deterministic symlink-containment tests."""
+
+    return path.resolve(strict=True)
+
+
+def _resolve_ocid_label_path(
+    *,
+    ocid_root: Path,
+    source_sequence: str,
+    source_filename: str,
+) -> Path:
+    sequence_parts = _ocid_relative_parts(
+        source_sequence, label="OCID source sequence"
+    )
+    filename_parts = _ocid_relative_parts(
+        source_filename, label="OCID source filename"
+    )
+    if len(filename_parts) != 1:
+        raise OcidEvaluationError("OCID source filename must be a basename")
+    try:
+        resolved_root = _resolve_strict_path(Path(ocid_root))
+    except (OSError, ValueError) as error:
+        raise OcidEvaluationError(f"cannot resolve OCID root: {error}") from error
+    if not resolved_root.is_dir():
+        raise OcidEvaluationError("OCID root must be a directory")
+    if _has_forbidden_ocid_path_token(resolved_root.parts):
+        raise OcidEvaluationError("resolved OCID root contains a forbidden path token")
+
+    supplied_path = resolved_root.joinpath(
+        *sequence_parts,
+        "label",
+        filename_parts[0],
+    )
+    try:
+        resolved_path = _resolve_strict_path(supplied_path)
+    except (OSError, ValueError) as error:
+        raise OcidEvaluationError(f"cannot resolve OCID label path: {error}") from error
+    try:
+        relative_resolved = resolved_path.relative_to(resolved_root)
+    except ValueError as error:
+        raise OcidEvaluationError("resolved OCID label path escapes OCID root") from error
+    if _has_forbidden_ocid_path_token(resolved_path.parts) or (
+        _has_forbidden_ocid_path_token(relative_resolved.parts)
+    ):
+        raise OcidEvaluationError(
+            "resolved OCID label path contains a forbidden path token"
+        )
+    if not resolved_path.is_file():
+        raise OcidEvaluationError("resolved OCID label path must be a file")
+    return resolved_path
+
+
 def _reviewed_mask(
     *,
     stream_id: str,
@@ -606,11 +806,11 @@ def _reviewed_mask(
     decisions: Mapping[str, Mapping[str, Any]],
 ) -> tuple[np.ndarray, dict[str, Any]]:
     source_label = int(instance_payload["source_label"])
-    label_path = ocid_root.joinpath(
-        *PurePosixPath(source_sequence).parts,
-        "label",
-        source_filename,
-    ).resolve(strict=True)
+    label_path = _resolve_ocid_label_path(
+        ocid_root=ocid_root,
+        source_sequence=source_sequence,
+        source_filename=source_filename,
+    )
     with Image.open(label_path) as image:
         labels = np.asarray(image).copy()
     if labels.ndim != 2 or not np.issubdtype(labels.dtype, np.integer):
@@ -920,7 +1120,7 @@ def evaluate_masks(
                 expected_bbox = mask_bbox_from_full_frame(expected_mask)
                 if expected_bbox is None or not _same_bbox(expected_bbox, expected_instance.bbox):
                     raise OcidEvaluationError(
-                        f"reviewed mask bbox differs from frozen annotation: {assignment.instance_id}"
+                        f"reviewed mask bbox differs from the stored annotation: {assignment.instance_id}"
                     )
                 raw_path = artifact_root / str(inference["raw_mask"]["path"])
                 cleaned_path = artifact_root / str(inference["cleaned_mask"]["path"])

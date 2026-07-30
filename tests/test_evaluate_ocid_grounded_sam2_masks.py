@@ -6,6 +6,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 import numpy as np
@@ -30,6 +31,25 @@ def _inventory(root: Path) -> tuple[DevelopmentStream, ...]:
 
 
 class GroundedSam2MaskTest(unittest.TestCase):
+    @staticmethod
+    def _overlay_candidate(index: int, *, score: float) -> subject.CandidateRecord:
+        return subject.CandidateRecord(
+            candidate_id=f"candidate:{index}",
+            frame_id="frame_0001",
+            frame_index=0,
+            score=score,
+            phrase="object",
+            bbox=BBox(10, 10, 1, 1),
+        )
+
+    @staticmethod
+    def _overlay_result(mask: np.ndarray, *, predicted_iou: float = 0.91) -> SimpleNamespace:
+        return SimpleNamespace(
+            status="valid",
+            cleaned_mask=mask,
+            quality=SimpleNamespace(predicted_iou=predicted_iou),
+        )
+
     def test_selected_manifest_is_exact_and_development_only(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -63,7 +83,7 @@ class GroundedSam2MaskTest(unittest.TestCase):
 
             payload["heldout_access"] = "accessed"
             path.write_text(json.dumps(payload), encoding="utf-8")
-            with self.assertRaisesRegex(OcidEvaluationError, "development-only"):
+            with self.assertRaisesRegex(OcidEvaluationError, "configured inventory"):
                 subject.load_selected_candidates(path, _inventory(root))
 
     def test_pixel_metrics_and_bbox_mask_are_half_open(self) -> None:
@@ -108,6 +128,92 @@ class GroundedSam2MaskTest(unittest.TestCase):
             loaded = subject._load_mask(path)
             self.assertTrue(np.array_equal(mask, loaded))
 
+    def test_overlay_palette_has_at_least_twenty_unique_colors(self) -> None:
+        self.assertGreaterEqual(len(subject.OVERLAY_PALETTE), 20)
+        self.assertEqual(
+            len(subject.OVERLAY_PALETTE),
+            len(set(subject.OVERLAY_PALETTE)),
+        )
+
+    def test_prediction_label_contains_only_frame_local_ordinal(self) -> None:
+        self.assertEqual(subject._prediction_label(3), "P03")
+        self.assertNotIn(".", subject._prediction_label(3))
+        with self.assertRaises(ValueError):
+            subject._prediction_label(-1)
+
+    def test_prediction_overlay_draws_large_masks_first_and_can_hide_candidates(self) -> None:
+        rgb = np.full((12, 12, 3), 100, dtype=np.uint8)
+        small_mask = np.zeros((12, 12), dtype=bool)
+        small_mask[3:9, 3:9] = True
+        large_mask = np.zeros((12, 12), dtype=bool)
+        large_mask[1:11, 1:11] = True
+        candidates = (
+            self._overlay_candidate(0, score=0.31),
+            self._overlay_candidate(1, score=0.42),
+        )
+        results = (
+            self._overlay_result(small_mask),
+            self._overlay_result(large_mask),
+        )
+        small_before = small_mask.copy()
+        large_before = large_mask.copy()
+
+        combined = np.asarray(subject.render_prediction_overlay(rgb, candidates, results))
+        large_color = np.asarray(subject.OVERLAY_PALETTE[1], dtype=np.float32)
+        small_color = np.asarray(subject.OVERLAY_PALETTE[0], dtype=np.float32)
+        expected = ((100.0 * 0.62 + large_color * 0.38) * 0.62 + small_color * 0.38).astype(
+            np.uint8
+        )
+        self.assertTrue(np.array_equal(combined[5, 5], expected))
+
+        without_large = np.asarray(
+            subject.render_prediction_overlay(
+                rgb,
+                candidates,
+                results,
+                hidden_indices=(1,),
+            )
+        )
+        expected_small_only = (100.0 * 0.62 + small_color * 0.38).astype(np.uint8)
+        self.assertTrue(np.array_equal(without_large[5, 5], expected_small_only))
+        self.assertTrue(np.array_equal(small_mask, small_before))
+        self.assertTrue(np.array_equal(large_mask, large_before))
+
+    def test_individual_prediction_overlays_isolate_requested_original_indices(self) -> None:
+        rgb = np.full((12, 12, 3), 100, dtype=np.uint8)
+        first_mask = np.zeros((12, 12), dtype=bool)
+        first_mask[3:9, 3:9] = True
+        second_mask = np.zeros((12, 12), dtype=bool)
+        second_mask[1:11, 1:11] = True
+        candidates = (
+            self._overlay_candidate(0, score=0.31),
+            self._overlay_candidate(1, score=0.42),
+        )
+        results = (
+            self._overlay_result(first_mask),
+            self._overlay_result(second_mask),
+        )
+
+        individual = subject.render_individual_prediction_overlays(
+            rgb,
+            candidates,
+            results,
+            candidate_indices=(1,),
+        )
+        self.assertEqual(set(individual), {1})
+        rendered = np.asarray(individual[1])
+        second_color = np.asarray(subject.OVERLAY_PALETTE[1], dtype=np.float32)
+        expected_second = (100.0 * 0.62 + second_color * 0.38).astype(np.uint8)
+        self.assertTrue(np.array_equal(rendered[5, 5], expected_second))
+
+        with self.assertRaisesRegex(ValueError, "out-of-range"):
+            subject.render_individual_prediction_overlays(
+                rgb,
+                candidates,
+                results,
+                candidate_indices=(2,),
+            )
+
     def test_model_asset_provenance_hashes_every_required_configuration(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -147,6 +253,114 @@ class GroundedSam2MaskTest(unittest.TestCase):
             )
             self.assertEqual(int(mask.sum()), 9)
             self.assertEqual(provenance["retained_component_ids"], ["c001"])
+
+    def test_reviewed_mask_rejects_traversal_before_image_open(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "ocid"
+            root.mkdir()
+            cases = (
+                ("ARID/table/bottom/seq", "../outside.png"),
+                ("ARID/../outside", "source.png"),
+            )
+            for source_sequence, source_filename in cases:
+                with self.subTest(
+                    source_sequence=source_sequence,
+                    source_filename=source_filename,
+                ), mock.patch.object(subject.Image, "open") as image_open:
+                    with self.assertRaisesRegex(OcidEvaluationError, "traversal"):
+                        subject._reviewed_mask(
+                            stream_id="stream_a",
+                            frame_id="frame_0001",
+                            instance_payload={"source_label": 3},
+                            source_sequence=source_sequence,
+                            source_filename=source_filename,
+                            ocid_root=root,
+                            decisions={},
+                        )
+                    image_open.assert_not_called()
+
+    def test_reviewed_mask_rejects_absolute_filename_before_image_open(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "ocid"
+            root.mkdir()
+            absolute = Path(temporary) / "outside.png"
+            with mock.patch.object(subject.Image, "open") as image_open:
+                with self.assertRaisesRegex(OcidEvaluationError, "absolute"):
+                    subject._reviewed_mask(
+                        stream_id="stream_a",
+                        frame_id="frame_0001",
+                        instance_payload={"source_label": 3},
+                        source_sequence="ARID/table/bottom/seq",
+                        source_filename=str(absolute),
+                        ocid_root=root,
+                        decisions={},
+                    )
+            image_open.assert_not_called()
+
+    def test_reviewed_mask_rejects_resolved_symlink_escape_before_open(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            workspace = Path(temporary)
+            root = workspace / "ocid"
+            root.mkdir()
+            outside = workspace / "outside.png"
+            outside.write_bytes(b"not opened")
+            with (
+                mock.patch.object(
+                    subject,
+                    "_resolve_strict_path",
+                    side_effect=(root.resolve(), outside.resolve()),
+                ),
+                mock.patch.object(subject.Image, "open") as image_open,
+            ):
+                with self.assertRaisesRegex(OcidEvaluationError, "escapes OCID root"):
+                    subject._reviewed_mask(
+                        stream_id="stream_a",
+                        frame_id="frame_0001",
+                        instance_payload={"source_label": 3},
+                        source_sequence="ARID/table/bottom/seq",
+                        source_filename="source.png",
+                        ocid_root=root,
+                        decisions={},
+                    )
+            image_open.assert_not_called()
+
+    def test_reviewed_mask_rejects_forbidden_supplied_and_resolved_tokens(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "ocid"
+            root.mkdir()
+            with mock.patch.object(subject.Image, "open") as image_open:
+                with self.assertRaisesRegex(OcidEvaluationError, "forbidden"):
+                    subject._reviewed_mask(
+                        stream_id="stream_a",
+                        frame_id="frame_0001",
+                        instance_payload={"source_label": 3},
+                        source_sequence="ARID/heldout/seq",
+                        source_filename="source.png",
+                        ocid_root=root,
+                        decisions={},
+                    )
+            image_open.assert_not_called()
+
+            resolved_forbidden = root / "heldout" / "source.png"
+            with (
+                mock.patch.object(
+                    subject,
+                    "_resolve_strict_path",
+                    side_effect=(root.resolve(), resolved_forbidden),
+                ),
+                mock.patch.object(subject.Image, "open") as image_open,
+            ):
+                with self.assertRaisesRegex(OcidEvaluationError, "forbidden"):
+                    subject._reviewed_mask(
+                        stream_id="stream_a",
+                        frame_id="frame_0001",
+                        instance_payload={"source_label": 3},
+                        source_sequence="ARID/table/bottom/seq",
+                        source_filename="source.png",
+                        ocid_root=root,
+                        decisions={},
+                    )
+            image_open.assert_not_called()
 
     def test_contract_failure_happens_before_selected_or_model_access(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

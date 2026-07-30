@@ -1,4 +1,4 @@
-"""Versioned semantic configurations for F09-F12."""
+"""Versioned configurations for matching, grouping, and change events."""
 
 from __future__ import annotations
 

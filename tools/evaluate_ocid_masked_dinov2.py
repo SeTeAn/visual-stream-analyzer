@@ -191,7 +191,7 @@ def load_predicted_candidate_inputs(
         or manifest.get("scope") != "development_only"
         or manifest.get("heldout_access") != "none"
     ):
-        raise OcidEvaluationError("SAM2 manifest must be a persisted development-only inference")
+        raise OcidEvaluationError("SAM2 manifest must be a persisted configured inference")
     provenance = manifest.get("selected_candidates")
     if not isinstance(provenance, Mapping) or provenance.get("sha256") != selected_digest:
         raise OcidEvaluationError("SAM2 manifest does not match the frozen selected candidate set")
@@ -695,7 +695,7 @@ def evaluate_persisted_inference(
             "output_token": "cls",
         }
     ):
-        raise OcidEvaluationError("persisted OCID representation evaluation inference manifest violates frozen configuration")
+        raise OcidEvaluationError("persisted OCID representation inference violates its configured settings")
     for key, label in (("selected_candidates", "selected candidates"),
                        ("sam2_inference_manifest", "SAM2 inference manifest")):
         provenance = manifest.get(key)

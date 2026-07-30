@@ -1,4 +1,4 @@
-"""In-memory mask records and deterministic mask digests for F05 extraction."""
+"""In-memory mask records and deterministic digests for candidate extraction."""
 
 import hashlib
 from collections.abc import Mapping

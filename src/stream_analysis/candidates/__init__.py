@@ -1,4 +1,4 @@
-"""Candidate-extraction primitives and canonical F05 extraction API."""
+"""Candidate-extraction primitives and the public extraction API."""
 
 from .background import (
     BackgroundAggregation,
@@ -19,6 +19,27 @@ from .diagnostics import (
     CandidateExtractionSnapshot,
     CandidateMaskRecord,
     candidate_mask_digest,
+)
+from .aggregate_resolution import (
+    DEFAULT_MASK_CONTAINMENT,
+    DEFAULT_MINIMUM_COVERED_MASKS,
+    AggregateResolutionReason,
+    AggregateResolutionResult,
+    CandidateAggregateDecision,
+    CoveredMaskEvidence,
+    PositionedCandidateMask,
+    resolve_aggregate_masks,
+)
+from .temporal_support import (
+    TEMPORAL_ADJACENT_RADIUS,
+    TEMPORAL_BASE_SCORE,
+    TEMPORAL_CONTAINMENT_REJECT,
+    TEMPORAL_LOW_SCORE,
+    TEMPORAL_PROFILE_ID,
+    TEMPORAL_SUPPORT_IOU,
+    Proposal as TemporalProposal,
+    TemporalSelection,
+    temporal_support_selection,
 )
 from .extraction import (
     CANDIDATE_EXTRACTION_CONFIG_SCHEMA_ID,
@@ -48,6 +69,8 @@ from .maskrcnn import (
 )
 
 __all__ = [
+    "AggregateResolutionReason",
+    "AggregateResolutionResult",
     "BackgroundAggregation",
     "BackgroundModel",
     "BackgroundModelConfig",
@@ -56,7 +79,11 @@ __all__ = [
     "CANDIDATE_GEOMETRY_SCHEMA_ID",
     "CANDIDATE_RECORD_SCHEMA_VERSION",
     "CANDIDATE_WARNING_SCHEMA_VERSION",
+    "CandidateAggregateDecision",
+    "CoveredMaskEvidence",
     "DEFAULT_CANDIDATE_SOURCE",
+    "DEFAULT_MASK_CONTAINMENT",
+    "DEFAULT_MINIMUM_COVERED_MASKS",
     "FRAME_CANDIDATE_DIAGNOSTICS_SCHEMA_VERSION",
     "HysteresisMaskConfig",
     "MASK_DIGEST_ENCODING_ID",
@@ -66,6 +93,15 @@ __all__ = [
     "MASKRCNN_MODEL_VERSION",
     "MorphologyCleanupConfig",
     "MorphologyKernelShape",
+    "PositionedCandidateMask",
+    "TEMPORAL_ADJACENT_RADIUS",
+    "TEMPORAL_BASE_SCORE",
+    "TEMPORAL_CONTAINMENT_REJECT",
+    "TEMPORAL_LOW_SCORE",
+    "TEMPORAL_PROFILE_ID",
+    "TEMPORAL_SUPPORT_IOU",
+    "TemporalProposal",
+    "TemporalSelection",
     "ResidualMaskConfig",
     "BackgroundStrategy",
     "CandidateExtractionConfig",
@@ -85,5 +121,7 @@ __all__ = [
     "extract_candidates",
     "extract_maskrcnn_candidates",
     "hysteresis_threshold_mask",
+    "resolve_aggregate_masks",
     "threshold_residual_mask",
+    "temporal_support_selection",
 ]
