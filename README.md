@@ -1,28 +1,60 @@
 # Visual Stream Analyzer
 
-Visual Stream Analyzer processes an ordered sequence of images and describes how visible objects change over time. It detects object candidates, builds visual representations, matches candidates between neighboring frames, groups recurring visual entities, and writes structured change events.
+Visual Stream Analyzer turns an ordered sequence of RGB images from a stationary camera into structured information about visible objects and scene changes. It can serve as a perception layer for monitoring a constrained scene such as a workstation, laboratory setup, storage area, or product display. The generated results can be passed to an event log, operator interface, or external information system.
 
-The repository contains the project code, tests, compact example streams, configuration files, and utilities for real-image experiments. Model weights and full external datasets are not stored in Git.
+The repository contains the current implementation, tests, a compact input stream, visual results, configuration files, and utilities for running the real-image pipeline. Model weights and the full external dataset are not stored in Git.
 
-## Processing Pipeline
+## Key Idea
 
-1. Validate the image-stream manifest and decode the frames.
-2. Detect candidate objects in every frame.
-3. Refine candidate masks when the real-image pipeline is used.
-4. Build visual representations for the detected candidates.
-5. Match candidates between neighboring frames.
-6. Group recurring visual entities across the stream.
-7. Create structured change events, reports, and image overlays.
+The pipeline does not require an application-specific catalogue of object classes. It uses a generic object prompt to find visible regions, creates a mask for each candidate, describes its visual appearance, and compares visible candidates across neighboring frames. This makes it possible to study a scene whose exact set of objects is not defined in advance.
 
-The standard command-line interface keeps analysis and evaluation separate: `analyze` reads only the image stream, while `evaluate` reads annotations for an already saved run.
+The system does not assign a semantic class name to every object. Its primary output is a structured description of object candidates, masks, visual groups, and changes in the observed scene.
 
-## Implemented Paths
+## Current Processing Pipeline
 
-- A lightweight handcrafted-feature path for local testing without model weights.
-- A DINOv2 representation path with explicit local source and checkpoint paths.
-- A configured real-image pipeline that combines Grounding DINO, SAM2, and DINOv2.
+1. Validate the image-stream manifest and decode the ordered frames.
+2. Use Grounding DINO with a generic object prompt to propose candidate regions.
+3. Use evidence from neighboring frames to support candidates that may be weak in an individual frame.
+4. Use SAM2 to create a pixel mask for every selected candidate.
+5. Remove scene-spanning aggregate masks when the frame contains separately supported object candidates.
+6. Use DINOv2 to build visual representations of the masked objects.
+7. Match visible candidates between neighboring frames and group recurring visual entities.
+8. Write a compact structured result, final binary masks, and type overlays.
 
-The real-image pipeline is executed by `tools.run_ocid_pipeline`. Its model versions, preprocessing, thresholds, matching, and grouping parameters are stored in `data/ocid/benchmark/ocid_pipeline_protocol_v1.json`.
+The public command runs this complete pipeline from the first frame to the last. Its fixed profile is stored in [`configs/visual_stream_analyzer_v1.json`](configs/visual_stream_analyzer_v1.json); model selection and thresholds are therefore reproducible and are not silently chosen at run time.
+
+## Visual Results
+
+### Complete 11-frame stream
+
+The repository includes one complete OCID RGB input sequence and the corresponding visualization produced by the current pipeline for every frame. All source frames are available in [`data/streams/ocid_arid10_table_top_fruits_seq10/frames`](data/streams/ocid_arid10_table_top_fruits_seq10/frames), and all result frames are available in [`assets/demo-stream/ocid_arid10_table_top_fruits_seq10/overlays`](assets/demo-stream/ocid_arid10_table_top_fruits_seq10/overlays).
+
+| Frame | Input | Analysis result |
+|---|---|---|
+| 3 | ![OCID stream frame 3](data/streams/ocid_arid10_table_top_fruits_seq10/frames/frame_0003.png) | ![Visual Stream Analyzer result for frame 3](assets/demo-stream/ocid_arid10_table_top_fruits_seq10/overlays/frame_0003.png) |
+| 7 | ![OCID stream frame 7](data/streams/ocid_arid10_table_top_fruits_seq10/frames/frame_0007.png) | ![Visual Stream Analyzer result for frame 7](assets/demo-stream/ocid_arid10_table_top_fruits_seq10/overlays/frame_0007.png) |
+| 11 | ![OCID stream frame 11](data/streams/ocid_arid10_table_top_fruits_seq10/frames/frame_0011.png) | ![Visual Stream Analyzer result for frame 11](assets/demo-stream/ocid_arid10_table_top_fruits_seq10/overlays/frame_0011.png) |
+
+### Additional scenes
+
+| OCID sequence and frame | Input | Analysis result |
+|---|---|---|
+| `ARID20/floor/top/seq12`, frame 15 | ![ARID20 floor input](assets/visual-example/current-results/ocid_arid20_floor_top_seq12-frame_0015-input.png) | ![ARID20 floor result](assets/visual-example/current-results/ocid_arid20_floor_top_seq12-frame_0015-result.png) |
+| `ARID20/table/bottom/seq01`, frame 13 | ![ARID20 table input](assets/visual-example/current-results/ocid_arid20_table_bottom_seq01-frame_0013-input.png) | ![ARID20 table result](assets/visual-example/current-results/ocid_arid20_table_bottom_seq01-frame_0013-result.png) |
+| `YCB10/table/top/mixed/seq21`, frame 9 | ![YCB10 table input](assets/visual-example/current-results/ocid_ycb10_table_top_mixed_seq21-frame_0009-input.png) | ![YCB10 table result](assets/visual-example/current-results/ocid_ycb10_table_top_mixed_seq21-frame_0009-result.png) |
+
+Each `type_...` label is a predicted visual group shared by observations that the pipeline considers visually related. It is not a semantic class name. Confidence values and internal candidate identifiers are intentionally omitted from the published overlays. Image provenance and adaptation details are recorded in [`assets/demo-stream/README.md`](assets/demo-stream/README.md) and [`assets/visual-example/README.md`](assets/visual-example/README.md).
+
+## Quantitative Results
+
+Performance was measured by matching predicted masks one-to-one with reference object masks in 10 annotated OCID image sequences containing 148 frames and 1,170 reference masks. A pair is considered a match when its intersection over union (IoU) reaches the selected threshold.
+
+| Required mask IoU | Precision | Recall | F1 |
+|---|---:|---:|---:|
+| IoU >= 0.50 | 0.9574 | 0.8846 | 0.9196 |
+| IoU >= 0.75 | 0.9001 | 0.8316 | 0.8645 |
+
+IoU measures the overlap between a predicted mask and its reference mask. The `0.50` threshold checks substantial object coverage, while `0.75` requires closer agreement with the full reference mask. Precision describes how often a predicted mask has a valid reference match, recall describes how many reference masks are found, and F1 balances both measures.
 
 ## Repository Layout
 
@@ -32,22 +64,11 @@ tools/                      dataset and real-image pipeline utilities
 tests/                      unit and integration tests
 data/streams/               compact image-stream examples
 data/ocid/                  OCID provenance and local-data instructions
-configs/examples/           example analysis configurations
-outputs/runs/               place for selected run examples
-outputs/evaluations/        place for selected evaluation artifacts
-assets/visual-example/      README illustration pair
+configs/                    fixed current runtime profile
+assets/demo-stream/         complete result stream used in this README
+assets/visual-example/      selected input/result pairs
+outputs/                    output layout and artifact documentation
 ```
-
-## Visual Examples
-
-The examples below use selected OCID frames. The first shows the configured full pipeline output; the second focuses on candidate-mask refinement.
-
-| Example | Input frame | Analysis result |
-|---|---|---|
-| Full pipeline | ![Full pipeline input](assets/visual-example/full-pipeline-input.png) | ![Full pipeline result](assets/visual-example/full-pipeline-result.png) |
-| Mask refinement | ![Mask refinement input](assets/visual-example/mask-refinement-input.png) | ![Mask refinement result](assets/visual-example/mask-refinement-result.png) |
-
-These are qualitative illustrations rather than aggregate performance measurements. Image provenance and adaptation details are recorded in `assets/visual-example/README.md`.
 
 ## Setup
 
@@ -59,70 +80,48 @@ python -m venv .venv
 $env:PYTHONPATH = "src"
 ```
 
-Install the optional CUDA/PyTorch dependencies for DINOv2:
+Install the CUDA-enabled PyTorch dependencies used by the fixed model pipeline:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-ml.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-cuda.txt
 ```
 
-Install the additional dependencies for the Grounding DINO + SAM2 + DINOv2 path:
+Model weights must be supplied as local files. The project verifies the fixed files recorded in the runtime profile and does not download models during analysis.
 
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-ocid.txt
-```
+## Run the Analyzer
 
-Model weights must be supplied as local files. The project does not download them during analysis.
-
-## Run the Handcrafted Example
-
-The handcrafted path runs on CPU and does not require model weights:
+Analyse any compatible directory that contains a `stream-input-0.1` manifest and its ordered RGB frames:
 
 ```powershell
 $env:PYTHONPATH = "src"
-
-.\.venv\Scripts\python.exe -B -m stream_analysis validate `
-  data\streams\probe_01_stationery `
-  --config configs\examples\config_handcrafted_bbox_v1.json `
-  --representation-family handcrafted `
-  --variant handcrafted_bbox_v1
-
 .\.venv\Scripts\python.exe -B -m stream_analysis analyze `
-  data\streams\probe_01_stationery `
-  --config configs\examples\config_handcrafted_bbox_v1.json `
-  --representation-family handcrafted `
-  --variant handcrafted_bbox_v1 `
-  --device cpu `
-  --diagnostic-level standard `
-  --output-root .local_outputs `
-  --run-id handcrafted_example
+  data\streams\ocid_arid10_table_top_fruits_seq10 `
+  --output .local_outputs\visual-stream-result
 ```
 
-The run is written to `.local_outputs/runs/handcrafted_example`.
-
-## Run the Configured Real-Image Sample
-
-After placing the expected local model files and prepared OCID data at the paths recorded in the protocol, validate the setup:
+By default the command reads models from the repository's `models` directory. A different local root can be supplied explicitly:
 
 ```powershell
-$env:PYTHONPATH = "src"
-
-.\.venv\Scripts\python.exe -B -m tools.run_ocid_pipeline check `
-  --output .local_outputs\ocid_pipeline\check.json
+.\.venv\Scripts\python.exe -B -m stream_analysis analyze `
+  <stream-directory> `
+  --output <output-directory> `
+  --models-root <models-directory>
 ```
 
-Run the configured sample stream:
-
-```powershell
-.\.venv\Scripts\python.exe -B -m tools.run_ocid_pipeline analyze-sample `
-  --output-root .local_outputs\ocid_pipeline\runs `
-  --run-id ocid_sample
-```
-
-This path uses Grounding DINO for candidate boxes, SAM2 for masks, and DINOv2 for visual representations. Generated artifacts remain under `.local_outputs`, which is ignored by Git.
+The output directory must not already exist. The command validates the manifest, local model files, and CUDA availability before decoding the RGB frames.
 
 ## Output Files
 
-An analysis run contains JSON manifests, a structured stream result, a text report, runtime status, and optional overlays and diagnostics. See `outputs/README.md` for the directory structure and artifact schemas.
+An analysis produces exactly three top-level entries:
+
+```text
+<output-directory>/
+  result.json
+  masks/<frame_id>/P00.png
+  overlays/<frame_id>.png
+```
+
+`result.json` contains the ordered frames, frame-local objects, predicted visual groups, neighboring-frame matches, and scene-change events. Every `Pnn.png` is a full-frame binary mask; `Pnn` is local to one frame. Overlays are generated from those same masks and display only the corresponding `type_...` labels. See [`outputs/README.md`](outputs/README.md) for the complete output contract and [`assets/demo-stream/ocid_arid10_table_top_fruits_seq10`](assets/demo-stream/ocid_arid10_table_top_fruits_seq10) for a checked-in full result.
 
 ## Tests
 
@@ -137,4 +136,4 @@ Tests that require local model weights or OCID files are skipped when those asse
 
 ## Dataset Attribution
 
-Real-image utilities use the Object Clutter Indoor Dataset (OCID), distributed under CC BY 4.0. A compact attributed RGB example stream is included; the full dataset is not bundled. Source, DOI, license, and local layout are documented in `data/ocid/README.md`.
+Real-image utilities use the Object Clutter Indoor Dataset (OCID), distributed under CC BY 4.0. A compact attributed RGB example stream and selected adapted result images are included; the full dataset is not bundled. Source, DOI, license, and local layout are documented in [`data/ocid/README.md`](data/ocid/README.md).

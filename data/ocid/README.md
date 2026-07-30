@@ -63,13 +63,17 @@ Candidate annotations can be generated separately from an OCID instance-label se
 
 The generated annotation file stays outside the RGB analysis stream.
 
-## Configured Real-Image Pipeline
+## Analyze a Prepared Stream
 
-`ocid_pipeline_protocol_v1.json` records the local asset paths and configuration for the Grounding DINO + SAM2 + DINOv2 pipeline. Run its read-only setup check with:
+The public analyzer accepts any prepared `stream-input-0.1` directory. For example, run the complete checked-in stream with:
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m tools.run_ocid_pipeline check `
-  --output .local_outputs\ocid_pipeline\check.json
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -B -m stream_analysis analyze `
+  data\streams\ocid_arid10_table_top_fruits_seq10 `
+  --output .local_outputs\visual-stream-result
 ```
+
+The fixed Grounding DINO, SAM2, and DINOv2 configuration is stored in [`configs/visual_stream_analyzer_v1.json`](../../configs/visual_stream_analyzer_v1.json).
 
 Model weights, full OCID files, and generated OCID inventories are intentionally excluded from the repository.

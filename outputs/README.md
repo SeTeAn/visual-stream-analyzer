@@ -1,32 +1,49 @@
-# Analysis outputs
+# Analysis output
 
-The command-line interface writes analysis runs under an output root selected by the user:
-
-```text
-<output-root>/
-  runs/
-    <run_id>/
-      run_manifest.json
-      candidate_manifest.json
-      stream_analysis.json
-      report.txt
-      runtime_status.json
-      overlays/
-      diagnostics/
-```
-
-`stream_analysis.json` contains the structured matching, grouping, and event records. `overlays/` contains visualizations, and `diagnostics/` contains optional technical details requested through the diagnostic level.
-
-Evaluation is a separate operation and writes its own artifacts:
+The public command writes one compact, self-contained result directory:
 
 ```text
-<output-root>/
-  evaluations/
-    <evaluation_id>/
-      evaluation_manifest.json
-      evaluation_report.json
-      error_ledger.json
-      summary.txt
+<output>/
+  result.json
+  masks/
+    <frame_id>/
+      P00.png
+      P01.png
+  overlays/
+    <frame_id>.png
 ```
 
-Run IDs are immutable: the tools refuse to overwrite an existing completed run. For normal local work, use `.local_outputs`, which is ignored by Git. The source-controlled `outputs` directory is reserved for examples deliberately selected for publication.
+The destination must not already exist. Files are first produced in a temporary sibling directory and then published as one atomic directory operation that refuses to replace existing data. If analysis or publication fails, no partial result directory is left behind.
+
+## `result.json`
+
+The JSON document contains:
+
+- stream identity, input-manifest hash, and ordered frame count;
+- the fixed runtime profile and the Grounding DINO, SAM2, and DINOv2 model families;
+- every frame and its frame-local objects;
+- predicted visual groups (`type_...`);
+- accepted or uncertain matches between neighboring frames;
+- structured scene-change events;
+- aggregate counts for frames, objects, visual groups, matches, and events.
+
+An object reference is always the pair `(<frame_id>, <Pnn>)`. The same `P00` filename in two different frame directories does not by itself identify the same object. Cross-frame relations are represented explicitly in `matches` and `visual_types`.
+
+## Masks
+
+Every mask is a full-frame, single-channel binary PNG:
+
+- `0` represents background;
+- `255` represents the predicted object region;
+- the image dimensions equal the corresponding RGB frame;
+- the mask is the final cleaned SAM2 result after aggregate-mask resolution.
+
+There is exactly one JSON object record for every mask file and no extra mask files.
+
+## Overlays
+
+Each frame has exactly one RGB overlay generated from the published masks. An overlay displays the predicted `type_...` visual-group label. It does not display detector confidence or internal candidate identifiers.
+
+All paths stored in `result.json` are relative POSIX paths. The public result does not contain model responses, embeddings, evaluation manifests, receipts, or absolute local paths.
+
+A complete checked-in example is available at [`assets/demo-stream/ocid_arid10_table_top_fruits_seq10`](../assets/demo-stream/ocid_arid10_table_top_fruits_seq10).
